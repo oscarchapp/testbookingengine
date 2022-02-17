@@ -42,8 +42,10 @@ def search(request):
 
 def home(request):
     books=Book.objects.all().order_by("-created")
+    room_search_form=SearchForm()
     context={
-        'books':books
+        'books':books,
+        'form':room_search_form
     }
     print(books)
     return render(request,"home.html",context)

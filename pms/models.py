@@ -28,7 +28,6 @@ class Room(models.Model):
     def __str__(self):
         return self.name
 
-
 class Book(models.Model):
     checkin=models.DateTimeField()
     checkout=models.DateTimeField()

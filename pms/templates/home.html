@@ -6,18 +6,14 @@
 <div class="collapse mt-3 " id="collapse-search">
         <div class="card card-body">
         <form action="/search" method="GET">
+            {% for field in form %}
             <div class="row">
-                <div class="col-md-1"><label for="checkin">Checkin</label></div>
-                <div class="col-md-auto"><input type="date" name="checkin" id="checkin"></div>
+                <div class="col-md-1">{{field.label}}</div>
+                <div class="col-md-auto">{{field}}</div>
             </div>
+            {% endfor %}
             <div class="row">
-                <div class="col-md-1"><label for="checkout">Checkout</label></div>
-                <div class="col-md-auto"><input type="date" name="checkout" id="checkout"></div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-1"><label for="guests">Huespedes</label></div>
-                <div class="col-md-auto"><input type="number" name="guests" id="guests"></div>
+                <div class="col"><span>Días: </span><span id="total-days"></span></div>
             </div>
             <div class="row">
                 <div class="col-md-auto">
@@ -29,18 +25,52 @@
     </div>
 </div>
 <div>
-    <h1>Reservas
-    </h1>
-    {% for book in books %}
-    <div class="row mt-2">
-        <div class="row">Reserva: {{book.code}}</div>
-        <div class="row">
-            <div class="col">{{book.customer.name}}</div>
-            <div class="col">{{book.customer.email}}</div>
-            <div class="col">{{book.customer.phone}}</div>
+    <h1>Reservas</h1>
+    <div class="ps-3">
+        {% for book in books %}
+        <div class="card card-body row mt-2">
+            <div class="row">Reserva: {{book.code}}</div>
+            <div class="row">
+                <div class="col">{{book.customer.name}}</div>
+                <div class="col">
+                    <i class="bi bi-envelope-fill"></i>
+                    <span>{{book.customer.email}}</span>
+                </div>
+                <div class="col">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>{{book.checkin}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">{{book.room.name}}</div>
+                <div class="col">
+                    <i class="bi bi-telephone-fill"></i>
+                    <span>{{book.customer.phone}}</span>
+                </div>
+                
+                <div class="col">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>{{book.checkout}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <i class="bi bi-person-fill"></i>
+                    <span>{{book.guests}}</span>
+                </div>
+                <div class="col"></div>
+                <div class="col"></div>
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <span>Total estadía: €{{book.total}}</span>
+                </div>
+            </div>
+
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 
 {% endblock content%}
