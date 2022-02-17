@@ -1,0 +1,33 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Book</h1>
+<div>
+    <h5>Está reservando la habitación {{room.name}}</h5>
+    <div>Info de reserva</div>
+    <div>Cambiar fechas?? Modal BS, recargar y si hay disponibilidad ok, sino, mostrar un error</div>
+    <div>
+        <form method="post" action="">
+            {% csrf_token%}
+
+            {{customer_form}}
+            
+            {{book_form}}
+            <div class="row">
+                <div class="col">{{form.name.label_tag}}</div>
+                <div class="col">{{form.name}}</div>
+            </div>
+            <div class="row">
+                <div class="col">{{form.email.label_tag}}</div>
+                <div class="col">{{form.email}}</div>
+            </div>
+            <div class="row">
+                <div class="col">{{form.phone.label_tag}}</div>
+                <div class="col">{{form.phone}}</div>
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <div>botonera</div>
+</div>
+{% endblock content%}

@@ -1,0 +1,33 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Home</h1>
+<div>
+    <form action="/search" method="GET">
+        <div class="row">
+            <div class="col"><label for="checkin">Checkin</label></div>
+            <div class="col"><input type="date" name="checkin" id="checkin"></div>
+        </div>
+        <div class="row">
+            <div class="col"><label for="checkout">Checkout</label></div>
+            <div class="col"><input type="date" name="checkout" id="checkout"></div>
+        </div>
+
+        <div class="row">
+            <div class="col"><label for="guests">Huespedes</label></div>
+            <div class="col"><input type="number" name="guests" id="guests"></div>
+        </div>
+        <div class="row">
+            <input type="submit" value="Buscar">
+        </div>
+    </form>
+</div>
+<div>
+    {% for book in books %}
+    <div class="row">
+        <div class="col">{{book.customer.name}}</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content%}

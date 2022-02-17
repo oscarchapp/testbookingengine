@@ -1,0 +1,24 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Search</h1>
+<div>
+    <div>
+        <span>Total de dias: </span>
+        <span>{{data.total_days}}</span> 
+    </div>
+    {% for room in rooms %}
+    <div class="row">
+        <div>{{room.name}}</div>
+        <ul>
+
+            <li><div>Tipo de habitación: {{room.room_type}}</div></li>
+            <li><div>Capacidad: {{room.room_type.max_guests}} persona/s</div></li>
+            <li><div>Precio por noche: € {{room.room_type.price}}</div></li>
+            <li><div>Precio total: € {{room.total}}</div></li>
+        </ul>
+        <a href="{% url 'book' pk=room.id%}?{{query}}">Reservar</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content%}
