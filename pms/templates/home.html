@@ -2,30 +2,43 @@
 
 {% block content %}
 <h1>Home</h1>
-<div>
-    <form action="/search" method="GET">
-        <div class="row">
-            <div class="col"><label for="checkin">Checkin</label></div>
-            <div class="col"><input type="date" name="checkin" id="checkin"></div>
-        </div>
-        <div class="row">
-            <div class="col"><label for="checkout">Checkout</label></div>
-            <div class="col"><input type="date" name="checkout" id="checkout"></div>
-        </div>
+<button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-search" aria-expanded="false" aria-controls="collapse-search">Nueva Reserva</button>
+<div class="collapse mt-3 " id="collapse-search">
+        <div class="card card-body">
+        <form action="/search" method="GET">
+            <div class="row">
+                <div class="col-md-1"><label for="checkin">Checkin</label></div>
+                <div class="col-md-auto"><input type="date" name="checkin" id="checkin"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-1"><label for="checkout">Checkout</label></div>
+                <div class="col-md-auto"><input type="date" name="checkout" id="checkout"></div>
+            </div>
 
-        <div class="row">
-            <div class="col"><label for="guests">Huespedes</label></div>
-            <div class="col"><input type="number" name="guests" id="guests"></div>
-        </div>
-        <div class="row">
-            <input type="submit" value="Buscar">
-        </div>
-    </form>
+            <div class="row">
+                <div class="col-md-1"><label for="guests">Huespedes</label></div>
+                <div class="col-md-auto"><input type="number" name="guests" id="guests"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-auto">
+                    <input type="submit" value="Buscar">
+                </div>
+                
+            </div>
+        </form>
+    </div>
 </div>
 <div>
+    <h1>Reservas
+    </h1>
     {% for book in books %}
-    <div class="row">
-        <div class="col">{{book.customer.name}}</div>
+    <div class="row mt-2">
+        <div class="row">Reserva: {{book.code}}</div>
+        <div class="row">
+            <div class="col">{{book.customer.name}}</div>
+            <div class="col">{{book.customer.email}}</div>
+            <div class="col">{{book.customer.phone}}</div>
+        </div>
     </div>
     {% endfor %}
 </div>
