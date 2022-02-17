@@ -1,1 +1,1 @@
-web: gunicorn pms.wsgi
+web: gunicorn chapp.wsgi
