@@ -6,6 +6,7 @@ from .forms import *
 from datetime import datetime
 from django.db.models import F
 from .reservation_code import generate
+from django.views.decorators.csrf import csrf_protect
 # Create your views here.
 
 def search(request):
@@ -47,23 +48,20 @@ def home(request):
     print(books)
     return render(request,"home.html",context)
 
-
+@csrf_protect
 def book(request,pk):
     if(request.method=="POST"):
         customer_form=CustomerForm(request.POST,prefix="customer")
         if customer_form.is_valid():
-            body=request.POST.dict()
-            customer=customer_form.save(commit=True)
+            customer=customer_form.save()
             temp_POST=request.POST.copy()
             temp_POST.update({
                 'book-customer':customer.id,
                 'book-room':pk,
                 'book-code':generate.get()})
             book_form=BookForm(temp_POST,prefix="book")
-            
             if book_form.is_valid():
-                pass
-                book_form.save(commit=True)
+                book_form.save()
                 
         return redirect('/')
     query=request.GET.dict()
