@@ -2,10 +2,13 @@ from django import forms
 from django.forms import ModelForm
 from .models import Book, Customer
 from datetime import datetime
-class SearchForm(ModelForm):
+class RoomSearchForm(ModelForm):
     class Meta:
         model=Book
         fields=['checkin', 'checkout', 'guests']
+        labels={
+            "guests":"Huéspedes"
+            }
         widgets={
             'checkin': forms.DateInput(attrs={'type':'date','min':datetime.today().strftime('%Y-%m-%d')}),
             'checkout': forms.DateInput(attrs={'type':'date','max':datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
@@ -17,6 +20,8 @@ class CustomerForm(ModelForm):
         model=Customer
         fields="__all__"
         labels={
+            "name":"Nombre y apellido",
+            "phone":"Teléfono"
         }
 
 class BookForm(ModelForm):
@@ -42,6 +47,7 @@ class BookFormExcluded(ModelForm):
         widgets = {
             'checkin': forms.HiddenInput(),
             'checkout': forms.HiddenInput(),
-            'guests':forms.HiddenInput()
+            'guests':forms.HiddenInput(),
+            'total':forms.HiddenInput()
         }
     

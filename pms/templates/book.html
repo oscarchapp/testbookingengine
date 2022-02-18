@@ -1,33 +1,24 @@
 {% extends "main.html"%}
 
 {% block content %}
-<h1>Book</h1>
+<h1>Crear reserva</h1>
 <div>
-    <h5>Está reservando la habitación {{room.name}}</h5>
-    <div>Info de reserva</div>
-    <div>Cambiar fechas?? Modal BS, recargar y si hay disponibilidad ok, sino, mostrar un error</div>
-    <div>
+    <h5>Reservando habitación {{room.room_type}} {{room.name}}</h5>
+    <div>Datos de contacto de la reserva:</div>
+    <div class="card card-body">
         <form method="post" action="">
             {% csrf_token%}
-
-            {{customer_form}}
-            
+            {% for field in customer_form %}
+            <div class="row">
+                <div class="col-md-2">{{field.label_tag}}</div>
+                <div class="col-md-auto">{{field}}</div>
+            </div>
+            {% endfor %}
             {{book_form}}
-            <div class="row">
-                <div class="col">{{form.name.label_tag}}</div>
-                <div class="col">{{form.name}}</div>
-            </div>
-            <div class="row">
-                <div class="col">{{form.email.label_tag}}</div>
-                <div class="col">{{form.email}}</div>
-            </div>
-            <div class="row">
-                <div class="col">{{form.phone.label_tag}}</div>
-                <div class="col">{{form.phone}}</div>
-            </div>
-            <input type="submit" value="Submit">
+            
+            <a class="btn btn-outline-primary" href="{% url 'search'%}?{{url_query}}">Atras</a>
+            <input class="btn btn-primary"type="submit" value="Confirmar reserva">
         </form>
     </div>
-    <div>botonera</div>
 </div>
 {% endblock content%}

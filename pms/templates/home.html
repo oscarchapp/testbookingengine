@@ -4,11 +4,11 @@
 <h1>Home</h1>
 <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-search" aria-expanded="false" aria-controls="collapse-search">Nueva Reserva</button>
 <div class="collapse mt-3 " id="collapse-search">
-        <div class="card card-body">
-        <form action="/search" method="GET">
+    <div class="card card-body">
+        <form action="{% url 'search'%}" method="GET">
             {% for field in form %}
             <div class="row">
-                <div class="col-md-1">{{field.label}}</div>
+                <div class="col-md-1">{{field.label_tag}}</div>
                 <div class="col-md-auto">{{field}}</div>
             </div>
             {% endfor %}
@@ -17,18 +17,33 @@
             </div>
             <div class="row">
                 <div class="col-md-auto">
-                    <input type="submit" value="Buscar">
+                    <button type="submit">Buscar disponibilidad</button>
                 </div>
-                
             </div>
         </form>
     </div>
 </div>
+<div class="">
+    <h4>Buscar reserva</h4>
+    <form action="{% url 'book_search'%}" method="GET">
+        <div>
+            <label for="filter">Nombre o N° de reserva:</label>
+            <input required name="filter" type="text" id="filter">
+        </div>
+        <div>
+            <button type="submit">Buscar</button>
+        </div>
+
+    </form>
+</div>
 <div>
-    <h1>Reservas</h1>
+    <h1>Reservas Realizadas</h1>
     <div class="ps-3">
+        {% if books|length == 0 %}
+        <div class="alert alert-danger">No hay resultados al buscar ""</div>
+        {% endif %}
         {% for book in books %}
-        <div class="card card-body row mt-2">
+        <div class="card card-body row mt-2 hover-card">
             <div class="row">Reserva: {{book.code}}</div>
             <div class="row">
                 <div class="col">{{book.customer.name}}</div>

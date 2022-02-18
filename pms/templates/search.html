@@ -1,24 +1,86 @@
 {% extends "main.html"%}
 
 {% block content %}
-<h1>Search</h1>
-<div>
-    <div>
-        <span>Total de dias: </span>
-        <span>{{data.total_days}}</span> 
-    </div>
-    {% for room in rooms %}
+<h1>Búsqueda</h1>
+<div class="card card-body row">
     <div class="row">
-        <div>{{room.name}}</div>
-        <ul>
+        <div class="col">
+            <span>Total de dias: </span>
+            <span>{{data.total_days}}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <span>Huéspedes: </span>
+            <span>{{ query.guests }}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <span>Checkin: </span>
+            <span>{{ query.checkin }}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <span>Checkout: </span>
+            <span>{{ query.checkout }}</span>
+        </div>
+    </div>
+    <a href="{% url 'home' %}">Nueva búsqueda</a>
+</div>
+<h1>Habitaciones disponibles</h1>
 
-            <li><div>Tipo de habitación: {{room.room_type}}</div></li>
-            <li><div>Capacidad: {{room.room_type.max_guests}} persona/s</div></li>
-            <li><div>Precio por noche: € {{room.room_type.price}}</div></li>
-            <li><div>Precio total: € {{room.total}}</div></li>
-        </ul>
-        <a href="{% url 'book' pk=room.id%}?{{query}}">Reservar</a>
+<div id="rooms-accordion" class="">
+    {% for room in total_rooms %}
+        
+    <div class="card mb-3">
+        <div id="room-type-{{room.room_type}}-container" class="card-header">
+            <div class="col h5"><span>Habitación: </span><span>{{room.room_type__name}}</span></div>
+            <div class="col"><span>Disponibles: </span><span>{{room.total}}</span></div>
+            <a class="btn btn-link" data-bs-toggle="collapse" href="#collapse-room-{{room.room_type}}">Seleccionar habitaciones disponibles</a>
+        </div>
+        <div id="collapse-room-{{room.room_type}}" class="card-body collapse" data-bs-parent="#rooms-accordion">
+            <div class="card-body">
+                {% for detail in rooms%}
+                    {% if room.room_type == detail.room_type.id %}
+                    <div class="card card-body row mb-2 hover-card">
+                        <div class="row">{{detail.name}}</div>
+                        <div class="row">
+                            <div class="col">
+                                Tipo de habitación: {{detail.room_type}}
+                            </div>
+                            <div class="col">
+                                Capacidad: {{detail.room_type.max_guests}} persona/s
+                            </div>
+                            <div class="col">
+                                Precio por noche: € {{detail.room_type.price}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                Precio total: € {{detail.total}} x {{detail.total_days}} día/s
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <a class="btn btn-outline-primary btn-sm" href="{% url 'book' pk=detail.id%}?{{url_query}}">Elegir habitación</a>
+                            </div>
+                            
+                        </div>
+                    
+                    </div>
+                    {% endif %}
+
+
+                {% endfor %}
+            </div>
+        </div>
+    
     </div>
     {% endfor %}
 </div>
+{% for room in rooms %}
+
+{% endfor %}
 {% endblock content%}
