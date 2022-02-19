@@ -16,9 +16,6 @@ def book_search(request):
     books=(Book.objects
         .filter(Q(code__icontains=query['filter']) | Q(customer__name__icontains=query['filter']))
         .order_by("-created"))
-    context={
-        'books':books,
-    }
     room_search_form=RoomSearchForm()
     context={
         'books':books,
