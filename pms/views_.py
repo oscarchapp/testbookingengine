@@ -6,6 +6,7 @@ from .forms import *
 from datetime import datetime
 from django.db.models import F,Q, Count
 from .reservation_code import generate
+from .form_dates import Ymd
 from django.views.decorators.csrf import csrf_protect
 # Create your views here.
 
@@ -25,10 +26,9 @@ def book_search(request):
 
 def room_search(request):
     query=request.GET.dict()
-    date_format = "%Y-%m-%d"
-    a = datetime.strptime(query['checkin'], date_format)
-    b = datetime.strptime(query['checkout'], date_format)
-    total_days=(b-a).days
+    checkin=Ymd.Ymd(query['checkin'])
+    checkout=Ymd.Ymd(query['checkout'])
+    total_days=checkout-checkin
 
     filters={
         'room_type__max_guests__gte':query['guests']
@@ -49,7 +49,6 @@ def room_search(request):
         .exclude(**exclude)
         .annotate(total=Count('room_type'))
         .order_by("room_type__max_guests"))
-    print(rooms[0].room_type.id)
     data={
         'total_days':total_days
     }
@@ -91,10 +90,9 @@ def book(request,pk):
         return redirect('/')
     query=request.GET.dict()
     room=Room.objects.get(id=pk)
-    date_format = "%Y-%m-%d"
-    a = datetime.strptime(query['checkin'], date_format)
-    b = datetime.strptime(query['checkout'], date_format)
-    total_days=(b-a).days
+    checkin=Ymd.Ymd(query['checkin'])
+    checkout=Ymd.Ymd(query['checkout'])
+    total_days=checkout-checkin
     total=total_days*room.room_type.price
     print(total)
     query['total']=total
