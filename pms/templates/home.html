@@ -2,41 +2,6 @@
 
 {% block content %}
 <h1>Home</h1>
-<button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-search" aria-expanded="false" aria-controls="collapse-search">Nueva Reserva</button>
-<div class="collapse mt-3 " id="collapse-search">
-    <div class="card card-body">
-        <form action="{% url 'search'%}" method="GET">
-            {% for field in form %}
-            <div class="row">
-                <div class="col-md-1">{{field.label_tag}}</div>
-                <div class="col-md-auto">{{field}}</div>
-            </div>
-            {% endfor %}
-            <div class="row">
-                <div class="col"><span>Días: </span><span id="total-days"></span></div>
-            </div>
-            <div class="row">
-                <div class="col-md-auto">
-                    <button type="submit">Buscar disponibilidad</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-<div class="">
-    <h4>Buscar reserva</h4>
-    <form action="{% url 'book_search'%}" method="GET">
-        <div>
-            <label for="filter">Nombre o N° de reserva:</label>
-            <input required name="filter" type="text" id="filter">
-        </div>
-        <div>
-            <button type="submit">Buscar</button>
-        </div>
-
-    </form>
-</div>
-<div>
     <h1>Reservas Realizadas</h1>
     <div class="ps-3">
         {% if books|length == 0 %}
@@ -80,6 +45,12 @@
             <div class="row">
                 <div class="col">
                     <span>Total estadía: €{{book.total}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+
+                    <a href="{% url 'edit_book' pk=book.id%} " >Editar datos de contacto</a>
                 </div>
             </div>
 
