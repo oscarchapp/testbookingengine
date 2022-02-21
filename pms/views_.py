@@ -4,7 +4,6 @@ from django.views import View
 from .models import Room
 from .forms import *
 from django.db.models import F,Q, Count
-from .reservation_code import generate
 from .form_dates import Ymd
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
@@ -51,6 +50,7 @@ class RoomSearchView(View):
         exclude = {
             'book__checkin__lte':query['checkout'],
             'book__checkout__gte':query['checkin'],
+            'book__state__exact':"NEW"
             }
         rooms = (Room.objects
             .filter(**filters)
@@ -100,13 +100,11 @@ class BookView(View):
             temp_POST = request.POST.copy()
             temp_POST.update({
                 'book-customer':customer.id,
-                'book-room':pk,
-                'book-code':generate.get()})
+                'book-room':pk})
             #if ok, save book data
             book_form = BookForm(temp_POST,prefix = "book")
             if book_form.is_valid():
                 book_form.save()
-                
         return redirect('/')
 
     def get(self,request,pk):
@@ -132,8 +130,24 @@ class BookView(View):
             }
         return render(request,"book.html",context)
 
+class DeleteBookView(View):
+    #renders the book deletion form
+    def get(self,request,pk):
+
+        book = Book.objects.get(id=pk)
+        context = {
+            'book':book
+        }
+        return render(request,"delete_book.html",context)
+
+    #deletes the book
+    def post(self,request,pk):
+        Book.objects.filter(id=pk).update(state="DEL")
+        return redirect("/")
+
+
 class EditBookView(View):
-    #renders the customer edition form
+    #renders the book edition form
     def get(self,request,pk):
 
         book = Book.objects.get(id=pk)
@@ -153,12 +167,8 @@ class EditBookView(View):
         book = Book.objects.get(id=pk)
         customer_form = CustomerForm(request.POST,prefix = "customer",instance=book.customer)
         if customer_form.is_valid():
-            print(customer_form)
             customer_form.save()
             return redirect("/")
-
-        pass
-    
 
 
 def reservations(request):

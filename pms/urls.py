@@ -7,5 +7,6 @@ urlpatterns = [
     path("search/book/",views_.BookSearchView.as_view(),name = "book_search"),
     path("book/<str:pk>/",views_.BookView.as_view(),name = "book"),
     path("book/<str:pk>/edit",views_.EditBookView.as_view(),name = "edit_book"),
+    path("book/<str:pk>/delete",views_.DeleteBookView.as_view(),name = "delete_book"),
     path("reservations/",views_.reservations,name = "reservations")
 ]

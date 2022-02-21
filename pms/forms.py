@@ -35,19 +35,20 @@ class BookForm(ModelForm):
             'checkout': forms.HiddenInput(),
             'guests':forms.HiddenInput()
         }
-    
 
 
 class BookFormExcluded(ModelForm):
     class Meta:
         model = Book
-        exclude = ["customer","code","room"]
+        exclude = ["customer","room"]
         labels = {
         }
         widgets = {
             'checkin': forms.HiddenInput(),
             'checkout': forms.HiddenInput(),
             'guests':forms.HiddenInput(),
-            'total':forms.HiddenInput()
+            'total':forms.HiddenInput(),
+            'state':forms.HiddenInput(),
+            'code':forms.HiddenInput(),
         }
     

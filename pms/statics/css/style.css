@@ -1,3 +1,18 @@
 .hover-card:hover{
     background: #f9f9f9;
 }
+
+.tag{
+    padding: 0.3em;
+    margin: 1em 0.5em 1em 0.5em;
+    border-radius: 0.3em;
+}
+.tag-red{
+
+    background: #ff7a7a;
+    color: white;
+}
+.tag-green {
+    background: #01a901;
+    color: white;
+}

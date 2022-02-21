@@ -6,8 +6,8 @@
     {% csrf_token%}
     {% for field in form %}
     <div class="row">
-        <div class="col-md-1">{{field.label_tag}}</div>
-        <div class="col-md-auto">{{field}}</div>
+        <div class="col-md-2">{{field.label_tag}}</div>
+        <div class="col-md">{{field}}</div>
     </div>
     {% endfor %}
     <div class="row">

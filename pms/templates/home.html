@@ -9,7 +9,16 @@
         {% endif %}
         {% for book in books %}
         <div class="card card-body row mt-2 hover-card">
-            <div class="row">Reserva: {{book.code}}</div>
+            <div class="row">
+                <div class="col">
+                    Reserva: {{book.code}}
+                    {% if book.state == "DEL" %}
+                    <span class="tag tag-red">Cancelada</span>
+                    {% elif book.state == "NEW" %}
+                    <span class="tag tag-green">Confirmada</span>
+                    {% endif %}
+                </div>
+            </div>
             <div class="row">
                 <div class="col">{{book.customer.name}}</div>
                 <div class="col">
@@ -52,6 +61,16 @@
 
                     <a href="{% url 'edit_book' pk=book.id%} " >Editar datos de contacto</a>
                 </div>
+                <div class="col">
+
+                </div>
+                <div class="col">
+
+                    {% if book.state != "DEL" %}
+                    <a href="{% url 'delete_book' pk=book.id%} " >Cancelar reserva</a>
+                    {% endif %}
+                </div>
+
             </div>
 
         </div>

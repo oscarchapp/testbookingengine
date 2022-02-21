@@ -1,0 +1,16 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar datos de contacto</h1>
+<div>
+    ¿Desea borrar la reserva {{book}} a nombre de {{book.customer}}?
+</div>
+<p></p>
+<form action="" method="post">
+    {% csrf_token%}
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-danger" type="submit">Borrar</button>
+</form>
+
+
+{% endblock content%}

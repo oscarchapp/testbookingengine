@@ -1,5 +1,5 @@
 from django.db import models
-
+from .reservation_code import generate
 # Create your models here.
 
 class Customer(models.Model):
@@ -29,15 +29,25 @@ class Room(models.Model):
         return self.name
 
 class Book(models.Model):
-    checkin = models.DateTimeField()
-    checkout = models.DateTimeField()
+    NEW = 'NEW'
+    DELETED = 'DEL'
+    STATE_CHOICES = [
+        (NEW, 'Nueva'),
+        (DELETED, 'Cancelada'),
+    ]
+    state = models.CharField(
+        max_length=3,
+        choices=STATE_CHOICES,
+        default=NEW,
+    )
+    checkin = models.DateField()
+    checkout = models.DateField()
     room = models.ForeignKey(Room,on_delete = models.SET_NULL,null = True)
     guests = models.IntegerField()#TODO: ADD VALIDATOR FOR ROOM, AVOID INJECTION
     customer = models.ForeignKey(Customer,on_delete = models.SET_NULL,null = True)
     total = models.FloatField()
-    code = models.CharField(max_length = 8)#TODO:DAFAULT VALUE IS A RANDOM ALPHANUMERIC VALUE
+    code = models.CharField(max_length = 8, default = generate.get())
     created = models.DateTimeField(auto_now_add = True)
-
     def __str__(self):
         return self.code
 
