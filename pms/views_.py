@@ -1,12 +1,14 @@
+from multiprocessing import context
 from urllib import request
 from django.shortcuts import render, redirect
 from django.views import View
 from .models import Room
 from .forms import *
-from django.db.models import F,Q, Count
+from django.db.models import F,Q, Count, Sum
 from .form_dates import Ymd
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
+from datetime import datetime
 # Create your views here.
 
 class BookSearchView(View):
@@ -21,7 +23,8 @@ class BookSearchView(View):
         room_search_form = RoomSearchForm()
         context = {
             'books':books,
-            'form':room_search_form
+            'form':room_search_form,
+            'filter':True
         }
         return render(request,"home.html",context)
 
@@ -170,6 +173,51 @@ class EditBookView(View):
             customer_form.save()
             return redirect("/")
 
+class DashboardView(View):
+    def get(self,request):
+        from datetime import date, time, datetime
+        today=date.today()
 
-def reservations(request):
-    return render(request,"reservations.html")
+        #get books created today
+        today_min = datetime.combine(today, time.min)
+        today_max = datetime.combine(today, time.max)
+        today_range=(today_min, today_max)
+        new_books = (Book.objects
+            .filter(created__range=today_range)
+            .values("id")
+            ).count()
+
+        #get incoming guests
+        incoming = (Book.objects
+            .filter(checkin=today)
+            .exclude(state="DEL")
+            .values("id")
+            ).count()
+
+        #get outcoming guests
+        outcoming = (Book.objects
+            .filter(checkout=today)
+            .exclude(state="DEL")
+            .values("id")
+            ).count()
+        
+        #get outcoming guests
+        invoiced = (Book.objects
+            .filter(created__range=today_range)
+            .exclude(state="DEL")
+            .aggregate(Sum('total'))
+        )
+
+        #preparing context data
+        dashboard={
+            'new_books':new_books,
+            'incoming_guests':incoming,
+            'outcoming_guests':outcoming,
+            'invoiced':invoiced
+
+        }
+        print(dashboard)
+        context={
+            'dashboard':dashboard
+        }
+        return render(request,"dashboard.html",context)

@@ -2,10 +2,15 @@
 
 {% block content %}
 <h1>Home</h1>
-    <h1>Reservas Realizadas</h1>
+    {% if filter %}
+    <h3>Resultados de la búsqueda</h3>
+    {% else %}
+    <h3>Reservas Realizadas</h3>
+    {% endif%}
+    
     <div class="ps-3">
         {% if books|length == 0 %}
-        <div class="alert alert-danger">No hay resultados al buscar ""</div>
+        <div class="alert alert-danger">No hay resultados</div>
         {% endif %}
         {% for book in books %}
         <div class="card card-body row mt-2 hover-card">
