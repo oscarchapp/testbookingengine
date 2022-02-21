@@ -13,6 +13,7 @@ function onDateUpdate(){
 
 document.querySelector("#id_checkout").addEventListener("change",(e)=>{
     onDateUpdate()
+    document.querySelector("#id_guests").focus()
     
 })
 document.querySelector("#id_checkin").addEventListener("change",(e)=>{

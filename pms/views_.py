@@ -1,5 +1,3 @@
-from multiprocessing import context
-from urllib import request
 from django.shortcuts import render, redirect
 from django.views import View
 from .models import Room
@@ -8,7 +6,6 @@ from django.db.models import F,Q, Count, Sum
 from .form_dates import Ymd
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.decorators import method_decorator
-from datetime import datetime
 from .reservation_code import generate
 # Create your views here.
 
