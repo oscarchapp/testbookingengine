@@ -9,48 +9,48 @@
     {% endif%}
     
     <div class="ps-3">
-        {% if books|length == 0 %}
+        {% if bookings|length == 0 %}
         <div class="alert alert-danger">No hay resultados</div>
         {% endif %}
-        {% for book in books %}
+        {% for booking in bookings %}
         <div class="card card-body row mt-2 hover-card">
             <div class="row">
                 <div class="col">
-                    Reserva: {{book.code}}
-                    {% if book.state == "DEL" %}
+                    Reserva: {{booking.code}}
+                    {% if booking.state == "DEL" %}
                     <span class="tag tag-red">Cancelada</span>
-                    {% elif book.state == "NEW" %}
+                    {% elif booking.state == "NEW" %}
                     <span class="tag tag-green">Confirmada</span>
                     {% endif %}
                 </div>
             </div>
             <div class="row">
-                <div class="col">{{book.customer.name}}</div>
+                <div class="col">{{booking.customer.name}}</div>
                 <div class="col">
                     <i class="bi bi-envelope-fill"></i>
-                    <span>{{book.customer.email}}</span>
+                    <span>{{booking.customer.email}}</span>
                 </div>
                 <div class="col">
                     <i class="bi bi-box-arrow-in-right"></i>
-                    <span>{{book.checkin}}</span>
+                    <span>{{booking.checkin}}</span>
                 </div>
             </div>
             <div class="row">
-                <div class="col">{{book.room.name}}</div>
+                <div class="col">{{booking.room.name}}</div>
                 <div class="col">
                     <i class="bi bi-telephone-fill"></i>
-                    <span>{{book.customer.phone}}</span>
+                    <span>{{booking.customer.phone}}</span>
                 </div>
                 
                 <div class="col">
                     <i class="bi bi-box-arrow-right"></i>
-                    <span>{{book.checkout}}</span>
+                    <span>{{booking.checkout}}</span>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
                     <i class="bi bi-person-fill"></i>
-                    <span>{{book.guests}}</span>
+                    <span>{{booking.guests}}</span>
                 </div>
                 <div class="col"></div>
                 <div class="col"></div>
@@ -58,21 +58,21 @@
             
             <div class="row">
                 <div class="col">
-                    <span>Total estadía: €{{book.total}}</span>
+                    <span>Total estadía: €{{booking.total}}</span>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
 
-                    <a href="{% url 'edit_book' pk=book.id%} " >Editar datos de contacto</a>
+                    <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
 
                 </div>
                 <div class="col">
 
-                    {% if book.state != "DEL" %}
-                    <a href="{% url 'delete_book' pk=book.id%} " >Cancelar reserva</a>
+                    {% if booking.state != "DEL" %}
+                    <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
                     {% endif %}
                 </div>
 

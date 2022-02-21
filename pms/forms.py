@@ -1,10 +1,10 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Book, Customer
+from .models import Booking, Customer
 from datetime import datetime
 class RoomSearchForm(ModelForm):
     class Meta:
-        model = Book
+        model = Booking
         fields = ['checkin', 'checkout', 'guests']
         labels = {
             "guests":"Huéspedes"
@@ -24,9 +24,9 @@ class CustomerForm(ModelForm):
             "phone":"Teléfono"
         }
 
-class BookForm(ModelForm):
+class BookingForm(ModelForm):
     class Meta:
-        model = Book
+        model = Booking
         fields = "__all__"
         labels = {
         }
@@ -37,10 +37,10 @@ class BookForm(ModelForm):
         }
 
 
-class BookFormExcluded(ModelForm):
+class BookingFormExcluded(ModelForm):
     class Meta:
-        model = Book
-        exclude = ["customer","room"]
+        model = Booking
+        exclude = ["customer","room","code"]
         labels = {
         }
         widgets = {
@@ -49,6 +49,5 @@ class BookFormExcluded(ModelForm):
             'guests':forms.HiddenInput(),
             'total':forms.HiddenInput(),
             'state':forms.HiddenInput(),
-            'code':forms.HiddenInput(),
         }
     
