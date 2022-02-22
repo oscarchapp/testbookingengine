@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col">{{booking.room.name}}</div>
+                <div class="col"><a href="{% url 'room_details' pk=booking.room.id%} ">{{booking.room.name}}</a></div>
                 <div class="col">
                     <i class="bi bi-telephone-fill"></i>
                     <span>{{booking.customer.phone}}</span>
