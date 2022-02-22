@@ -221,8 +221,9 @@ class DashboardView(View):
         }
         return render(request,"dashboard.html",context)
 
-class RoomView(View):
+class RoomDetailsView(View):
     def get(self,request,pk):
+        #renders room details
         room = Room.objects.get(id=pk)
         bookings = room.booking_set.all()
         context = {
@@ -231,8 +232,10 @@ class RoomView(View):
         print(context)
         return render(request,"room_detail.html",context)
 
+
 class RoomsView(View):
     def get(self,request):
+        #renders a list of rooms
         rooms = Room.objects.all().values("name","room_type__name","id")
         context = {
             'rooms':rooms
