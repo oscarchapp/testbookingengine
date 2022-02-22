@@ -44,6 +44,13 @@ Use for username and password for superuser is "admin" (without quotes).Remember
 - SECRET_KEY should be stored in .env file for production!
 - DEBUG is set to TRUE.
 
+## TODO List / Improvements
+
+- Handle and create error pages
+- Validate dates for checkin/checkout in serverside
+- Check for room availability exactly before save data in DB
+- Change date or define date range in dashboard
+- Improve and add more data in dashboard
 # 🚀 About Me
 Fullstack developer. Tech skills:
 - HTML
