@@ -35,6 +35,9 @@ To deploy this project run
     python manage.py runserver
   
 ```
+### Django admin (/admin)
+Use for username and password for superuser is "admin" (without quotes).Remember to change it.
+
 
 
 # 🚀 About Me
@@ -61,6 +64,6 @@ Fullstack developer. Tech skills:
 
 
 ## License
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://choosealicense.com/licenses/mit/)
 
-[MIT](https://choosealicense.com/licenses/mit/)
 
