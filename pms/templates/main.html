@@ -31,6 +31,9 @@
                      <li class="nav-item">
                         <a class="nav-link" href="{% url 'dashboard'%}">Dashboard</a>
                      </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'rooms'%}">Habitaciones</a>
+                     </li>
                   </ul>
                   <form action="{% url 'booking_search'%}" method="GET" class="d-flex">
                      <input class="form-control me-2" type="search" required name="filter" placeholder="Nombre o código de reserva" aria-label="Search">

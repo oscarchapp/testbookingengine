@@ -1,8 +1,17 @@
 body{
     padding-top: 4em
 }
+
+
+
+.bg-tr-250, .bg-tr-250:hover{
+
+    -webkit-transition: background-color 250ms linear;
+    -ms-transition: background-color 250ms linear;
+    transition: background-color 250ms linear;
+}
 .hover-card:hover{
-    background: #f9f9f9;
+    background: #f0f0f0;
 }
 
 .tag{

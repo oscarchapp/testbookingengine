@@ -1,0 +1,82 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Detalles de la habitación</h1>
+<div class="card">
+    <div class="card-header">
+        Habitación {{room.name}}
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-2">
+                <span>Descripción: </span>
+            </div>
+            <div class="col">
+                <span>{{room.description}}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <span>Tipo de habitación:</span>
+            </div>
+            <div class="col">
+                <span>{{room.room_type}}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <span>Cant. huéspedes:</span>
+            </div>
+            <div class="col">
+                <span>{{room.room_type.max_guests}}</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <span>Precio por día:</span>
+            </div>
+            <div class="col">
+                <span>€ {{room.room_type.price}}</span>
+            </div>
+        </div>    
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Localicador</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Huéspedes</th>
+                            <th scope="col">Checkin</th>
+                            <th scope="col">Checkout</th>
+                            <th scope="col">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if bookings|length == 0%}
+                        <tr>
+                            <th>
+                                No hay reservas
+                            </th>
+                        </tr>
+    
+                        {% endif %}
+                        {% for booking in bookings%}
+                        <tr>
+                            <th scope="row"><a href="{% url 'booking_search'%}?filter={{booking.code}}">{{booking.code}}</a></th>
+                            <td>{{booking.customer}}</td>
+                            <td>{{booking.guests}}</td>
+                            <td>{{booking.checkin}}</td>
+                            <td>{{booking.checkout}}</td>
+                            <td>{{booking.get_state_display}}</td>
+                        
+                        {% endfor%}
+                    </tbody>
+                </table>
+                
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock content%}

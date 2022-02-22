@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.views import View
 from .models import Room
@@ -208,7 +209,7 @@ class DashboardView(View):
         )
 
         #preparing context data
-        dashboard={
+        dashboard = {
             'new_bookings':new_bookings,
             'incoming_guests':incoming,
             'outcoming_guests':outcoming,
@@ -216,7 +217,25 @@ class DashboardView(View):
 
         }
         print(dashboard)
-        context={
+        context = {
             'dashboard':dashboard
         }
         return render(request,"dashboard.html",context)
+
+class RoomView(View):
+    def get(self,request,pk):
+        room = Room.objects.get(id=pk)
+        bookings = room.booking_set.all()
+        context = {
+            'room':room,
+            'bookings':bookings}
+        print(context)
+        return render(request,"room_detail.html",context)
+
+class RoomsView(View):
+    def get(self,request):
+        rooms = Room.objects.all().values("name","room_type__name","id")
+        context = {
+            'rooms':rooms
+        }
+        return render(request,"rooms.html",context)

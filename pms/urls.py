@@ -8,5 +8,7 @@ urlpatterns = [
     path("booking/<str:pk>/",views_.BookingView.as_view(),name = "booking"),
     path("booking/<str:pk>/edit",views_.EditBookingView.as_view(),name = "edit_booking"),
     path("booking/<str:pk>/delete",views_.DeleteBookingView.as_view(),name = "delete_booking"),
+    path("rooms/",views_.RoomsView.as_view(),name = "rooms"),
+    path("room/<str:pk>/",views_.RoomView.as_view(),name = "room_details"),
     path("dashboard/",views_.DashboardView.as_view(),name = "dashboard")
 ]

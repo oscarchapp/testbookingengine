@@ -44,8 +44,8 @@
             <div class="card-body">
                 {% for detail in rooms%}
                     {% if room.room_type == detail.room_type.id %}
-                    <div class="card card-body row mb-2 hover-card">
-                        <div class="row">{{detail.name}}</div>
+                    <div class="card card-body row mb-2 hover-card bg-tr-250">
+                        <div class="row"><a href="{% url 'room_details' pk=detail.id %}" target="_blank">{{detail.name}}</a></div>
                         <div class="row">
                             <div class="col">
                                 Tipo de habitación: {{detail.room_type}}
