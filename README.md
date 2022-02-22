@@ -40,9 +40,9 @@ To deploy this project locally run
 ### Django admin (/admin)
 Use for username and password for superuser is "admin" (without quotes).Remember to change it.
 
-### Warning
-SECRET_KEY should be stored in .env file for production!
-
+### Warnings
+- SECRET_KEY should be stored in .env file for production!
+- DEBUG is set to TRUE.
 
 # 🚀 About Me
 Fullstack developer. Tech skills:
