@@ -3,7 +3,7 @@
 
 A small open-source PMS app made with Django.
 
-## Demo
+## Live Demo
 
 https://chapp-inn.herokuapp.com/
 
@@ -11,18 +11,20 @@ https://chapp-inn.herokuapp.com/
 - Type of rooms: name, n° of guests and price per day
 - Rooms: name, description
 - Customers: name, email, phone
-- Bookings with checkin, checkout, total guests, customer information, total amount
+- Bookings: checkin, checkout, total guests, customer information, total amount
 
 
 ## Features
-- Create and check bookings for each room
+- Create, delete and check bookings for each room
+- Check room availability
 - Find bookings by code or customer name
 - Dashboard with bookings, incoming and outcoming customers, total invoiced
 - Get detailed information about each room
+- Edit customer information
 
 ## Local Deployment
 
-To deploy this project run
+To deploy this project locally run
 
 ```bash
     pip install virtualenv
@@ -38,6 +40,8 @@ To deploy this project run
 ### Django admin (/admin)
 Use for username and password for superuser is "admin" (without quotes).Remember to change it.
 
+### Warning
+SECRET_KEY should be stored in .env file for production!
 
 
 # 🚀 About Me
