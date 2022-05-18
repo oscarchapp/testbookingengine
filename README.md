@@ -27,6 +27,11 @@ https://chapp-inn.herokuapp.com/
 To deploy this project locally run
 
 
+### Using Docker
+```bash
+    docker compose -f docker-compose.yml up
+```
+
 ### Using Virtualenv
 
 ```bash
@@ -38,11 +43,6 @@ To deploy this project locally run
     cd chapp_pms
     pipenv sync
     python manage.py runserver
-```
-
-### Using Docker
-```bash
-    docker compose -f docker-compose.yml up
 ```
 
 ### Django admin (/admin)
