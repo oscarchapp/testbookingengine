@@ -16,15 +16,15 @@ document.querySelector("#id_checkout").addEventListener("change",(e)=>{
     document.querySelector("#id_guests").focus()
     
 })
-document.querySelector("#id_checkin").addEventListener("change",(e)=>{
-    const checkout=document.querySelector("#id_checkout")
+// document.querySelector("#id_checkin").addEventListener("change",(e)=>{
+//     const checkout=document.querySelector("#id_checkout")
 
-    const tomorrow=new Date(e.target.value).addDays(1).toISOString().split('T')[0]
-    if(e.target.value>checkout.value){
-        checkout.setAttribute("value",tomorrow)
+//     const tomorrow=new Date(e.target.value).addDays(1).toISOString().split('T')[0]
+//     if(e.target.value>checkout.value){
+//         checkout.setAttribute("value",tomorrow)
         
-    }
-    onDateUpdate()
-    checkout.setAttribute("min",tomorrow)
-    checkout.focus()
-})
+//     }
+//     onDateUpdate()
+//     checkout.setAttribute("min",tomorrow)
+//     checkout.focus()
+// })
