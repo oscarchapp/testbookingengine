@@ -1,246 +1,294 @@
-from django.db.models import F, Q, Count, Sum
+from datetime import datetime
+from email.policy import default
+from django.contrib import messages
+
 from django.shortcuts import render, redirect
-from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import ensure_csrf_cookie
-
-from .form_dates import Ymd
+from .models import Room, Booking
 from .forms import *
-from .models import Room
+from django.db.models import F,Q, Count, Sum
+from .form_dates import Ymd
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from .reservation_code import generate
-
+# Create your views here.
 
 class BookingSearchView(View):
-    # renders search results for bookingings
-    def get(self, request):
+    #renders search results for bookingings
+    def get(self,request):
         query = request.GET.dict()
-        if (not "filter" in query):
+        if(not "filter" in query):
             return redirect("/")
         bookings = (Booking.objects
-                    .filter(Q(code__icontains=query['filter']) | Q(customer__name__icontains=query['filter']))
-                    .order_by("-created"))
+            .filter(Q(code__icontains = query['filter']) | Q(customer__name__icontains = query['filter']))
+            .order_by("-created"))
         room_search_form = RoomSearchForm()
         context = {
-            'bookings': bookings,
-            'form': room_search_form,
-            'filter': True
+            'bookings':bookings,
+            'form':room_search_form,
+            'filter':True
         }
-        return render(request, "home.html", context)
+        return render(request,"home.html",context)
 
 
 class RoomSearchView(View):
-    # renders the search form
-    def get(self, request):
+    #renders the search form
+    def get(self,request):
         room_search_form = RoomSearchForm()
         context = {
-            'form': room_search_form
+            'form':room_search_form
         }
+        
+        return render(request,"booking_search_form.html",context)
 
-        return render(request, "booking_search_form.html", context)
-
-    # renders the search results of available rooms by date and guests
-    def post(self, request):
+    #renders the search results of available rooms by date and guests
+    def post(self,request):
         query = request.POST.dict()
-        # calculate number of days in the hotel
+        #calculate number of days in the hotel
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
-        total_days = checkout - checkin
-        # get available rooms and total according to dates and guests
+        total_days = checkout-checkin
+        #get available rooms and total according to dates and guests
         filters = {
-            'room_type__max_guests__gte': query['guests']
-        }
+            'room_type__max_guests__gte':query['guests']
+            }
         exclude = {
-            'booking__checkin__lte': query['checkout'],
-            'booking__checkout__gte': query['checkin'],
-            'booking__state__exact': "NEW"
-        }
+            'booking__checkin__lte':query['checkout'],
+            'booking__checkout__gte':query['checkin'],
+            'booking__state__exact':"NEW"
+            }
         rooms = (Room.objects
-                 .filter(**filters)
-                 .exclude(**exclude)
-                 .annotate(total=total_days * F('room_type__price'))
-                 .order_by("room_type__max_guests", "name")
-                 )
+            .filter(**filters)
+            .exclude(**exclude)
+            .annotate(total = total_days*F('room_type__price'))
+            .order_by("room_type__max_guests","name")
+            )
         total_rooms = (Room.objects
-                       .filter(**filters)
-                       .values("room_type__name", "room_type")
-                       .exclude(**exclude)
-                       .annotate(total=Count('room_type'))
-                       .order_by("room_type__max_guests"))
-        # prepare context data for template
+            .filter(**filters)
+            .values("room_type__name","room_type")
+            .exclude(**exclude)
+            .annotate(total = Count('room_type'))
+            .order_by("room_type__max_guests"))
+        #prepare context data for template
         data = {
-            'total_days': total_days
+            'total_days':total_days
         }
-        # pass the actual url query to the template
+        #pass the actual url query to the template
         url_query = request.POST.urlencode()
         context = {
-            "rooms": rooms,
-            "total_rooms": total_rooms,
-            "query": query,
-            "url_query": url_query,
-            "data": data
-        }
-        return render(request, "search.html", context)
-
+            "rooms":rooms,
+            "total_rooms":total_rooms,
+            "query":query,
+            "url_query":url_query,
+            "data":data
+            }
+        return render(request,"search.html",context)
 
 class HomeView(View):
-    # renders home page with all the bookingings order by date of creation
-    def get(self, request):
+    #renders home page with all the bookingings order by date of creation
+    def get(self,request):
         bookings = Booking.objects.all().order_by("-created")
         context = {
-            'bookings': bookings
+            'bookings':bookings
         }
-        return render(request, "home.html", context)
-
+        return render(request,"home.html",context)
 
 class BookingView(View):
     @method_decorator(ensure_csrf_cookie)
-    def post(self, request, pk):
-        # check if customer form is ok
-        customer_form = CustomerForm(request.POST, prefix="customer")
+    def post(self, request,pk):
+        #check if customer form is ok
+        customer_form = CustomerForm(request.POST,prefix = "customer")
         if customer_form.is_valid():
-            # save customer data
+            #save customer data
             customer = customer_form.save()
-            # add the customer id to the booking form
+            #add the customer id to the booking form
             temp_POST = request.POST.copy()
             temp_POST.update({
-                'booking-customer': customer.id,
-                'booking-room': pk,
-                'booking-code': generate.get()})
-            # if ok, save booking data
-            booking_form = BookingForm(temp_POST, prefix="booking")
+                'booking-customer':customer.id,
+                'booking-room':pk,
+                'booking-code':generate.get()})
+            #if ok, save booking data
+            booking_form = BookingForm(temp_POST,prefix = "booking")
             if booking_form.is_valid():
                 booking_form.save()
         return redirect('/')
 
-    def get(self, request, pk):
-        # renders the form for booking confirmation.
+    def get(self,request,pk):
+        #renders the form for booking confirmation. 
         # It returns 2 forms, the one with the booking info is hidden
-        # The second form is for the customer information
+        #The second form is for the customer information
 
         query = request.GET.dict()
-        room = Room.objects.get(id=pk)
+        room = Room.objects.get(id = pk)
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
-        total_days = checkout - checkin
-        total = total_days * room.room_type.price  # total amount to be paid
+        total_days = checkout-checkin
+        total = total_days*room.room_type.price #total amount to be paid
         query['total'] = total
         url_query = request.GET.urlencode()
-        booking_form = BookingFormExcluded(prefix="booking", initial=query)
-        customer_form = CustomerForm(prefix="customer")
+        booking_form = BookingFormExcluded(prefix = "booking",initial = query)
+        customer_form = CustomerForm(prefix = "customer")
         context = {
-            "url_query": url_query,
-            "room": room,
-            "booking_form": booking_form,
-            "customer_form": customer_form
-        }
-        return render(request, "booking.html", context)
-
+            "url_query":url_query,
+            "room":room,
+            "booking_form":booking_form,
+            "customer_form":customer_form
+            }
+        return render(request,"booking.html",context)
 
 class DeleteBookingView(View):
-    # renders the booking deletion form
-    def get(self, request, pk):
+    #renders the booking deletion form
+    def get(self,request,pk):
+
         booking = Booking.objects.get(id=pk)
         context = {
-            'booking': booking
+            'booking':booking
         }
-        return render(request, "delete_booking.html", context)
+        return render(request,"delete_booking.html",context)
 
-    # deletes the booking
-    def post(self, request, pk):
+    #deletes the booking
+    def post(self,request,pk):
         Booking.objects.filter(id=pk).update(state="DEL")
         return redirect("/")
 
 
 class EditBookingView(View):
-    # renders the booking edition form
-    def get(self, request, pk):
+    #renders the booking edition form
+    def get(self,request,pk):
+
         booking = Booking.objects.get(id=pk)
-        booking_form = BookingForm(prefix="booking", instance=booking)
-        customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+        booking_form = BookingForm(prefix="booking",instance=booking)
+        customer_form = CustomerForm(prefix="customer",instance=booking.customer)
         context = {
-            'booking_form': booking_form,
-            'customer_form': customer_form
+            'booking_form':booking_form,
+            'customer_form':customer_form
 
         }
-        return render(request, "edit_booking.html", context)
+        return render(request,"edit_booking.html",context)
 
-    # updates the customer form
+
+    #updates the customer form
     @method_decorator(ensure_csrf_cookie)
-    def post(self, request, pk):
+    def post(self,request,pk):
         booking = Booking.objects.get(id=pk)
-        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+        customer_form = CustomerForm(request.POST,prefix = "customer",instance=booking.customer)
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
 
-
 class DashboardView(View):
-    def get(self, request):
+    def get(self,request):
         from datetime import date, time, datetime
-        today = date.today()
+        today=date.today()
 
-        # get bookings created today
+        #get bookings created today
         today_min = datetime.combine(today, time.min)
         today_max = datetime.combine(today, time.max)
-        today_range = (today_min, today_max)
+        today_range=(today_min, today_max)
         new_bookings = (Booking.objects
-                        .filter(created__range=today_range)
-                        .values("id")
-                        ).count()
+            .filter(created__range=today_range)
+            .values("id")
+            ).count()
 
-        # get incoming guests
+        #get incoming guests
         incoming = (Booking.objects
-                    .filter(checkin=today)
-                    .exclude(state="DEL")
-                    .values("id")
-                    ).count()
+            .filter(checkin=today)
+            .exclude(state="DEL")
+            .values("id")
+            ).count()
 
-        # get outcoming guests
+        #get outcoming guests
         outcoming = (Booking.objects
-                     .filter(checkout=today)
-                     .exclude(state="DEL")
-                     .values("id")
-                     ).count()
-
-        # get outcoming guests
+            .filter(checkout=today)
+            .exclude(state="DEL")
+            .values("id")
+            ).count()
+        
+        #get outcoming guests
         invoiced = (Booking.objects
-                    .filter(created__range=today_range)
-                    .exclude(state="DEL")
-                    .aggregate(Sum('total'))
-                    )
+            .filter(created__range=today_range)
+            .exclude(state="DEL")
+            .aggregate(Sum('total'))
+        )
 
-        # preparing context data
+        #preparing context data
         dashboard = {
-            'new_bookings': new_bookings,
-            'incoming_guests': incoming,
-            'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'new_bookings':new_bookings,
+            'incoming_guests':incoming,
+            'outcoming_guests':outcoming,
+            'invoiced':invoiced
 
         }
-
+        print(dashboard)
         context = {
-            'dashboard': dashboard
+            'dashboard':dashboard
         }
-        return render(request, "dashboard.html", context)
-
+        return render(request,"dashboard.html",context)
 
 class RoomDetailsView(View):
-    def get(self, request, pk):
-        # renders room details
+    def get(self,request,pk):
+        #renders room details
         room = Room.objects.get(id=pk)
         bookings = room.booking_set.all()
         context = {
-            'room': room,
-            'bookings': bookings}
+            'room':room,
+            'bookings':bookings}
         print(context)
-        return render(request, "room_detail.html", context)
+        return render(request,"room_detail.html",context)
 
 
 class RoomsView(View):
-    def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+    def get(self,request):
+        #renders a list of rooms
+        rooms = Room.objects.all().values("name","room_type__name","id")
         context = {
-            'rooms': rooms
+            'rooms':rooms
         }
-        return render(request, "rooms.html", context)
+        return render(request,"rooms.html",context)
+
+
+class EditCustomBookingView(View):
+
+    def get(self,request,pk):
+        #renders booking calendar and code
+        booking = Booking.objects.get(id=pk)
+        booking_code = booking.code
+        booking_form = BookingCustomForm(prefix="booking",instance=booking)
+
+        context = {
+            'booking_form':booking_form,
+            'booking_code':booking_code,
+        }
+        return render(request,"edit_custom_booking.html",context)
+    
+    def post(self, request, pk):
+        #updates booking days with conditions
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingCustomForm(request.POST, prefix = "booking", instance=booking)
+        booking_price = booking.room.room_type.price
+        booking_room = booking.room.name
+        checkin = request.POST.get('booking-checkin')
+        checkout = request.POST.get('booking-checkout')
+        booking_search = Booking.objects.filter(
+            Q(checkin__gte=checkin) and
+            Q(checkout__lte=checkout) and
+            Q(room__name=booking_room)).values()[0]
+        total_days = datetime.strptime(checkout, "%Y-%m-%d") - datetime.strptime(checkin, "%Y-%m-%d")
+        total_price = (total_days*booking_price).days
+
+        if booking_form.is_valid():
+            #validates if there's a duplicated booking and the date
+            booking.total = total_price
+            booking_form.save(commit=False)
+            if booking.checkin != booking_search['checkin'] or booking.checkout != booking_search['checkout'] and booking.room != booking_search["room_id"]:
+                if checkout <= checkin:
+                    messages.warning(request, "No puede ingresar una fecha igual o anterior al checkin.")
+                    return redirect("/")
+                else:
+                    messages.success(request, "Cambios realizados con exito.")
+                    booking_form.save(commit=True)
+                    return redirect("home")
+            else:
+                messages.warning(request, "Ya existe una reserva con esas caracteristicas.")
+                return redirect("/")
+

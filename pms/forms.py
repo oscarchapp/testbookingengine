@@ -56,3 +56,35 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingCustomForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        widgets = {
+            'checkin': forms.DateInput(attrs = {
+                'class':'form-control',
+                'type':'date',
+                'min':datetime.today().strftime('%Y-%m-%d')
+            }),
+            'checkout': forms.DateInput(attrs = {
+                'class':'form-control',
+                'type':'date',
+                'min':datetime.today().strftime('%Y-%m-%d'),
+                'max':datetime.today().replace(month = 12, day = 31).strftime('%Y-%m-%d')})
+            }
+
+    # def clean(self):
+    #     query = self.cleaned_data
+    #     checkin = query.get('checkin')
+    #     checkout = query.get('checkout')
+    #     booking_room = self.instance.room
+    #     booking = Booking.objects.filter(
+    #         Q(checkin__gte=checkin) and
+    #         Q(checkout__lte=checkout) and
+    #         Q(room__name=booking_room)).values()[0]
+
+    #     if booking["checkin"] == checkin or booking["checkout"] != checkout and booking["room"] == booking_room:
+    #         raise forms.ValidationError("Ya existe una reserva con esas caracteristicas.")
+    #     return query

@@ -1,7 +1,7 @@
 {% extends "main.html"%}
 
 {% block content %}
-
+{% include 'messages.html' %}
 <h1>Home</h1>
     {% if filter %}
     <h3>Resultados de la búsqueda</h3>
@@ -68,10 +68,11 @@
                     <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
-
+                    {% if booking.state == "NEW" %}
+                    <a href="{% url 'edit_custom_booking' pk=booking.id %} " >Editar reserva</a>
+                    {% endif %}
                 </div>
                 <div class="col">
-
                     {% if booking.state != "DEL" %}
                     <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
                     {% endif %}
