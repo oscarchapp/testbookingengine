@@ -1,0 +1,42 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar reserva</h1>
+<form action="" method="post">
+    {% csrf_token%}
+    </div>
+    <div class="alert alert-danger" role="alert">
+        {{message}}
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            Fecha actual de entrada
+        </div>
+        <div class="col">
+            {{booking.checkin}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            Fecha actual de salida
+        </div>
+        <div class="col">
+            {{booking.checkout}}
+        </div>
+    </div>
+    <br>
+
+    {% for field in form %}
+    <div class="row">
+        <div class="col-md-2">{{field.label_tag}}</div>
+        <div class="col-md">{{field}}</div>
+    </div>
+    {% endfor %}
+
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary" type="submit">Guardar datos</button>
+</form>
+
+
+{% endblock content%}

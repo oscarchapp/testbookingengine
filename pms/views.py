@@ -136,6 +136,59 @@ class BookingView(View):
         return render(request, "booking.html", context)
 
 
+class UpdateBookingView(View):
+    # renders the booking update form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        room_search_form = BookingUpdateForm()
+        context = {
+            'booking': booking,
+            'form': room_search_form,
+        }
+        return render(request, "update_booking.html", context)
+
+    # updates the booking dates
+    def post(self, request, pk):
+        checkin = Ymd.Ymd(request.POST['checkin'])
+        checkout = Ymd.Ymd(request.POST['checkout'])
+        total_days = checkout - checkin
+        booking = Booking.objects.get(id=pk)
+
+        # checking the availability
+        filters = {
+            'room_type__max_guests__gte': booking.guests
+        }
+        excludes = {
+            'booking__checkin__lte': str(checkout.date.date()),
+            'booking__checkout__gte': str(checkin.date.date()),
+            'booking__state__exact': "NEW"
+        }
+        rooms = (Room.objects
+                 .filter(**filters)
+                 .exclude(**excludes)
+                 .annotate(total=total_days * F('room_type__price'))
+                 .order_by("room_type__max_guests", "name")
+                 )
+
+        # handling the response according to the availability
+        if rooms:
+            # updating the booking
+            total_price = total_days * booking.room.room_type.price
+            booking.checkin = checkin.date
+            booking.checkout = checkout.date
+            booking.total = total_price
+            booking.save()
+            return redirect('/')
+        else:
+            # rendering no availability message
+            context = {
+                'booking': booking,
+                'form': BookingUpdateForm(),
+                'message': 'No hay disponibilidad, cambie las fechas.'
+            }
+            return render(request, "update_booking.html", context)
+
+
 class DeleteBookingView(View):
     # renders the booking deletion form
     def get(self, request, pk):

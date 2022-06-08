@@ -20,6 +20,24 @@ class RoomSearchForm(ModelForm):
         }
 
 
+class BookingUpdateForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        labels = {
+            "checkin": "Nueva fecha de entrada",
+            "checkout": "Nueva fecha de salida"
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date',
+                                              'min': datetime.today().strftime('%Y-%m-%d'),
+                                              'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(attrs={'type': 'date',
+                                               'min': datetime.today().strftime('%Y-%m-%d'),
+                                               'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+        }
+
+
 class CustomerForm(ModelForm):
     class Meta:
         model = Customer
