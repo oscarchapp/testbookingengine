@@ -160,7 +160,6 @@ class EditBookingView(View):
         context = {
             'booking_form': booking_form,
             'customer_form': customer_form
-
         }
         return render(request, "edit_booking.html", context)
 
@@ -172,6 +171,70 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+class EditStayDateBookingView(View):
+    # Render the form to edit dates
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingEditForm(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form,
+        }
+
+        return render(request, "edit_stay_date.html", context)
+    
+    # checking for available rooms and updating 
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        data = request.POST.dict()
+        booking = Booking.objects.get(id=pk)
+        checkin_old = booking.checkin
+        checkout_old = booking.checkout
+        booking_form = BookingEditForm(request.POST, prefix="booking", instance=booking)
+        room = Room.objects.get(name=booking.room)
+        checkin = Ymd.Ymd(data['booking-checkin'])
+        checkout = Ymd.Ymd(data['booking-checkout'])
+        total_days = checkout - checkin
+        total_price = total_days * room.room_type.price
+
+        # changing the instance state for a while in order to include this room into the search
+        instance=booking_form.save(commit=False)
+        instance.state='DEL'
+        instance.save()
+        
+        filters = {
+            'room_type__max_guests__gte': booking.guests
+        }
+        exclude = {
+            'booking__checkin__lt': data['booking-checkout'],
+            'booking__checkout__gt': data['booking-checkin'],
+            'booking__state__exact': 'NEW',
+        }
+        total_rooms = (Room.objects
+                        .filter(**filters)
+                        .exclude(**exclude)
+                        .order_by("room_type__max_guests"))
+        if not total_rooms:
+            context = {
+                'message': 'No hay habitaciones disponibles, compruebe otras fechas'
+            }
+            instance = booking_form.save(commit=False)
+            instance.state='NEW'
+            instance.checkin = checkin_old
+            instance.checkout = checkout_old
+            instance.save()
+            return render(request, "edit_stay_date.html", context)
+        new_room = total_rooms.first()
+
+        if booking_form.is_valid():
+            instance = booking_form.save(commit=False)
+            instance.state = 'NEW'
+            instance.total = total_price
+            instance.room = new_room
+            instance.save()
+            return redirect("/")
+        else:
+            return render(request, "edit_stay_date.html", booking_form.errors)
 
 
 class DashboardView(View):
