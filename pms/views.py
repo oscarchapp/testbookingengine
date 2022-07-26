@@ -244,3 +244,25 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+class RoomSearch(View):
+
+    def get(self,request):
+        # renders a list of rooms
+        name = request.GET.get("room")
+        room = Room.objects.filter(name__icontains=name).values("name", "room_type__name", "id")
+        state = ""
+        count = len(room)
+        if count == 0:
+            room = Room.objects.all().values("name", "room_type__name", "id")
+            state = 1
+
+        context={
+            'rooms':room,
+            'name':name,
+            'state':state,
+            'count': count
+        }
+        return render(request,"rooms.html",context)
+
+

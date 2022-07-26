@@ -2,18 +2,37 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
+{% if state  %}
+<div class="alert alert-danger" role="alert">
+    No se han encontrado habitaciones con ese nombre
+</div>
+{% endif %}
+<div class="row">
+     <div class="col-lg-4">
+        <form action="{% url 'search_room' %}" method="GET" class="form-inline">
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="inputsearch" class="sr-only">Search Room</label>
+                <input type="search" class="form-control" name="room" id="inputsearch" placeholder="Room name" required>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <button type="submit" class="btn btn-primary mb-2">Search</button>
+            </div>
+        </form>
+     </div>
+</div>
+{% if count > 0 %}
+<p><span class="bold">{{count}} habitaciones</span> encontradas</p>
+{% endif %}
+{% for room in rooms %}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
         <div class="">
-            {{room.name}} ({{room.room_type__name}})
+            {{room.name}}({{room.room_type__name}})
         </div>
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
         </div>
-        
     </div>
-    
 </div>
 {% endfor %}
 {% endblock content%}
