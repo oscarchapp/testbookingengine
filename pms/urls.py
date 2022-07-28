@@ -7,9 +7,12 @@ urlpatterns = [
     path("search/room/", views.RoomSearchView.as_view(), name="search"),
     path("search/booking/", views.BookingSearchView.as_view(), name="booking_search"),
     path("booking/<str:pk>/", views.BookingView.as_view(), name="booking"),
-    path("booking/<str:pk>/edit", views.EditBookingView.as_view(), name="edit_booking"),
-    path("booking/<str:pk>/delete", views.DeleteBookingView.as_view(), name="delete_booking"),
+    path("booking/<str:pk>/edit",
+         views.EditBookingView.as_view(), name="edit_booking"),
+    path("booking/<str:pk>/delete",
+         views.DeleteBookingView.as_view(), name="delete_booking"),
     path("rooms/", views.RoomsView.as_view(), name="rooms"),
     path("room/<str:pk>/", views.RoomDetailsView.as_view(), name="room_details"),
+    path("room-search/", views.RoomSearchView.as_view(), name="room_search"),
     path("dashboard/", views.DashboardView.as_view(), name="dashboard")
 ]

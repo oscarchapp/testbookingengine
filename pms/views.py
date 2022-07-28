@@ -156,7 +156,8 @@ class EditBookingView(View):
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
         booking_form = BookingForm(prefix="booking", instance=booking)
-        customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+        customer_form = CustomerForm(
+            prefix="customer", instance=booking.customer)
         context = {
             'booking_form': booking_form,
             'customer_form': customer_form
@@ -168,7 +169,8 @@ class EditBookingView(View):
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
         booking = Booking.objects.get(id=pk)
-        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+        customer_form = CustomerForm(
+            request.POST, prefix="customer", instance=booking.customer)
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
@@ -234,6 +236,17 @@ class RoomDetailsView(View):
             'bookings': bookings}
         print(context)
         return render(request, "room_detail.html", context)
+
+
+class RoomSearchView(View):
+    def get(self, request):
+        # renders room search
+        name = request.GET['filter']
+        rooms = Room.objects.filter(name__contains=name).all().values(
+            "name", "room_type__name", "id")
+        context = {
+            'rooms': rooms}
+        return render(request, "rooms.html", context)
 
 
 class RoomsView(View):

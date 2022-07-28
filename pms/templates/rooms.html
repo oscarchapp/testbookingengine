@@ -2,7 +2,14 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<form action="{% url 'room_search'%}" method="GET" class="d-flex">
+    <input class="form-control me-2" type="search" required name="filter"
+        placeholder="Busque una habitacion por nombre" aria-label="Search">
+    <button type="submit" class="btn btn-outline-dark">Buscar </button>
+</form>
 {% for room in rooms%}
+
+
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
         <div class="">
@@ -11,9 +18,9 @@
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
         </div>
-        
+
     </div>
-    
+
 </div>
 {% endfor %}
 {% endblock content%}
