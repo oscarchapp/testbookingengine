@@ -240,7 +240,29 @@ class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+        filter_form = RoomFilterForm()
+
         context = {
-            'rooms': rooms
+            'rooms': rooms,
+            'filter': filter_form
+        }
+        return render(request, "rooms.html", context)
+
+    def post(self, request):
+        # filter a list of books
+        query = request.POST.dict()
+        filter_form = RoomFilterForm()
+
+        filters = {
+            'name__contains': query['name']
+        }
+        rooms = (Room.objects
+                 .filter(**filters)
+                 .values("name", "room_type__name", "id"))
+
+        context = {
+            "rooms": rooms,
+            "query": query,
+            'filter': filter_form
         }
         return render(request, "rooms.html", context)

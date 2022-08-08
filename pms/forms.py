@@ -2,7 +2,7 @@ from datetime import datetime
 from django import forms
 from django.forms import ModelForm
 
-from .models import Booking, Customer
+from .models import Booking, Customer, Room
 
 
 class RoomSearchForm(ModelForm):
@@ -19,6 +19,13 @@ class RoomSearchForm(ModelForm):
             'guests': forms.DateInput(attrs={'type': 'number', 'min': 1, 'max': 4}),
         }
 
+class RoomFilterForm(ModelForm):
+    class Meta:
+        model = Room
+        fields = ['name']
+        labels = {
+            "name": "Nombre habitación"
+        }
 
 class CustomerForm(ModelForm):
     class Meta:
