@@ -266,7 +266,9 @@ class RoomsSearchedView(View):
 def check_availability(checkin, checkout, room):
     
         booking_avalible = Booking.objects.filter(room=room, checkin=checkin, checkout=checkout).count()
-        if booking_avalible > 0:
+        print(room)
+        print(booking_avalible)
+        if booking_avalible == 0:
             return True
         return False
         
@@ -285,13 +287,14 @@ class EditBookingDateView(View):
     
     @method_decorator(ensure_csrf_cookie)
     def post(self,request,pk):
-        booking = Booking.objects.filter(id=pk)
-        room = Room.objects.get(id=pk)
+        booking = Booking.objects.get(id=pk)
         date_form = DateForm(request.POST)
         checkin = request.POST["checkin"]
         checkout = request.POST["checkout"]
-        if date_form.is_valid() and check_availability(checkin, checkout, room):
-            booking.update(checkin=request.POST["checkin"],checkout=request.POST["checkout"])
+        if date_form.is_valid() and check_availability(checkin, checkout, booking.room):
+            booking.checkin = checkin
+            booking.checkout = checkout
+            booking.save()
             return redirect("/")
         return HttpResponse("No hay disponibilidad para las fechas seleccionadas.", status=404)
             
