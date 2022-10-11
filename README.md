@@ -26,14 +26,6 @@ https://chapp-inn.herokuapp.com/
 
 To deploy this project locally run
 
-
-### Using Docker
-```bash
-    docker compose -f docker-compose.yml up
-```
-
-### Using Virtualenv
-
 ```bash
     pip install virtualenv
     virtualenv pms
@@ -43,8 +35,8 @@ To deploy this project locally run
     cd chapp_pms
     pipenv sync
     python manage.py runserver
+  
 ```
-
 ### Django admin (/admin)
 Use for username and password for superuser is "admin" (without quotes).Remember to change it.
 
@@ -59,6 +51,27 @@ Use for username and password for superuser is "admin" (without quotes).Remember
 - Check for room availability exactly before save data in DB
 - Change date or define date range in dashboard
 - Improve and add more data in dashboard
+# 🚀 About Me
+Fullstack developer. Tech skills:
+- HTML
+- Bootstrap 5
+- CSS
+- Javascript
+- NodeJS
+- ReactJS
+- MongoDB
+- PHP
+- MYSQL
+- Python
+- C#
+- Linux (Ubuntu Server / Manjaro)
+- AWS (S3, EC2, Route 53)
+- API REST
+
+
+### 🔗 Links
+[![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://github.com/vsa-ok/)
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/maximiliano-villa)
 
 
 ## License

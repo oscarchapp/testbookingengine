@@ -2,18 +2,39 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<div class="row  mt-3 mb-3 bg-tr-250">
+  <form method="post">
+    {% csrf_token %}
+    <div class=" mb-3 input-group">
+      <span class="input-group-text">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" id="btn_search_room" name="btn_search_room" class="form-control" placeholder="Nombre de la habitación">      
+      <input type="hidden" name="form_name" value="search_room" />
+      <input type="submit" class="btn btn-dark" value="Buscar"/>
+    </div>
+  </form>
+  <hr>
+</div>
+{% if errormsg %}
+<div class="row mt-3 mb-3">
+  <div class="border border-danger p-2 ps-4 pe-4 text-danger fs-4 text-center">
+    {{ errormsg }}
+  </div>
+
+</div>
+{% endif  %}
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
-    <div class="col p-3">
-        <div class="">
-            {{room.name}} ({{room.room_type__name}})
-        </div>
-        <div>
-            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>
-        
+  <div class="col p-3">
+    <div class="">
+      {{room.name}} ({{room.room_type__name}})
+    </div>
+    <div>
+      <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
     </div>
     
+  </div>  
 </div>
 {% endfor %}
 {% endblock content%}

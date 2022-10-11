@@ -1,0 +1,33 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar datos de contacto</h1>
+{% if msg_ok %}
+<div class="row text-center">
+    <span class="border border-success text-success w-auto p4 fs-4 mb-4">{{ msg_ok }}</span>
+</div>
+{% endif %}
+{% if msg_nok %}
+<div class="row text-center">
+    <span class="border border-danger text-danger w-auto p4 fs-4 mb-4">{{ msg_nok }}</span>
+</div>
+{% endif %}
+
+<form action="" method="post">
+    {% csrf_token%}
+    {% for field in booking_form %}
+    <div class="row mt-2">
+        <div class="col-md-2">
+            {{field.label_tag}}
+        </div>
+        <div class="col">
+            {{field}}
+        </div>
+    </div>
+    {% endfor %}
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary" type="submit">Guardar datos</button>
+</form>
+
+
+{% endblock content%}
