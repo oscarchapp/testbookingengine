@@ -4,7 +4,15 @@
 <h1>Habitaciones del hotel</h1>
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
+    
     <div class="col p-3">
+        <div>
+            <form action="{% url 'room_search'%}" method="GET" class="d-flex">
+                {% csrf_token%}
+                <input class="form-control me-2" type="search" required name="filter_room" placeholder="Nombre de habitacion" aria-label="Search">
+                <button class="btn btn-outline" type="submit">buscar </button>
+             </form>
+        </div>
         <div class="">
             {{room.name}} ({{room.room_type__name}})
         </div>
