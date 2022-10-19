@@ -1,0 +1,25 @@
+{% extends "main.html"%}
+
+{% block content %}
+    <h1>Editar fechas de reserva</h1>
+    <form action="" method="post">
+        {% csrf_token%}
+        {% for field in booking_form %}
+            <div class="row">
+                <div class="col-md-2">
+                    {{field.label_tag}}
+                </div>
+                <div class="col">
+                    {{field}}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="row ml-4">
+            {% if form %}
+                <label class="text-danger ml-4">{{ form }}</label>
+            {% endif %}
+        </div>
+        <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+        <button class="btn btn-primary" type="submit">Guardar datos</button>
+    </form>
+{% endblock content%}

@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from .filters.room_filter import RoomFilter
 from .form_dates import Ymd
 from .forms import *
 from .models import Room
@@ -174,6 +175,40 @@ class EditBookingView(View):
             return redirect("/")
 
 
+class EditBookingDatesView(View):
+    # renders the booking dates edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = EditBookingDatesForm(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+    # updates the booking form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = EditBookingDatesForm(request.POST, prefix="booking", instance=booking)
+        exist_booking = Booking.objects.filter(
+            room=booking.room,
+            checkin=request.POST['booking-checkin'],
+            checkout=request.POST['booking-checkout']
+        ).exists()
+
+        # If the booking doesn't exist, the object is saved in database.
+        if booking_form.is_valid() and not exist_booking:
+            booking_form.save()
+            return redirect("/")
+
+        # If the booking exist, returns an error message.
+        context = {
+            'booking_form': booking_form,
+            'form': "No hay disponibilidad para las fechas seleccionadas."
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+
 class DashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
@@ -209,19 +244,37 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get percentage occupation
+        percentage_occupation = self.get_percentage_occupation()
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'percentage_occupation': percentage_occupation
         }
 
         context = {
             'dashboard': dashboard
         }
         return render(request, "dashboard.html", context)
+
+    @staticmethod
+    def get_percentage_occupation():
+        """
+        This method is used to obtain the occupancy percentage.
+        Make a division of confirmed reservations divided by total rooms.
+        """
+        percentage_occupation = 0
+        total_confirmed_bookings = Booking.objects.filter(state="NEW").count()
+        total_rooms = Room.objects.all().count()
+
+        if total_rooms > 0:
+            percentage_occupation = total_confirmed_bookings * 100 / total_rooms
+
+        return percentage_occupation
 
 
 class RoomDetailsView(View):
@@ -240,7 +293,8 @@ class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+        list_filter = RoomFilter(request.GET, queryset=rooms)
         context = {
-            'rooms': rooms
+            'list_filter': list_filter
         }
         return render(request, "rooms.html", context)

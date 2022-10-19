@@ -43,6 +43,17 @@ class BookingForm(ModelForm):
         }
 
 
+class EditBookingDatesForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ('checkin', 'checkout')
+        labels = {}
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date'}),
+            'checkout': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+
 class BookingFormExcluded(ModelForm):
     class Meta:
         model = Booking
