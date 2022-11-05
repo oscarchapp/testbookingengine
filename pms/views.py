@@ -41,6 +41,11 @@ class RoomSearchView(View):
     # renders the search results of available rooms by date and guests
     def post(self, request):
         query = request.POST.dict()
+        # valid range dates
+        if query['checkin'] > query['checkout']:
+            room_search_form = RoomSearchForm()
+            context = {'error':"Checkin cannot be greater than checkout",'form':room_search_form}
+            return render(request, "booking_search_form.html", context)
         # calculate number of days in the hotel
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
