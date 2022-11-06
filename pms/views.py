@@ -8,6 +8,7 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from .filters import RoomFilter
 
 
 class BookingSearchView(View):
@@ -41,6 +42,11 @@ class RoomSearchView(View):
     # renders the search results of available rooms by date and guests
     def post(self, request):
         query = request.POST.dict()
+        # valid range dates
+        if query['checkin'] > query['checkout']:
+            room_search_form = RoomSearchForm()
+            context = {'error':"Checkin cannot be greater than checkout",'form':room_search_form}
+            return render(request, "booking_search_form.html", context)
         # calculate number of days in the hotel
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
@@ -239,8 +245,5 @@ class RoomDetailsView(View):
 class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
-        return render(request, "rooms.html", context)
+        f = RoomFilter(request.GET, queryset=Room.objects.all().values("name", "room_type__name", "id"))
+        return render(request, 'rooms.html', {'rooms': f})
