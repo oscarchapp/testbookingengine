@@ -1,0 +1,41 @@
+body{
+    padding-top: 4em
+}
+
+
+
+.bg-tr-250, .bg-tr-250:hover{
+
+    -webkit-transition: background-color 250ms linear;
+    -ms-transition: background-color 250ms linear;
+    transition: background-color 250ms linear;
+}
+.hover-card:hover{
+    background: #f0f0f0;
+}
+
+.tag{
+    padding: 0.3em;
+    margin: 1em 0.5em 1em 0.5em;
+    border-radius: 0.3em;
+}
+.tag-red{
+
+    background: #ff7a7a;
+    color: white;
+}
+.tag-green {
+    background: #01a901;
+    color: white;
+}
+.card-customization{
+    width: 250px;
+    height: 200px;
+}
+.dashboard-value{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+}
