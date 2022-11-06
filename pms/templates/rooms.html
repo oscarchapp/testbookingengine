@@ -2,8 +2,24 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
+
+
+
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
+    <div class="col p-3">
+        <div class="">
+            <form method="get">
+                {{ rooms.form.as_p }}
+                <input type="submit" />
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% for room in rooms.qs %}
+<div class="row card mt-3 mb-3 hover-card bg-tr-250">
+    
     <div class="col p-3">
         <div class="">
             {{room.name}} ({{room.room_type__name}})
@@ -16,4 +32,5 @@
     
 </div>
 {% endfor %}
+
 {% endblock content%}

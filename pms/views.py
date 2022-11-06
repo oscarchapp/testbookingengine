@@ -8,6 +8,7 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from .filters import RoomFilter
 
 
 class BookingSearchView(View):
@@ -244,8 +245,5 @@ class RoomDetailsView(View):
 class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
-        return render(request, "rooms.html", context)
+        f = RoomFilter(request.GET, queryset=Room.objects.all().values("name", "room_type__name", "id"))
+        return render(request, 'rooms.html', {'rooms': f})
