@@ -58,6 +58,8 @@ class BookingTestCase(TestCase):
         self.booking_two = Booking.objects.create(checkin = '2022-11-11',checkout = '2022-11-20',room = self.room_cuadruple,guests = 4,customer = self.customer,total = 500,code = 'WDZFTX8HB')
 
     
+
+
     def test_confict_rangedates_edit_booking(self):
         response = self.client.post('/booking/'+str(self.booking_one.id)+'/edit-date',{'checkin': '2022-11-09', 'checkout': '2022-10-13'} )
         self.assertEqual(response.status_code, 409)
@@ -65,3 +67,7 @@ class BookingTestCase(TestCase):
     def test_confict_save_edit_booking(self):
         response = self.client.post('/booking/'+str(self.booking_one.id)+'/edit-date',{'checkin': '2022-11-15', 'checkout': '2022-10-15'} )
         self.assertEqual(response.status_code, 409)
+
+    def test_save_edit_booking(self):
+        response = self.client.post('/booking/'+str(self.booking_one.id)+'/edit-date',{'checkin': '2022-11-21', 'checkout': '2022-11-25'} )
+        self.assertEqual(response.status_code, 302)
