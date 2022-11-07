@@ -42,9 +42,9 @@ class RoomSearchView(View):
     # renders the search results of available rooms by date and guests
     def post(self, request):
         query = request.POST.dict()
-        # valid range dates
+        # validate range dates
         if query['checkin'] > query['checkout']:
-            room_search_form = RoomSearchForm()
+            room_search_form = RoomSearchForm(request.POST)
             context = {'error':"Checkin cannot be greater than checkout",'form':room_search_form}
             return render(request, "booking_search_form.html", context)
         # calculate number of days in the hotel
@@ -178,6 +178,61 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+
+class EditBookingDateView(View):
+    # renders the search form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        edit_booking_form = EditBookingDateForm(instance=booking)
+
+        context = {
+            'edit_booking_form': edit_booking_form,
+        }
+        return render(request, "edit_booking_date.html", context)
+
+    # renders the search results of available rooms by date and guests
+    
+    def post(self, request,pk):
+        query = request.POST.dict()
+        checkin_query = query['checkin']
+        checkout_query = query['checkout']
+
+        # valid range dates
+        if checkin_query > checkout_query:
+            edit_booking_form = EditBookingDateForm(request.POST)
+            context = {'error':"Checkin cannot be greater than checkout",'edit_booking_form':edit_booking_form}
+            return render(request, "edit_booking_date.html", context)
+        
+        booking = Booking.objects.get(id=pk)
+
+        filters = {
+            'room':booking.room,
+            'state__exact': "NEW"
+        }
+
+        exclude = {
+            'id': booking.id,
+        }
+        # get bookings
+        bookings = (Booking.objects
+                 .filter(Q(checkin__range=(checkin_query,checkout_query)) | Q(checkout__range=(checkin_query,checkout_query)))
+                 .filter(**filters)
+                 .exclude(**exclude)
+                 )
+
+        if bookings:
+            edit_booking_form = EditBookingDateForm(request.POST)
+            context = {'error':"There is no availability for the selected dates",'edit_booking_form':edit_booking_form}
+            return render(request, "edit_booking_date.html", context)               
+        else:
+            # save checking and checkout
+            booking.checkin = query['checkin']
+            booking.checkout = query['checkout']
+            booking.save()                    
+        return redirect("/")
+
+
 
 
 class DashboardView(View):
