@@ -21,9 +21,9 @@
             <h5 class="small">Total facturado</h5>
             <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
         </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
+        <div class="card text-white p-3 card-customization" style="background-color: #100763;">
             <h5 class="small">% Ocupación</h5>
-            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+            <h1 class="dashboard-value">{{ dashboard.percentage }}%</h1>
         </div>        
     </div>
 </div>

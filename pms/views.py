@@ -1,4 +1,4 @@
-from django.db.models import F, Q, Count, Sum
+from django.db.models import F, Q, Count, Sum, Avg
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -215,13 +215,18 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        
+        booking = Booking.objects.filter(state="NEW").count()
+        rooms = Room.objects.all().count()
+        percentage_occupation = booking * 100 / rooms
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'percentage': percentage_occupation
         }
 
         context = {
