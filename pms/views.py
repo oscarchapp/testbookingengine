@@ -46,7 +46,7 @@ class RoomSearchView(View):
         if query['checkin'] > query['checkout']:
             room_search_form = RoomSearchForm(request.POST)
             context = {'error':"Checkin cannot be greater than checkout",'form':room_search_form}
-            return render(request, "booking_search_form.html", context)
+            return render(request, "booking_search_form.html", context, status=409)
         # calculate number of days in the hotel
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
@@ -202,7 +202,7 @@ class EditBookingDateView(View):
         if checkin_query > checkout_query:
             edit_booking_form = EditBookingDateForm(request.POST)
             context = {'error':"Checkin cannot be greater than checkout",'edit_booking_form':edit_booking_form}
-            return render(request, "edit_booking_date.html", context)
+            return render(request, "edit_booking_date.html", context, status=409)
         
         booking = Booking.objects.get(id=pk)
 
@@ -224,7 +224,7 @@ class EditBookingDateView(View):
         if bookings:
             edit_booking_form = EditBookingDateForm(request.POST)
             context = {'error':"There is no availability for the selected dates",'edit_booking_form':edit_booking_form}
-            return render(request, "edit_booking_date.html", context)               
+            return render(request, "edit_booking_date.html", context, status=409)               
         else:
             # save checking and checkout
             booking.checkin = query['checkin']
