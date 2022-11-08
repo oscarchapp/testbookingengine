@@ -39,3 +39,13 @@ body{
     height: 100%;
     align-items: center;
 }
+
+.tag-warning{
+
+    background: #e2ca41;
+    color: white;
+}
+.tag-success {
+    background: #01a901;
+    color: white;
+}

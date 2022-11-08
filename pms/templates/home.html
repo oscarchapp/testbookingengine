@@ -68,7 +68,9 @@
                     <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
-
+                    {% if booking.state != "DEL" %}
+                    <a href="{% url 'booking_edit_dates' pk=booking.id%} " >Editar reserva</a>
+                    {% endif %}
                 </div>
                 <div class="col">
 

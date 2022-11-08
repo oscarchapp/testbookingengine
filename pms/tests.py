@@ -17,3 +17,16 @@ class TestCases(TestCase):
     def test_filter_byname(self):
         data = {'name':'Room 1'}
         self.assertIsNotNone(Room.objects.filter(name__icontains=data.get('name')))
+    
+    def test_updated_booking(self):
+        data = {'checkin': '2022-11-11', 'checkout': '2022-11-12'}
+        self.assertTrue(data.get('checkin') < data.get('checkout'))
+        self.assertIsNone(Booking.objects.filter(
+            checkin__lte = data.get('checkin'),
+            checkout__gte = data.get('checkout'),
+            state__exact = "NEW",
+            room=self.room
+        ))
+        self.booking.checkin = data.get('checkin')
+        self.booking.checkout = data.get('checkout')
+        self.booking.save()

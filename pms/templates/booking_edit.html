@@ -1,0 +1,33 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar reserva</h1>
+<form method="POST">
+    {% csrf_token%}
+    {% if messages %}
+        {% for message in messages %}
+        <div{% if message.tags %} class="tag tag-{{message.tags}}"{% endif %}>
+            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+ 
+    {% for field in form %}
+    <div class="row">
+        <div class="col-md-2">{{field.label_tag}}</div>
+        <div class="col-md">{{field}}</div>
+    </div>
+    {% endfor %}
+    <div class="row">
+        <div class="col"><span>Días: </span><span id="total-days"></span></div>
+    </div>
+    <div class="row">
+        <div class="col-md-auto">
+            <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+            <button class="btn btn-primary" type="submit">Actualizar</button>
+        </div>
+    </div>
+</form>
+
+{% endblock content%}
