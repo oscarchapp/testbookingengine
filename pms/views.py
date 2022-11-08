@@ -240,6 +240,9 @@ class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+        if request.GET.get('name'):
+            rooms = rooms.filter(
+                name__icontains=request.GET.get('name'))
         context = {
             'rooms': rooms
         }
