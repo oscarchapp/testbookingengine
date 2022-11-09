@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'whitenoise',
     'django.contrib.staticfiles',
-    'pms.apps.PmsConfig'
+    'pms.apps.PmsConfig',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
