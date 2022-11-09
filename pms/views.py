@@ -244,3 +244,50 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+class EditBookingDateView(View):
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_date_form = BookingDateForm(instance=booking)
+
+        context = {
+            'code': booking.code,
+            'booking_date_form': booking_date_form,
+        }
+        return render(request, "edit_booking_date.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingDateForm(request.POST, instance=booking)
+
+        query = request.POST.dict()
+        # calculate number of days in the hotel
+        checkin = Ymd.Ymd(query['checkin'])
+        checkout = Ymd.Ymd(query['checkout'])
+        total_days = checkout - checkin
+
+        if total_days <= 0:
+            edit_booking_form = BookingDateForm(request.POST)
+            context = {'error': 'Checkout debe ser mayor que checkin',
+                       'booking_date_form': edit_booking_form}
+            return render(request, "edit_booking_date.html", context,
+                          status=409)
+
+        is_booking_available = not Booking.objects.filter(
+                room=booking.room,
+                checkin__lt=checkout.date,
+                checkout__gt=checkin.date
+        ).exclude(id=booking.id).exists()
+
+        if booking_form.is_valid() and is_booking_available:
+            booking_form.save()
+            return redirect("/")
+
+        edit_booking_form = BookingDateForm(request.POST)
+        context = {'error': 'No hay disponibilidad para las fechas seleccionadas',
+                   'booking_date_form': edit_booking_form}
+        return render(request, "edit_booking_date.html", context,
+                      status=409)
