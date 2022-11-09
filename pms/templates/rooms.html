@@ -2,7 +2,16 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
+
+
+<div>
+    <form method="get">
+        {{ rooms.form.as_p }}
+        <button type="submit">Buscar</button>
+    </form>
+</div>
+
+{% for room in rooms.qs%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
         <div class="">
@@ -11,9 +20,9 @@
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
         </div>
-        
+
     </div>
-    
+
 </div>
 {% endfor %}
 {% endblock content%}
