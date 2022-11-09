@@ -209,13 +209,20 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        bookings = Booking.objects.filter(
+                state="NEW", checkin__lte=today, checkout__gte=today).count()
+        rooms = Room.objects.all().count()
+        occupation = 0
+        if rooms > 0:
+            occupation = bookings / rooms * 100
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupation': occupation
         }
 
         context = {
