@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -175,6 +177,8 @@ class EditBookingView(View):
 
 
 class DashboardView(View):
+    model = Booking
+
     def get(self, request):
         from datetime import date, time, datetime
         today = date.today()
@@ -209,12 +213,16 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get current reservation
+        current_reservation = self.get_current_reservation()
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'current_reservation': current_reservation
 
         }
 
@@ -222,6 +230,10 @@ class DashboardView(View):
             'dashboard': dashboard
         }
         return render(request, "dashboard.html", context)
+
+    def get_current_reservation(self):
+        rooms = Room.objects.all()
+        return (self.model.objects.filter(state='NEW').count() / rooms.count()) * 100 if rooms.exists() else Decimal(100)
 
 
 class RoomDetailsView(View):
@@ -239,7 +251,7 @@ class RoomDetailsView(View):
 class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
-        query = self.get_queryset(request)
+        query = self.get_queryset(request.GET)
         rooms = query.values("name", "room_type__name", "id")
         context = {
             'rooms': rooms
@@ -247,5 +259,5 @@ class RoomsView(View):
         return render(request, "rooms.html", context)
 
     def get_queryset(self, request):
-        value_to_search = request.GET.get('value_to_search', None)
+        value_to_search = request.get('value_to_search', None)
         return Room.objects.filter(name__icontains=value_to_search) if value_to_search else Room.objects.all()

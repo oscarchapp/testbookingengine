@@ -1,27 +1,33 @@
-{% extends "main.html"%}
+{% extends "main.html" %}
 
 {% block content %}
-<h1>Dashboard</h1>
-<div class="card">
-    <h5 class="card-header">Hoy</h5>
-    <div class="d-flex justify-content-evenly pt-5 pb-5">
-        <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
-            <h5 class="small">Reservas hechas</h5>
-            <h1 class="dashboard-value">{{dashboard.new_bookings}}</h1>
-        </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
-            <h5 class="small">Huéspedes ingresando</h5>
-            <h1 class="dashboard-value">{{dashboard.incoming_guests}}</h1>
-        </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
-            <h5 class="small">Huéspedes saliendo</h5>
-            <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
-        </div>
+    <h1>Dashboard</h1>
+    <div class="card">
+        <h5 class="card-header">Hoy</h5>
+        <div class="d-flex justify-content-evenly pt-5 pb-5">
+            <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
+                <h5 class="small">Reservas hechas</h5>
+                <h1 class="dashboard-value">{{ dashboard.new_bookings }}</h1>
+            </div>
+            <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
+                <h5 class="small">Huéspedes ingresando</h5>
+                <h1 class="dashboard-value">{{ dashboard.incoming_guests }}</h1>
+            </div>
+            <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
+                <h5 class="small">Huéspedes saliendo</h5>
+                <h1 class="dashboard-value">{{ dashboard.outcoming_guests }}</h1>
+            </div>
 
-        <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
-            <h5 class="small">Total facturado</h5>
-            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+            <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
+                <h5 class="small">Total facturado</h5>
+                <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}
+                    0.00{% endif %} {{ dashboard.invoiced.total__sum|floatformat:2 }}</h1>
+            </div>
+            <div class="card text-white p-3 card-customization" style="background-color: #338529;">
+                    <h5 class="small">Porcentaje De Ocupación</h5>
+                    <h1 class="dashboard-value">% {% if dashboard.current_reservation == None %}
+                        0.00{% endif %} {{ dashboard.current_reservation|floatformat:2 }}</h1>
+            </div>
         </div>
     </div>
-</div>
-{% endblock content%}
+{% endblock content %}
