@@ -56,3 +56,35 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingDateForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        labels = {
+            "guests": "Huéspedes"
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(
+                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+            'guests': forms.DateInput(attrs={'type': 'number', 'min': 1, 'max': 4}),
+        }
+
+
+    def __init__(self, *args, **kwargs):
+        super(BookingDateForm, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+            })
+
+    def clean(self):
+        cleaned_data = super().clean()
+        checkin = cleaned_data['checkin']
+        checkout = cleaned_data['checkout']
+        booking_in_date_range = Booking.objects.exclude(id=self.instance.pk).filter(checkin__lt=checkout, checkout__gt=checkin)
+        if booking_in_date_range.exists():
+            raise forms.ValidationError("Ya existe una reservación para fecha especificada, por favor seleccione otra fecha")
+        return cleaned_data
