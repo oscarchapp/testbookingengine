@@ -237,10 +237,18 @@ class RoomDetailsView(View):
 
 
 class RoomsView(View):
+    form = RoomSearchNameForm
+
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
+        context = {"form": self.form, "rooms": rooms}
+        return render(request, "rooms.html", context)
+
+    def post(self, request):
+        # render a list of rooms filter for name
+        query = request.POST.dict()
+        filters = {"name__icontains": query["name"]}
+        rooms = Room.objects.filter(**filters).order_by("name")
+        context = {"form": self.form, "rooms": rooms}
         return render(request, "rooms.html", context)

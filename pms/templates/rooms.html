@@ -2,6 +2,19 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+
+
+<form action="{% url 'rooms'%}" method="POST">
+    {% csrf_token%}
+    {% for field in form %}
+    <div class="row">
+        <div class="col-md-2">{{field.label_tag}}</div>
+        <div class="col-md">{{field}}</div>
+        <button class="btn btn-primary col-md" type="submit">Buscar habitaciones</button>
+    </div>
+    {% endfor %}
+</form>
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
