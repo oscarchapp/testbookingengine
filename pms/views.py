@@ -1,3 +1,4 @@
+import datetime
 from decimal import Decimal
 
 from django.db.models import F, Q, Count, Sum
@@ -223,7 +224,6 @@ class DashboardView(View):
             'outcoming_guests': outcoming,
             'invoiced': invoiced,
             'current_reservation': current_reservation
-
         }
 
         context = {
@@ -232,8 +232,11 @@ class DashboardView(View):
         return render(request, "dashboard.html", context)
 
     def get_current_reservation(self):
+        today = datetime.today().date()
         rooms = Room.objects.all()
-        return (self.model.objects.filter(state='NEW').count() / rooms.count()) * 100 if rooms.exists() else Decimal(100)
+        number_of_rooms = rooms.count()
+        number_of_reservations = self.model.objects.filter(state='NEW', checkin__lte=today, checkout__gt=today).count()
+        return (number_of_reservations / number_of_rooms) * 100 if number_of_rooms > 0 else Decimal(100)
 
 
 class RoomDetailsView(View):
