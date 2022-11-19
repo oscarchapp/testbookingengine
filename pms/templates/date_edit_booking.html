@@ -1,0 +1,26 @@
+{% extends "main.html"%}
+
+{% block content %}
+<div class="col-sm-12 col-md-12">
+    <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset>
+            <legend>
+                <header>
+                    <h3 class="text-center col-sm-12">
+                        Actualizar Fecha De Reserva
+                    </h3>
+                </header>
+            </legend>
+        </fieldset>
+        {{ form.media }}
+        <table class="table fixed-table-body fixed-table-container">
+            {{ form.as_table }}
+        </table>
+        <div class="text-center">
+            <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+            <button type="submit" class="btn btn-outline-primary">Guardar</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

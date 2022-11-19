@@ -43,6 +43,38 @@ class BookingForm(ModelForm):
         }
 
 
+# By Nauzet
+
+class DateEditBooking(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        labels = {
+            "checkin": "Checkin",
+            "checkout": "Checkout"
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(
+                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(DateEditBooking, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+            })
+
+    def cleanDateEdit(self):
+        clean_data = super().clean()
+        checkin = clean_data['checkin']
+        checkout = clean_data['checkout']
+        date_booking = Booking.objects.exclude(id=self.instance.pk).filter(checkin__lt=checkout, checkout__gt=checkin)
+        if date_booking.exists():
+            raise forms.ValidationError("Ya existe una reserva en ese rango de fechas")
+        return clean_data
+
 class BookingFormExcluded(ModelForm):
     class Meta:
         model = Booking
@@ -56,3 +88,9 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+
+
+
+

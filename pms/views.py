@@ -1,9 +1,13 @@
-#By nauzet avg
-from django.db.models import F, Q, Count, Sum, Avg
+from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+
+# By Nauzet
+from django.urls import reverse
+from django.views.generic import UpdateView
+
 
 from .form_dates import Ymd
 from .forms import *
@@ -51,14 +55,9 @@ class RoomSearchView(View):
             'room_type__max_guests__gte': query['guests']
         }
 
-        #By Nauzet
+        # By Nauzet
         if 'search' in query:
-            filters['name__icontains'] = query['search']
-        #By Nauzet
-        if 'porcentaje' in query:
-            filters['total_rooms'] = query['porcentaje']
-        if 'porcentaje' in query:
-            filters['booking'] = query['porcentaje']
+            filters['name__icontains'] = query['search'],
 
         exclude = {
             'booking__checkin__lte': query['checkout'],
@@ -89,11 +88,10 @@ class RoomSearchView(View):
             "query": query,
             "url_query": url_query,
             "data": data,
-            #by nauzet
+            # by nauzet
             "checkin": query['checkin'],
             "checkout": query['checkout'],
-            "guests": query['guests'],
-            "porcentaje": query['porcentaje'],
+            "guests": query['guests']
         }
         return render(request, "search.html", context)
 
@@ -142,7 +140,7 @@ class BookingView(View):
         query['total'] = total
         url_query = request.GET.urlencode()
         booking_form = BookingFormExcluded(prefix="booking", initial=query)
-        customer_form = CustomerForm(prefix="customer")  
+        customer_form = CustomerForm(prefix="customer")
         context = {
             "url_query": url_query,
             "room": room,
@@ -172,7 +170,8 @@ class EditBookingView(View):
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
         booking_form = BookingForm(prefix="booking", instance=booking)
-        customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+        customer_form = CustomerForm(
+            prefix="customer", instance=booking.customer)
         context = {
             'booking_form': booking_form,
             'customer_form': customer_form
@@ -181,10 +180,12 @@ class EditBookingView(View):
         return render(request, "edit_booking.html", context)
 
     # updates the customer form
+
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
         booking = Booking.objects.get(id=pk)
-        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+        customer_form = CustomerForm(
+            request.POST, prefix="customer", instance=booking.customer)
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
@@ -243,7 +244,7 @@ class DashboardView(View):
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
             'invoiced': invoiced,
-            'porcentaje_guests': porcentaje_guests,
+            'porcentaje_guests': porcentaje_guests
 
         }
 
@@ -273,3 +274,15 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+#By Nauzet
+
+class DateEditBooking(UpdateView):
+    model = Booking
+    form_class = DateEditBooking
+    template_name = 'date_edit_booking.html'
+
+    def get_success_url(self):
+        return reverse('home')
+

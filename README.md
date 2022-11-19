@@ -67,3 +67,4 @@ Use for username and password for superuser is "admin" (without quotes).Remember
 #Colaboradores
 * Nauzet Lopez Mendoza 1.Filter room panel
 * Nauzet Lopez Mendoza 2.Porcentaje ocupacion
+* Nauzet Lopez Mendoza 3.Editar fechas
