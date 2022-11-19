@@ -49,6 +49,11 @@ class RoomSearchView(View):
         filters = {
             'room_type__max_guests__gte': query['guests']
         }
+
+        #By Nauzet
+        if 'search' in query:
+            filters['name__icontains'] = query['search']
+
         exclude = {
             'booking__checkin__lte': query['checkout'],
             'booking__checkout__gte': query['checkin'],
@@ -77,7 +82,11 @@ class RoomSearchView(View):
             "total_rooms": total_rooms,
             "query": query,
             "url_query": url_query,
-            "data": data
+            "data": data,
+            #by nauzet
+            "checkin": query['checkin'],
+            "checkout": query['checkout'],
+            "guests": query['guests'],
         }
         return render(request, "search.html", context)
 

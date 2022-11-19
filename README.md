@@ -64,4 +64,5 @@ Use for username and password for superuser is "admin" (without quotes).Remember
 ## License
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://choosealicense.com/licenses/mit/)
 
-
+#Colaboradores
+* Nauzet Lopez Mendoza 1.Filter room panel

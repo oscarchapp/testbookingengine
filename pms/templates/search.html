@@ -31,6 +31,17 @@
 </div>
 <h1>Habitaciones disponibles</h1>
 
+<!-- By Nauzet -->
+<form action="{% url 'search'%}" method="post">
+    {% csrf_token%}
+    <input type="text" name="search" placeholder="filter">
+    <input type="hidden" value="{{checkin}}" name="checkin">
+    <input type="hidden" value="{{checkout}}" name="checkout">
+    <input type="hidden" value="{{guests}}" name="guests">
+    <button class="btn btn-primary" type="submit">Filtrar</button>
+</form>
+
+
 <div id="rooms-accordion" class="">
     {% for room in total_rooms %}
         
