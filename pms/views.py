@@ -1,4 +1,5 @@
-from django.db.models import F, Q, Count, Sum
+#By nauzet avg
+from django.db.models import F, Q, Count, Sum, Avg
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -6,7 +7,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .form_dates import Ymd
 from .forms import *
-from .models import Room
+from .models import Room, Room_type
 from .reservation_code import generate
 
 
@@ -53,6 +54,11 @@ class RoomSearchView(View):
         #By Nauzet
         if 'search' in query:
             filters['name__icontains'] = query['search']
+        #By Nauzet
+        if 'porcentaje' in query:
+            filters['total_rooms'] = query['porcentaje']
+        if 'porcentaje' in query:
+            filters['booking'] = query['porcentaje']
 
         exclude = {
             'booking__checkin__lte': query['checkout'],
@@ -87,6 +93,7 @@ class RoomSearchView(View):
             "checkin": query['checkin'],
             "checkout": query['checkout'],
             "guests": query['guests'],
+            "porcentaje": query['porcentaje'],
         }
         return render(request, "search.html", context)
 
@@ -135,7 +142,7 @@ class BookingView(View):
         query['total'] = total
         url_query = request.GET.urlencode()
         booking_form = BookingFormExcluded(prefix="booking", initial=query)
-        customer_form = CustomerForm(prefix="customer")
+        customer_form = CustomerForm(prefix="customer")  
         context = {
             "url_query": url_query,
             "room": room,
@@ -218,12 +225,25 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # By Nauzet get % ocupacion
+        # porcentaje = (Booking.objects
+        #             .filter(created__range=today_range)
+        #             .exclude(state="DEL")
+        #             .values("id")
+        #             .aggregate(Avg('total'))
+        #            )
+        booking = Booking.objects.filter(state="NEW").count()
+        room = Room.objects.all().count()
+        porcentaje_guests = (booking / room) * 100
+                                                
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'porcentaje_guests': porcentaje_guests,
 
         }
 

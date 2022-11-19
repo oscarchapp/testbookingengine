@@ -22,6 +22,13 @@
             <h5 class="small">Total facturado</h5>
             <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
         </div>
+        <!-- By Nauzet -->
+        <div class="card text-white p-3 card-customization" style="background-color: #f70404;">
+            <h5 class="small">% Ocupación</h5>
+            <h1 class="dashboard-value">{{dashboard.porcentaje_guests}}%</h1>
+        </div>
+
+
     </div>
 </div>
 {% endblock content%}
