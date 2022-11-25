@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from django import forms
 from django.forms import ModelForm
@@ -56,3 +57,13 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+class RoomForm(forms.Form):
+    room=forms.CharField(label='',max_length=100,widget=forms.TextInput(attrs={'class' : 'form-control', 'placeholder':'Habitacion','class':'mb-0 mt-0 pb-0','required':'false'}))
+    def clean_room(self):
+        p = re.compile('^[A-Za-z0-9]*\s*.*[0-9]*\s*[0-9]*$')
+        room=self.cleaned_data.get("room")
+        m=p.match(room)
+        if not m:
+            raise forms.ValidationError("Patron para habitacion incorrecto")
+        return room
