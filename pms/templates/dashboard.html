@@ -20,8 +20,16 @@
 
         <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
             <h5 class="small">Total facturado</h5>
-            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %}
+                {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
         </div>
     </div>
-</div>
-{% endblock content%}
+    <h5 class="card-header">% de Ocupación</h5>
+    <div class="justify-content-evenly pt-5 pb-5" style="padding-left: 48px; padding-right: 48px;">
+        <div class="progress" style="height: 60px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: {{dashboard.ocupation_percent}}%;"
+                aria-valuenow="{{dashboard.ocupation_percent}}" aria-valuemin="0" aria-valuemax="100">{{dashboard.ocupation_percent}}%</div>
+        </div>
+    </div>
+
+    {% endblock content%}

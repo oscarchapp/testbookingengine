@@ -11,32 +11,31 @@
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250 rooms">
     <div class="col p-3">
-        <div class="info_room">
+        <div>
             {{room.name}} ({{room.room_type__name}})
         </div>
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>    
-    </div>    
+        </div>
+    </div>
 </div>
 {% endfor %}
 {% endblock content%}
 {% block javascript %}
 <script>
     const btnSearch = document.querySelector('#btnSearch')
-    btnSearch.addEventListener('click', ()=>{
+    btnSearch.addEventListener('click', () => {
         const txtSearch = document.querySelector('#txtSearch').value
         rooms = Array.from(document.querySelectorAll('.rooms'))
-        rooms.forEach((item, key)=>{
+        rooms.forEach((item, key) => {
             re = new RegExp(txtSearch, 'gi')
             const child_element = item.firstElementChild.firstElementChild.innerText
-            // if(!child_element.includes(txtSearch)){
-            if(!re.test(child_element)){
+            if (!re.test(child_element)) {
                 item.style.display = "none";
-            }else{
+            } else {
                 item.style.display = "block";
             }
-            
+
         })
 
     })
