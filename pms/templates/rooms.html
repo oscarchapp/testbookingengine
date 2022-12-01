@@ -2,18 +2,43 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<div class="row">
+    <div class="col col-6">
+        <input type="text" id="txtSearch" class="">
+        <button id="btnSearch" class="btn btn-info">Search</button>
+    </div>
+</div>
 {% for room in rooms%}
-<div class="row card mt-3 mb-3 hover-card bg-tr-250">
+<div class="row card mt-3 mb-3 hover-card bg-tr-250 rooms">
     <div class="col p-3">
-        <div class="">
+        <div class="info_room">
             {{room.name}} ({{room.room_type__name}})
         </div>
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>
-        
-    </div>
-    
+        </div>    
+    </div>    
 </div>
 {% endfor %}
 {% endblock content%}
+{% block javascript %}
+<script>
+    const btnSearch = document.querySelector('#btnSearch')
+    btnSearch.addEventListener('click', ()=>{
+        const txtSearch = document.querySelector('#txtSearch').value
+        rooms = Array.from(document.querySelectorAll('.rooms'))
+        rooms.forEach((item, key)=>{
+            re = new RegExp(txtSearch, 'gi')
+            const child_element = item.firstElementChild.firstElementChild.innerText
+            // if(!child_element.includes(txtSearch)){
+            if(!re.test(child_element)){
+                item.style.display = "none";
+            }else{
+                item.style.display = "block";
+            }
+            
+        })
+
+    })
+</script>
+{% endblock %}
