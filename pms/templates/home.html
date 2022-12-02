@@ -64,11 +64,10 @@
             </div>
             <div class="row">
                 <div class="col">
-
                     <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
-
+                    <a href="{% url 'edit_booking' pk=booking.id %}?dates=edit">Editar fechas de reserva</a>
                 </div>
                 <div class="col">
 

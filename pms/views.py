@@ -154,27 +154,48 @@ class DeleteBookingView(View):
 class EditBookingView(View):
     # renders the booking edition form
     def get(self, request, pk):
+        edit_dates = request.GET.get('dates', None)
         booking = Booking.objects.get(id=pk)
-        booking_form = BookingForm(prefix="booking", instance=booking)
+        booking_edit_form = BookingEditForm(instance=booking)
         customer_form = CustomerForm(prefix="customer", instance=booking.customer)
         context = {
-            'booking_form': booking_form,
-            'customer_form': customer_form
-
+            'booking_form': booking_edit_form,
+            'customer_form': customer_form,
+            'edit_dates': edit_dates
         }
         return render(request, "edit_booking.html", context)
 
-    # updates the customer form
+    # updates the customer or booking form
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
         booking = Booking.objects.get(id=pk)
-        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
-        if customer_form.is_valid():
-            customer_form.save()
-            return redirect("/")
+        edit_dates = request.GET.get('dates', None)
+        if not edit_dates:
+            customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+            if customer_form.is_valid():
+                customer_form.save()
+                return redirect("/")
+        else:
+            booking_edit_form = BookingEditForm(request.POST, instance=booking)
+            reserved_booking = (Booking.objects
+                                .filter(room=booking.room, 
+                                        checkin__lte=request.POST.get('checkin'), 
+                                        checkout__gte=request.POST.get('checkout')))                 
+            if reserved_booking:
+                context = {
+                    'booking_form': booking_edit_form,
+                    'edit_dates': edit_dates,
+                    'error': 'No hay disponibilidad para las fechas seleccionadas.'
+                }
+                return render(request, "edit_booking.html", context)
+            else:
+                if booking_edit_form.is_valid():
+                    booking_edit_form.save()
+                    return redirect('/')
 
 
-class DashboardView(View):
+
+class DashboardView(View): 
     def get(self, request):
         from datetime import date, time, datetime
         today = date.today()
