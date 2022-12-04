@@ -41,6 +41,11 @@ class RoomSearchView(View):
     # renders the search results of available rooms by date and guests
     def post(self, request):
         query = request.POST.dict()
+        # validate range dates
+        if query['checkin'] > query['checkout']:
+            room_search_form = RoomSearchForm(request.POST)
+            context = {'error':"La fecha de Checkin no puede ser despues de checkout",'form':room_search_form}
+            return render(request, "booking_search_form.html", context)
         # calculate number of days in the hotel
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
@@ -173,6 +178,53 @@ class EditBookingView(View):
             customer_form.save()
             return redirect("/")
 
+
+class EditBookingDateView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        edit_booking_form = EditBookingDateForm(instance=booking)
+
+        context = {
+            'edit_booking_form': edit_booking_form,
+        }
+        return render(request, "edit_booking_date.html", context)
+
+    def post(self, request,pk):
+        query = request.POST.dict()
+        checkin_query = query['checkin']
+        checkout_query = query['checkout']
+
+        if checkin_query > checkout_query:
+            edit_booking_form = EditBookingDateForm(request.POST)
+            context = {'error':"La fecha de Checkin no puede ser despues de checkout",'edit_booking_form':edit_booking_form}
+            return render(request, "edit_booking_date.html", context)
+
+        booking = Booking.objects.get(id=pk)
+
+        filters = {
+            'room':booking.room,
+            'state__exact': "NEW"
+        }
+
+        exclude = {
+            'id': booking.id,
+        }
+
+        bookings = (Booking.objects
+                 .filter(Q(checkin__range=(checkin_query,checkout_query)) | Q(checkout__range=(checkin_query,checkout_query)))
+                 .filter(**filters)
+                 .exclude(**exclude)
+                 )
+
+        if bookings:
+            edit_booking_form = EditBookingDateForm(request.POST)
+            context = {'error':"No hay disponibilidad para las fechas seleccionadas",'edit_booking_form':edit_booking_form}
+            return render(request, "edit_booking_date.html", context)               
+        else:
+            booking.checkin = query['checkin']
+            booking.checkout = query['checkout']
+            booking.save()                    
+        return redirect("/")
 
 class DashboardView(View):
     def get(self, request):
