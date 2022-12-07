@@ -209,13 +209,22 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # occupancy percentage
+        # Filter by checkout is added since there is Booking with state New but with past checkout
+        confirmed_bookings = Booking.objects.filter(
+            state=Booking.NEW,
+            checkout__gte=today,
+        ).count()
+        total_rooms = Room.objects.count()
+        occupancy = 0 if confirmed_bookings == 0 else (confirmed_bookings / total_rooms)*100
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupancy': occupancy
         }
 
         context = {
