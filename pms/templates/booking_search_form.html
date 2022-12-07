@@ -1,10 +1,10 @@
 {% extends "main.html"%}
 
 {% block content %}
-<h1>Nueva reserva</h1>
-<form action="{% url 'search'%}" method="POST">
+<h1>{{title_form}}</h1>
+<form action="{{url_form}}" method="POST">
     {% csrf_token%}
-    {% for field in form %}
+    {% for field in form.visible_fields%}
     <div class="row">
         <div class="col-md-2">{{field.label_tag}}</div>
         <div class="col-md">{{field}}</div>
@@ -14,8 +14,19 @@
         <div class="col"><span>Días: </span><span id="total-days"></span></div>
     </div>
     <div class="row">
+        {% if form.errors %}
+            {% for error in form.non_field_errors  %}
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span style="color:red">Error: {{ error|striptags }}</span>
+            {% endfor %}
+        {% endif%}
+        {% if error %}
+            <span style="color:red">Error: {{ error }}</span>
+        {% endif%}
+    </div>
+    <div class="row">
         <div class="col-md-auto">
-            <button class="btn btn-primary" type="submit">Buscar disponibilidad</button>
+            <button class="btn btn-primary" type="submit">{{submit_name}}</button>
         </div>
     </div>
 </form>

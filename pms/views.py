@@ -1,5 +1,6 @@
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -33,6 +34,9 @@ class RoomSearchView(View):
     def get(self, request):
         room_search_form = RoomSearchForm()
         context = {
+            'url_form': reverse('search'),
+            'title_form': 'Nueva reserva',
+            'submit_name': 'Buscar disponibilidad',
             'form': room_search_form
         }
 
@@ -244,3 +248,83 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+class BookingDatesView(View):
+
+    def get(self, request, pk):
+        """Render de dates form
+        
+        Args:
+            id: pk
+
+        Context:
+            form BookingDatesForm
+
+        Template:
+            :template: 'booking_search_form.html'
+
+        """
+        booking = Booking.objects.get(id=pk)
+        booking_dates_form = BookingDatesForm(instance=booking)
+        context = {
+            'url_form': reverse('edit_dates', args=[pk]),
+            'title_form': 'Editar fechas de la reserva',
+            'submit_name': 'Guardar',
+            'form': booking_dates_form
+        }
+
+        return render(request, "booking_search_form.html", context)
+
+    def post(self, request, pk):
+        """Modifies de dates for a booking
+        
+        Args:
+            id: pk
+            
+        Context:
+            form BookingDatesForm
+
+        Template:
+            :template: 'booking_search_form.html'
+
+        """
+        booking = Booking.objects.get(id=pk)
+        query = request.POST.dict()
+        
+        new_checkin = query['checkin']
+        new_checkout = query['checkout']
+
+        # calculate number of days in the hotel
+        checkin = Ymd.Ymd(new_checkin)
+        checkout = Ymd.Ymd(new_checkout)
+        total_days = checkout - checkin
+
+        bookings_for_room = Booking.objects.filter(
+                                Q(room_id=booking.room.id),
+                                Q(state__exact=Booking.NEW),
+                                Q(checkin__range=[new_checkin, new_checkout]) |
+                                Q(checkout__range=[new_checkin, new_checkout])      
+                            ).exclude(id=booking.id)
+        
+        post_values = request.POST.copy()
+        post_values['total']=total_days * booking.room.room_type.price
+
+        booking_dates_form = BookingDatesForm(post_values, instance=booking)
+        context = {
+            'url_form': reverse('edit_dates', args=[pk]),
+            'title_form': 'Editar fechas de la reserva',
+            'submit_name': 'Guardar',
+            'form': booking_dates_form
+        }
+        
+        if bookings_for_room:
+            context['error'] = 'No hay disponibilidad para las fechas seleccionadas'
+            return render(request, "booking_search_form.html", context)
+            
+        elif booking_dates_form.is_valid():
+            booking_dates_form.save()
+            return redirect("/")
+
+        else:
+            return render(request, "booking_search_form.html", context)     

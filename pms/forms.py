@@ -56,3 +56,25 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingDatesForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout', 'total']
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(
+                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+            'total': forms.HiddenInput()
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        checkin = cleaned_data.get('checkin')
+        checkout = cleaned_data.get('checkout')
+        if checkout < checkin:
+            raise forms.ValidationError(
+                'La fecha de salida no puede ser menor '
+                'a la fecha de entrada'
+            )
