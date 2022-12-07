@@ -2,6 +2,21 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+
+<div class="row">
+    <div class="col-md-8"></div>
+    <div class="col-md-4">
+
+        <form method="get" class="d-flex">
+            <input class="form-control me-2" type="search" required name="name" placeholder="Nombre Habitación" style="background-color:lavender;">
+            <button class="btn" style="background-color:LightSteelBlue;" type="submit">Buscar</button>
+            <div>
+                <a href="{% url 'rooms' %}">Limpiar Busqueda</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
