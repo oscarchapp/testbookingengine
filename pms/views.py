@@ -238,8 +238,24 @@ class RoomDetailsView(View):
 
 class RoomsView(View):
     def get(self, request):
-        # renders a list of rooms
+        """Renders a list of rooms :model: Room
+
+        Args:
+            name (str) : optional search by name
+            
+        Context:
+            list instances of Room
+
+        Template:
+            :template: 'rooms.html'
+
+        """
+        name = request.GET.get("name")       
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+
+        if name:
+            rooms = rooms.filter(name__icontains=name)
+
         context = {
             'rooms': rooms
         }
