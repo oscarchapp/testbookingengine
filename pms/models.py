@@ -33,8 +33,10 @@ class Room(models.Model):
 class Booking(models.Model):
     NEW = 'NEW'
     DELETED = 'DEL'
+    COMFIRMED = 'COM'
     STATE_CHOICES = [
         (NEW, 'Nueva'),
+        (COMFIRMED, 'Confirmado'),
         (DELETED, 'Cancelada'),
     ]
     state = models.CharField(

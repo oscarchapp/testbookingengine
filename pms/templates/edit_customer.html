@@ -5,7 +5,7 @@
 <form action="" method="post">
 
     {% csrf_token%}
-    {% for field in booking_form %}
+    {% for field in customer_form %}
     <div class="row">
         <div class="col-md-2">
             {{field.label_tag}}
@@ -15,11 +15,6 @@
         </div>
     </div>
     {% endfor %}
-    <div class="row">
-        <div class="col-md-2">
-            <p>{{ booking_form.non_field_errors }}</p>
-        </div>
-    </div>
     <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
     <button class="btn btn-primary" type="submit">Guardar datos</button>
 </form>

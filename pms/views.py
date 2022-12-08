@@ -3,10 +3,11 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from decimal import Decimal
 
 from .form_dates import Ymd
 from .forms import *
-from .models import Room
+from .models import Room, Booking
 from .reservation_code import generate
 
 
@@ -151,18 +152,16 @@ class DeleteBookingView(View):
         return redirect("/")
 
 
-class EditBookingView(View):
+class EditCustomerView(View):
     # renders the booking edition form
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
-        booking_form = BookingForm(prefix="booking", instance=booking)
         customer_form = CustomerForm(prefix="customer", instance=booking.customer)
         context = {
-            'booking_form': booking_form,
             'customer_form': customer_form
 
         }
-        return render(request, "edit_booking.html", context)
+        return render(request, "edit_customer.html", context)
 
     # updates the customer form
     @method_decorator(ensure_csrf_cookie)
@@ -172,6 +171,29 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+
+class EditBookingView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingEditForm(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form,
+        }
+        return render(request, "edit_booking.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingEditForm(request.POST, prefix="booking", instance=booking)
+        if booking_form.is_valid():
+            booking_form.save()
+            return redirect("/")
+        else:
+            context = {
+                'booking_form': booking_form,
+            }
+            return render(request, "edit_booking.html", context)
 
 
 class DashboardView(View):
@@ -191,31 +213,41 @@ class DashboardView(View):
         # get incoming guests
         incoming = (Booking.objects
                     .filter(checkin=today)
-                    .exclude(state="DEL")
+                    .exclude(state=Booking.DELETED)
                     .values("id")
                     ).count()
 
         # get outcoming guests
         outcoming = (Booking.objects
                      .filter(checkout=today)
-                     .exclude(state="DEL")
+                     .exclude(state=Booking.DELETED)
                      .values("id")
                      ).count()
 
         # get outcoming guests
         invoiced = (Booking.objects
                     .filter(created__range=today_range)
-                    .exclude(state="DEL")
+                    .exclude(state=Booking.DELETED)
                     .aggregate(Sum('total'))
                     )
+
+        # get number of booking comfirmed
+        booking_comfirmed = (Booking.objects
+                            .filter(state=Booking.COMFIRMED, 
+                                    checkin=today, 
+                                    checkout=today)
+                            .exclude(state=Booking.DELETED)
+                            ).count()
+
+        existing_rooms  = Room.objects.all().count()
 
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupancy_rate': (Decimal(booking_comfirmed)/Decimal(existing_rooms)) * 100
         }
 
         context = {

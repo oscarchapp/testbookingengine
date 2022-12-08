@@ -19,15 +19,22 @@ body{
     margin: 1em 0.5em 1em 0.5em;
     border-radius: 0.3em;
 }
-.tag-red{
 
+.tag-red{
     background: #ff7a7a;
     color: white;
 }
+
+.tag-yellow{
+    background: #dbcf27;
+    color: white;
+}
+
 .tag-green {
     background: #01a901;
     color: white;
 }
+
 .card-customization{
     width: 250px;
     height: 200px;
