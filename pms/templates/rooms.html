@@ -2,6 +2,19 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<div class="card card-body row">
+    <form method="post" action="">{% csrf_token %}
+        <div class="row">
+            <div class="col">
+                <span>Habitacion</span>
+                <input name="search" type="text" placeholder="Search" value="{{search}}" />
+            </div>
+            <div class="col">
+                <button type="submit">Buscar</button>
+            </div>
+        </div>
+    </form> 
+</div>
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
