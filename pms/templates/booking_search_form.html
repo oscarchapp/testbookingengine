@@ -1,19 +1,28 @@
 {% extends "main.html"%}
 
 {% block content %}
-<h1>Nueva reserva</h1>
-<form action="{% url 'search'%}" method="POST">
+<h1>{{title}}</h1>
+
+    {% if id %}
+        <form action="{% url url_form pk=id%}" method="POST">
+    {% else %}
+        <form action="{% url url_form %}" method="POST">  
+    {% endif%}
+
     {% csrf_token%}
     {% for field in form %}
-    <div class="row">
+    <div class="row mt-2">
         <div class="col-md-2">{{field.label_tag}}</div>
         <div class="col-md">{{field}}</div>
     </div>
     {% endfor %}
-    <div class="row">
+    <div class="row mt-2">
         <div class="col"><span>Días: </span><span id="total-days"></span></div>
     </div>
-    <div class="row">
+    {% if message %}
+        <h4>{{message}}</h4>
+    {% endif%}
+    <div class="row mt-2">
         <div class="col-md-auto">
             <button class="btn btn-primary" type="submit">Buscar disponibilidad</button>
         </div>

@@ -42,6 +42,18 @@ class BookingForm(ModelForm):
             'guests': forms.HiddenInput()
         }
 
+class BookingFormUpdate(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin','checkout','guests']
+        labels = {
+            'guests': 'Huéspedes'
+        }
+        widgets = {  
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+            'guests': forms.DateInput(attrs={'readonly':True, 'type': 'number', 'min': 1, 'max': 4} ),
+        }
 
 class BookingFormExcluded(ModelForm):
     class Meta:

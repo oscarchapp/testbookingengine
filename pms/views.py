@@ -33,6 +33,8 @@ class RoomSearchView(View):
     def get(self, request):
         room_search_form = RoomSearchForm()
         context = {
+            'title': 'Nueva Reserva',
+            'url_form': 'search',
             'form': room_search_form
         }
 
@@ -262,4 +264,47 @@ class RoomsView(View):
             'rooms': rooms,
             'search': search
         }
-        return render(request, "rooms.html", context)    
+        return render(request, "rooms.html", context)
+
+class EditDateBookingView(View):
+    def get(self, request, pk):
+        # find booking to edit and return data 
+        booking = Booking.objects.get(id=pk)
+        booking_form_update = BookingFormUpdate(instance=booking)
+        context = {
+            'title': 'Modificar Reserva',
+            'url_form': 'valid_change',
+            'form': booking_form_update,
+            'id': pk
+        }
+
+        return render(request, "booking_search_form.html", context)
+
+class ValidDateBookingView(View):
+    # validate availability for the new dates
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        message = 'Fechas no disponibles para la habitacion'
+        query = request.POST.dict()
+        range_booking = (query["checkin"], query["checkout"])
+
+        # query to find any room with crossing dates
+        active_booking = Booking.objects.filter(room=booking.room).filter(
+            Q(checkout__range=range_booking) | Q(checkin__range=range_booking)).exclude(id=booking.id).exclude(state="DEL").count()
+
+        if(active_booking==0):
+            message='Reserva modificada exitosamente'
+            booking.checkin=query["checkin"]
+            booking.checkout=query["checkout"]
+            booking.save()
+
+        booking_form_update = BookingFormUpdate(instance=booking)
+        context = {
+            'title': 'Modificar Reserva',
+            'url_form': 'valid_change',
+            'form': booking_form_update,
+            'id': pk,
+            'message': message
+        }
+
+        return render(request, "booking_search_form.html", context)
