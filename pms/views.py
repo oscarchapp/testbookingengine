@@ -208,14 +208,28 @@ class DashboardView(View):
                     .exclude(state="DEL")
                     .aggregate(Sum('total'))
                     )
+        
+        # get occupancy percentage
+        bookings = float(
+            Booking.objects
+            .exclude(state="DEL")
+            .filter(
+                Q(checkin__lte=today) & Q(checkout__gt=today)
+            ).values('id')
+            .count()
+        )
+        if bookings == 0:
+            occupancy = 0
+        else:
+            occupancy = int(bookings / float(Room.objects.values('id').count()) * 100)
 
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupancy': occupancy
         }
 
         context = {
