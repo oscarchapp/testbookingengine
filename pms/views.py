@@ -160,7 +160,6 @@ class EditBookingView(View):
         context = {
             'booking_form': booking_form,
             'customer_form': customer_form
-
         }
         return render(request, "edit_booking.html", context)
 
@@ -173,6 +172,21 @@ class EditBookingView(View):
             customer_form.save()
             return redirect("/")
 
+
+class EditBookingDatesView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        dates_form = DatesForm(prefix="dates", instance=booking)
+        context = {'dates_form': dates_form}
+        return render(request, 'edit_booking_dates.html', context)
+    
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        dates_form = DatesForm(request.POST, prefix="dates", instance=booking)
+        if dates_form.is_valid():
+            dates_form.save()
+            return redirect("/")
 
 class DashboardView(View):
     def get(self, request):
