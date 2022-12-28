@@ -2,7 +2,15 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
+<form class="form-inline" method="GET">
+    <div class="form-group">
+      <div class="input-group">
+        {{rooms.form.search}}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+{% for room in rooms.qs %}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
         <div class="">

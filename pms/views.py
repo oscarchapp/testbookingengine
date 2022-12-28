@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from .filters import RoomFilter
 from .form_dates import Ymd
 from .forms import *
 from .models import Room
@@ -239,8 +240,12 @@ class RoomDetailsView(View):
 class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
+        rooms = RoomFilter(
+            request.GET,
+            Room.objects.all()
+            .select_related("room_type")
+            .values("name", "room_type__name", "id")
+            .order_by("name"),
+        )
+        context = {"rooms": rooms}
         return render(request, "rooms.html", context)
