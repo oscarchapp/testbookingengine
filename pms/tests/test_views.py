@@ -65,17 +65,11 @@ class RoomSearchViewTest(TestCase):
         self.assertQuerysetEqual(context["rooms"].qs, queryset)
 
     def test_search_with_value_and_return_empty_content(self):
-        """
-        Test to verify if the search works well
-        """
         response = self.client.get(self.url, {"search": "1.133"})
         context = response.context
         self.assertQuerysetEqual(context["rooms"].qs, [])
 
     def test_search_with_empty_value_and_return_empty_content(self):
-        """
-        Test to verify if the search works well
-        """
         response = self.client.get(self.url, {"search": ""})
         context = response.context
         queryset = (
