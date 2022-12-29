@@ -1,7 +1,9 @@
 from django.db.models import F, Q, Count, Sum
+from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.generic import UpdateView
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .form_dates import Ymd
@@ -244,3 +246,10 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+class BookingEditDatesView(UpdateView):
+    model = Booking
+    form_class = BookingEditDatesForm
+    template_name = "edit_dates_booking.html"
+    success_url = reverse_lazy("home")

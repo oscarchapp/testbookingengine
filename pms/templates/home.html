@@ -64,14 +64,12 @@
             </div>
             <div class="row">
                 <div class="col">
-
                     <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
-
+                    <a href="{% url 'edit_dates_booking' pk=booking.id%} " >Editar fecha</a>
                 </div>
                 <div class="col">
-
                     {% if booking.state != "DEL" %}
                     <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
                     {% endif %}
