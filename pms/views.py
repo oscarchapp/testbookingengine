@@ -215,7 +215,10 @@ class DashboardView(View):
             .count()
         )
         rooms_all_exist = Room.objects.all().count()
-        percentage_by_occupation =  (total_booking_confirmed / rooms_all_exist) * 100
+        if rooms_all_exist == 0:
+            percentage_by_occupation = 0
+        else:
+            percentage_by_occupation =  (total_booking_confirmed / rooms_all_exist) * 100
 
         # preparing context data
         dashboard = {
