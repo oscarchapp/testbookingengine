@@ -209,7 +209,11 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
         #percentage by occupation
-        total_booking_confirmed = Booking.objects.filter(state=Booking.NEW, checkout__gt=today).count()
+        total_booking_confirmed = (
+            Booking.objects
+            .filter(state=Booking.NEW, checkout__gt=today)
+            .count()
+        )
         rooms_all_exist = Room.objects.all().count()
         percentage_by_occupation =  (total_booking_confirmed / rooms_all_exist) * 100
 
