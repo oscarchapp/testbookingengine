@@ -96,7 +96,6 @@ class DashboardViewTest(TestCase):
         )
 
     def test_percentage_value_50(self):
-
         response = self.client.get(self.url)
         context = response.context
         self.assertEqual(context["dashboard"]["percentage_by_occupation"], 50)
