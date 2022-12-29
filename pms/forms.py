@@ -2,6 +2,7 @@ from datetime import datetime
 from django import forms
 from django.forms import ModelForm
 
+from .form_dates.dates_limits import *
 from .models import Booking, Customer
 
 
@@ -13,9 +14,9 @@ class RoomSearchForm(ModelForm):
             "guests": "Huéspedes"
         }
         widgets = {
-            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': get_today_str()}),
             'checkout': forms.DateInput(
-                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+                attrs={'type': 'date', 'max': get_checkout_max_date(), 'min': get_checkout_min_date()}),
             'guests': forms.DateInput(attrs={'type': 'number', 'min': 1, 'max': 4}),
         }
 
@@ -67,8 +68,8 @@ class DatesForm(ModelForm):
             'checkout': 'Checkout'
         }
         widgets = {
-            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': get_today_str()}),
             'checkout': forms.DateInput(
-                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}
+                attrs={'type': 'date', 'max': get_checkout_max_date(), 'min': get_checkout_min_date()}
             )
         }
