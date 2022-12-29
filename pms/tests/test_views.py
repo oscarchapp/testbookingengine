@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from pms.models import Room, Room_type, Booking
 from pms.forms import BookingEditDatesForm
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class BookingEditDatesViewTest(TestCase):
 
@@ -81,11 +81,13 @@ class BookingEditDatesViewTest(TestCase):
         self.assertContains(response, "Booking already exists with date", 1)
 
     def test_valid_success(self):
+        today = datetime.today().date()
+        more_days = today + timedelta(days=3)
         response = self.client.post(self.url, {
-            "checkout": datetime(2022, 12, 30).date(),
-            "checkin": datetime(2022, 12, 26).date()
+            "checkout": more_days,
+            "checkin": today
         })
         self.assertEqual(response.status_code, 302)
         booking = Booking.objects.get(id=self.booking_1.id)
-        self.assertEqual(booking.checkout, datetime(2022, 12, 30).date())
-        self.assertEqual(booking.checkin, datetime(2022, 12, 26).date())
+        self.assertEqual(booking.checkout, more_days)
+        self.assertEqual(booking.checkin, today)

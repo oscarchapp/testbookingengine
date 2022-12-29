@@ -75,7 +75,9 @@ class BookingEditDatesForm(ModelForm):
         checkin = self.cleaned_data.get('checkin')
         checkout = self.cleaned_data.get('checkout')
         if checkout < checkin:
-            self.add_error('checkout', "checkout invalid")
+            self.add_error('checkout', 'checkout invalid')
+        if checkin < datetime.today().date():
+             self.add_error('checkin', 'checkin invalid')
         room = self.booking.room
         booking_exist = (
             Booking.objects
@@ -87,5 +89,5 @@ class BookingEditDatesForm(ModelForm):
             )
         )
         if booking_exist.exists():
-            raise forms.ValidationError("Booking already exists with date")
+            raise forms.ValidationError('Booking already exists with date')
         return self.cleaned_data

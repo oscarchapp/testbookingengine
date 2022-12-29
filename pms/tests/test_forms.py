@@ -1,7 +1,7 @@
 from django.test import TestCase
 from pms.models import Room, Room_type, Booking
 from pms.forms import BookingEditDatesForm
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class BookingEditDatesFormTest(TestCase):
 
@@ -61,6 +61,16 @@ class BookingEditDatesFormTest(TestCase):
         self.assertFalse(booking_form.is_valid())
         self.assertEqual(booking_form.errors["checkout"], ["checkout invalid"])
 
+    def test_date_checkin_invalid(self):
+        today = datetime.today().date()
+        yesterday = today - timedelta(days=1)
+        booking_form = BookingEditDatesForm({
+            "checkout": datetime(2022, 12, 30).date(),
+            "checkin": yesterday
+        }, instance=self.booking_1)
+        self.assertFalse(booking_form.is_valid())
+        self.assertEqual(booking_form.errors["checkin"], ["checkin invalid"])
+
     def test_range_date_invalid(self):
         booking_form = BookingEditDatesForm({
             "checkout": datetime(2022, 12, 30).date(),
@@ -70,8 +80,10 @@ class BookingEditDatesFormTest(TestCase):
         self.assertEqual(booking_form.errors["__all__"], ["Booking already exists with date"])
 
     def test_valid_success(self):
+        today = datetime.today().date()
+        more_days = today + timedelta(days=3)
         booking_form = BookingEditDatesForm({
-            "checkout": datetime(2022, 12, 30).date(),
-            "checkin": datetime(2022, 12, 26).date()
+            "checkout": more_days,
+            "checkin": today
         }, instance=self.booking_1)
         self.assertTrue(booking_form.is_valid())
