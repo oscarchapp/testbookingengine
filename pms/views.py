@@ -240,7 +240,11 @@ class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+        filter_name = request.GET.get("name")
+        if filter_name:
+            rooms = rooms.filter(name__contains=filter_name)
         context = {
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
