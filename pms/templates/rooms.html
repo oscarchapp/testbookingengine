@@ -2,6 +2,14 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<div>
+    <li class="nav-item d-flex justify-content w-75">
+        <form class="d-flex justify-content-end w-50" action="/rooms/" method="POST">{% csrf_token %}  <!-- Search bar -->
+            <input class="form-control mr-sm-2" name="searched" type="text" placeholder="Search room" aria-label="Search" style="display: inline;">
+            <button type="submit" class="btn btn-secondary" style="display: inline;">Buscar</button>
+        </form>
+    </li>
+</div>
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
