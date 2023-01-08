@@ -208,14 +208,19 @@ class DashboardView(View):
                     .exclude(state="DEL")
                     .aggregate(Sum('total'))
                     )
+        
+        # get % of occupation
+        occupation = int(100 * Booking.objects.filter(state="NEW").count() / Room.objects.all().count())
+
+        print(occupation)
 
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupation': occupation
         }
 
         context = {
