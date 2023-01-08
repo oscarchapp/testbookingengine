@@ -209,13 +209,22 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # occupancy percentage
+        confirmed_reservations = Booking.objects.filter(state="NEW").count()
+        total_rooms = Room.objects.all().count()
+        occupancy_percentage = 0
+        print(confirmed_reservations)
+        print(total_rooms)
+        if confirmed_reservations != 0 and total_rooms != 0:
+            occupancy_percentage = confirmed_reservations / total_rooms
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupancy_percentage': occupancy_percentage
         }
 
         context = {
