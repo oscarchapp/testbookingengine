@@ -213,8 +213,6 @@ class DashboardView(View):
         confirmed_reservations = Booking.objects.filter(state="NEW").count()
         total_rooms = Room.objects.all().count()
         occupancy_percentage = 0
-        print(confirmed_reservations)
-        print(total_rooms)
         if confirmed_reservations != 0 and total_rooms != 0:
             occupancy_percentage = confirmed_reservations / total_rooms
 
@@ -257,3 +255,49 @@ class RoomsView(View):
         }
         return render(request, "rooms.html", context)
 
+
+class EditBookingDateView(View):
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        room_search_form = RoomSearchDateForm(instance=booking)
+        context = {
+            'room_search_form': room_search_form
+        }
+        return render(request, "edit_booking_date.html", context)
+
+    
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        room_search_form = RoomSearchDateForm(request.POST, instance=booking)
+        
+        query = request.POST.dict()
+        # calculate number of days in the hotel
+        checkin = Ymd.Ymd(query['checkin'])
+        checkout = Ymd.Ymd(query['checkout'])
+        total_days = checkout - checkin
+
+        # minium days >= 1
+        if total_days < 1:
+            error = 'La fecha de salida debe ser superior a la de entrada'
+            context = {'error': error,
+                       'room_search_form': room_search_form}
+            return render(request, "edit_booking_date.html", context)
+
+        any_booking = Booking.objects.filter(
+                room=booking.room,
+                checkin__lt=checkout.date,
+                checkout__gt=checkin.date
+        ).exclude(id=booking.id).exists()
+
+        # is ok and room not reserved in this date
+        if room_search_form.is_valid() and not any_booking:
+            room_search_form.save()
+            return redirect("/")
+        else:
+            error = 'No hay disponibilidad para las fechas seleccionadas'
+            context = {'error': error,
+                    'room_search_form': room_search_form}
+            return render(request, "edit_booking_date.html", context)

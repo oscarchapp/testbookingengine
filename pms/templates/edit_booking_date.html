@@ -1,0 +1,26 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar fechas de la reserva</h1>
+<form action="" method="POST">
+    {% csrf_token%}
+    {% for field in room_search_form %}
+    <div class="row">
+        <div class="col-md-2">{{field.label_tag}}</div>
+        <div class="col-md">{{field}}</div>
+    </div>
+    {% endfor %}
+    {% if error %}
+    <div class="row">
+        <div class="col-md" style="color: #ff0000">
+            {{error}}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-auto">
+            <button class="btn btn-primary" type="submit">Guardar</button>
+        </div>
+    </div>
+</form>
+{% endblock content%}
