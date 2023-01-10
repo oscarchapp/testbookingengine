@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from django import forms
 from django.forms import ModelForm
 
@@ -56,3 +56,17 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingEditDate(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date',
+                                              'min': datetime.today().strftime('%Y-%m-%d')}),
+            
+            'checkout': forms.DateInput(attrs={'type': 'date',
+                                               'min': (datetime.today() + timedelta(1)).strftime('%Y-%m-%d'),
+                                               'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')})
+            }

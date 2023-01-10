@@ -174,6 +174,22 @@ class EditBookingView(View):
             return redirect("/")
 
 
+class EditBookingDateView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingEditDate(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form,
+        }
+        return render(request, "edit_booking_date.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        print(request.POST)
+        return redirect("/")
+        
+
 class DashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
