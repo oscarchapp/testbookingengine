@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -187,6 +188,8 @@ class EditBookingDateView(View):
     def post(self, request, pk):
         booking = Booking.objects.get(id=pk)
         print(request.POST)
+        messages.warning(request, 'ya existe')
+        return render(request, "edit_booking_date.html")
         return redirect("/")
         
 
