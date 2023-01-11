@@ -2,15 +2,6 @@
 
 {% block content %}
 <h1>Editar fecha de reserva</h1>
-<div class="d-flex justify-content-start w-25 mt-2">
-    {% if messages %}
-       {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-          </div>
-       {% endfor %}
-    {% endif %}
-</div>
 <form action="" method="post">
 
     {% csrf_token%}
@@ -27,6 +18,4 @@
     <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
     <button class="btn btn-primary" type="submit">Guardar datos</button>
 </form>
-
-
 {% endblock content%}

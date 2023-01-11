@@ -8,6 +8,15 @@
     {% else %}
     <h3>Reservas Realizadas</h3>
     {% endif%}
+    <div class="d-flex justify-content-start w-25 mt-2">
+        {% if messages %}
+           {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+              </div>
+           {% endfor %}
+        {% endif %}
+    </div>
     
     <div class="ps-3">
         {% if bookings|length == 0 %}

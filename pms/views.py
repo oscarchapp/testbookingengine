@@ -178,7 +178,7 @@ class EditBookingView(View):
 class EditBookingDateView(View):
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
-        booking_form = BookingEditDate(prefix="booking", instance=booking)
+        booking_form = BookingEditDate(instance=booking)
         context = {
             'booking_form': booking_form,
         }
@@ -186,13 +186,24 @@ class EditBookingDateView(View):
 
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
+        checkin = Ymd.Ymd(request.POST['checkin'])
+        checkout = Ymd.Ymd(request.POST['checkout'])
+        if (checkout - checkin) < 1:
+            messages.warning(request, 'Error: la fecha de salida no puede ser menor a la fecha de entrada')
+            return redirect("/")
+
         booking = Booking.objects.get(id=pk)
-        print(request.POST)
-        messages.warning(request, 'ya existe')
-        return render(request, "edit_booking_date.html")
+        reserved_booking = Booking.objects.filter(room=booking.room, checkin__lt=checkout.date, checkout__gt=checkin.date).exclude(id=booking.id).exists()
+        booking_form = BookingEditDate(request.POST, instance=booking)
+
+        if not reserved_booking and booking_form.is_valid():
+            booking_form.save()
+            messages.success(request, 'Reserva modificada')
+        else:
+            messages.warning(request, 'Error: la fecha solicitada ya se encuentra ocupada')
         return redirect("/")
         
-
+        
 class DashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
