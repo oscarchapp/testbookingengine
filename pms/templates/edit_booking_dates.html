@@ -1,0 +1,62 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar fechas de la Reserva</h1>
+<form action="" method="post">
+
+    {% csrf_token%}
+    {% for field in booking_form %}
+    <div class="row">
+        <div class="col-md-2">
+            {{field.label_tag}}
+        </div>
+        <div class="col">
+            {{field}}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="row d-none" id="divError">
+        <div class="col-md-4 text-center">
+            <p class="text-danger"> Esto es un error</p>
+        </div>
+    </div>
+    <a class="btn btn-outline-primary mt-2" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary mt-2" type="submit" id="BtnSaveBookingDates">Guardar datos</button>
+</form>
+
+{% endblock content%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function(){
+        let error = '{{error}}';
+        if (error.length){
+            changeDivError(true, error)
+        }
+        $(".booking_date").on("change", function() {
+            let checkin = $("#id_booking-checkin");
+            let checkout = $("#id_booking-checkout");
+            let divError = $("#divError");
+            let btnSave = $("#BtnSaveBookingDates");
+            if (checkin.val() > checkout.val()){
+                btnSave.prop("disabled", true);
+                changeDivError(true, "La fecha de CheckIn no puede ser superior al CheckOut")
+            } else {
+                changeDivError(false);
+                btnSave.prop("disabled", false);
+            }
+        })
+    })
+    function changeDivError(status, message) {
+        let divError = $("#divError");
+        if (status){
+            divError.find(".text-danger").html(message);
+            divError.removeClass("d-none");
+        } else {
+            divError.addClass("d-none");
+        }
+    }
+
+</script>
+
+{% endblock scripts %}

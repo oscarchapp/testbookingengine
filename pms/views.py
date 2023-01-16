@@ -174,6 +174,33 @@ class EditBookingView(View):
             return redirect("/")
 
 
+class EditBookingDatesView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingDatesForm(prefix="booking", instance=booking)
+        context = {"booking_form": booking_form}
+        return render(request, "edit_booking_dates.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingDatesForm(request.POST, prefix="booking", instance=booking)
+        if booking_form.is_valid():
+            range_dates = (datetime.strptime(request.POST["booking-checkin"], "%Y-%m-%d"),
+                           datetime.strptime(request.POST["booking-checkout"], "%Y-%m-%d"))
+            booking_reserved = Booking.objects.filter(room_id=booking.room_id,
+                                                      state="NEW").filter(Q(checkin__range=range_dates) |
+                                                                          Q(checkout__range=range_dates)).exclude(id=pk)
+            if booking_reserved:
+                context = {
+                    "booking_form": booking_form,
+                    "error": "No hay disponibilidad para las fechas seleccionadas"
+                }
+                return render(request, "edit_booking_dates.html", context)
+            booking_form.save()
+            return redirect("/")
+
+
 class DashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
