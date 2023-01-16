@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 
 from .form_dates import Ymd
 from .forms import *
@@ -244,3 +245,12 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+class RoomAjaxSearchView(View):
+    def get(self, request):
+        query = request.GET.get("query", "")
+        rooms = Room.objects.filter(name__contains=query).values("name", "room_type__name", "id")
+        context = {
+            'rooms': rooms
+        }
+        return render(request, "rooms_search_result.html", context)

@@ -1,7 +1,15 @@
 {% extends "main.html"%}
 
 {% block content %}
+<form id="search-form">
+  <div class="form-group">
+    <label for="search-input">Buscar habitación</label>
+    <input type="text" class="form-control" id="search-input">
+  </div>
+  <button type="submit" class="btn btn-primary btn-custom">Buscar</button>
+</form>
 <h1>Habitaciones del hotel</h1>
+<div id="rooms-container">
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
@@ -11,9 +19,10 @@
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
         </div>
-        
     </div>
-    
 </div>
 {% endfor %}
+</div>
+{% load static %}
+    <script src="{% static 'js/filter.js' %}"></script>
 {% endblock content%}
