@@ -2,10 +2,13 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<div class="col-xl-5">
+    <input type="text" id="search_rooms" class="form-control" placeholder="Filtrar por nombre de Habitación">
+</div>
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
-        <div class="">
+        <div class="room-title">
             {{room.name}} ({{room.room_type__name}})
         </div>
         <div>
@@ -17,3 +20,21 @@
 </div>
 {% endfor %}
 {% endblock content%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $("#search_rooms").on("keyup", function(){
+            let search = this.value
+            $(".room-title").each(function(){
+                let title = $(this).html().replace(/(\r\n|\n|\r|)/gm, "").trim()
+                if ( title.trim().includes(search) ){
+                    $(this).parents(".hover-card:first").removeClass('d-none')
+                } else {
+                    $(this).parents(".hover-card:first").addClass('d-none')
+                }
+            })
+        })
+    })
+</script>
+{% endblock scripts %}
