@@ -6,7 +6,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .form_dates import Ymd
 from .forms import *
-from .models import Room
+from .models import Room, Booking
 from .reservation_code import generate
 
 
@@ -209,13 +209,19 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get percentage of occupation
+        now = datetime.now()
+        booking_occupation = Booking.objects.filter(state="NEW", checkin__lte=now, checkout__gte=now).count()
+        total_rooms = Room.objects.all().count()
+        percentage_occupation = (booking_occupation / total_rooms) * 100 if total_rooms else 100
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'percentage_occupation': percentage_occupation
         }
 
         context = {
