@@ -39,3 +39,8 @@ body{
     height: 100%;
     align-items: center;
 }
+
+.date-reservation{
+    position: relative;
+    right: 210px
+}

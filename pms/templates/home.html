@@ -76,7 +76,14 @@
                     <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
                     {% endif %}
                 </div>
+                <div class="col">
 
+                </div>
+                <div class="col">
+                </div>
+                <div class="col date-reservation">
+                <a href="{% url 'edit_dates' pk=booking.id%} " >Editar fecha de reserva</a>
+                </div>
             </div>
 
         </div>
