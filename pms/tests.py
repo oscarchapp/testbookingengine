@@ -6,7 +6,7 @@ from pms.models import Room, Booking
 # Create your tests here.
 class TestOccupancyPercentage(TestCase):
     def setUp(self):
-        # Crear habitaciones
+        # Create rooms
         self.room1 = Room.objects.create(name='Habitación 1', room_type=None, description='Habitación estándar')
         self.room2 = Room.objects.create(name='Habitación 2', room_type=None, description='Habitación estándar')
         self.room3 = Room.objects.create(name='Habitación 3', room_type=None, description='Habitación estándar')        
