@@ -44,3 +44,7 @@ body{
     position: relative;
     right: 210px
 }
+
+.alert-error {
+    color: red;
+}

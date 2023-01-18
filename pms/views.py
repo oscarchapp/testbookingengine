@@ -266,17 +266,18 @@ class EditReservationDatesView(View):
             bookings_in_range = Booking.objects.filter(
                 room=room, checkin__lte=checkout, checkout__gte=checkin).exclude(pk=reservation.pk)
             # Validar disponibilidad de habitación en las nuevas fechas seleccionadas
-            if not bookings_in_range.exists():   
+            if not bookings_in_range.exists(): 
+                 
                 base_url = reverse('room_details', args=[reservation.room.pk])  # 1 /room/4/
                 form.save()
                 return redirect(base_url)
 
             else:
-                print("gola")
                 messages.error(request, 'No hay disponibilidad para las fechas seleccionadas')
                 context = {'form': form, 'reservation': reservation}
                 return render(request, 'edit_reservation_dates.html', context)
         else:
+            
             messages.error(request, 'Datos inválidos')
             context = {'form': form, 'reservation': reservation}
             return render(request, 'edit_reservation_dates.html', context)
