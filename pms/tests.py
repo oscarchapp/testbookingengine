@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from .models import Room, Room_type
 
-class RoomAjaxSearchViewTestCase(TestCase):
+class RoomsViewTestCase(TestCase):
     def setUp(self):
         self.client = Client()
         room_types = [Room_type(name='Standard', price=100.0, max_guests=2), Room_type(name='Deluxe', price=200.0, max_guests=4), Room_type(name='Luxury', price=300.0, max_guests=6)]
@@ -13,19 +13,22 @@ class RoomAjaxSearchViewTestCase(TestCase):
         Room.objects.bulk_create(rooms)
 
     def test_search_view_with_valid_query(self):
-        response = self.client.get(reverse('room_ajax_search'), {'query': 'Room 2'})
+        response = self.client.get(reverse('rooms'), {'query': 'Room 2'},
+        HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Room 2')
         self.assertNotContains(response, 'Room 1')
         self.assertNotContains(response, 'Room 3')
 
     def test_search_view_with_invalid_query(self):
-        response = self.client.get(reverse('room_ajax_search'), {'query': 'Invalid Room'})
+        response = self.client.get(reverse('rooms'), {'query': 'Invalid Room'},
+        HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '')
 
     def test_search_view_without_query(self):
-        response = self.client.get(reverse('room_ajax_search'))
+        response = self.client.get(reverse('rooms'),
+        HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Room 1')
         self.assertContains(response, 'Room 2')

@@ -246,7 +246,6 @@ class RoomsView(View):
             query = request.GET.get("query", "")
             rooms = Room.objects.filter(name__contains=query).values("name", "room_type__name", "id")
             responsefile = "rooms_search_result.html"
-
         else:
             rooms = Room.objects.all().values("name", "room_type__name", "id")
 
@@ -254,13 +253,4 @@ class RoomsView(View):
             'rooms': rooms
         }
 
-        return render(request, responsefile, context)   
-
-"""class RoomAjaxSearchView(View):
-    def get(self, request):
-        query = request.GET.get("query", "")
-        rooms = Room.objects.filter(name__contains=query).values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
-        return render(request, "rooms_search_result.html", context)"""
+        return render(request, responsefile, context)
