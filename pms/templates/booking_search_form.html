@@ -18,6 +18,9 @@
             <button class="btn btn-primary" type="submit">Buscar disponibilidad</button>
         </div>
     </div>
+    <div class="col-md-auto">
+        {{ error }}
+    </div>
 </form>
 {% load static %}
 <script async src="{% static 'js/search_room.js' %}"></script>

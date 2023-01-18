@@ -5,7 +5,7 @@ $(document).ready(function() {
     var searchValue = $("#search-input").val();
 
     $.ajax({
-      url: '/search/room/ajax/',
+      url: '.',
       type: 'GET',
       data: { 'query': searchValue },
       success: function(data) {

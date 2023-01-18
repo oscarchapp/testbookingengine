@@ -1,6 +1,7 @@
 {% extends "main.html"%}
 
 {% block content %}
+
 <form id="search-form">
   <div class="form-group">
     <label for="search-input">Buscar habitación</label>
@@ -8,7 +9,9 @@
   </div>
   <button type="submit" class="btn btn-primary btn-custom">Buscar</button>
 </form>
+
 <h1>Habitaciones del hotel</h1>
+
 <div id="rooms-container">
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">

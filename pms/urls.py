@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
     path("search/room/", views.RoomSearchView.as_view(), name="search"),
-    path('search/room/ajax/', views.RoomAjaxSearchView.as_view(), name='room_ajax_search'),
     path("search/booking/", views.BookingSearchView.as_view(), name="booking_search"),
     path("booking/<str:pk>/", views.BookingView.as_view(), name="booking"),
     path("booking/<str:pk>/edit", views.EditBookingView.as_view(), name="edit_booking"),

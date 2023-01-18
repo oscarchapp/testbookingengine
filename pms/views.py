@@ -239,18 +239,28 @@ class RoomDetailsView(View):
 
 class RoomsView(View):
     def get(self, request):
+        responsefile = "rooms.html"
+
         # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        if (request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'):
+            query = request.GET.get("query", "")
+            rooms = Room.objects.filter(name__contains=query).values("name", "room_type__name", "id")
+            responsefile = "rooms_search_result.html"
+
+        else:
+            rooms = Room.objects.all().values("name", "room_type__name", "id")
+
         context = {
             'rooms': rooms
         }
-        return render(request, "rooms.html", context)
 
-class RoomAjaxSearchView(View):
+        return render(request, responsefile, context)   
+
+"""class RoomAjaxSearchView(View):
     def get(self, request):
         query = request.GET.get("query", "")
         rooms = Room.objects.filter(name__contains=query).values("name", "room_type__name", "id")
         context = {
             'rooms': rooms
         }
-        return render(request, "rooms_search_result.html", context)
+        return render(request, "rooms_search_result.html", context)"""
