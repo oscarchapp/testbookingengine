@@ -2,3 +2,4 @@
 .idea/
 pms/migrations/**
 .vscode/**
+staticfiles/**
