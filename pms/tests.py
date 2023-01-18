@@ -25,7 +25,7 @@ class EditDatesViewTest(TestCase):
         # Test GET request
         response = self.client.get(reverse('edit_dates', args=[self.booking.pk]))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'edit_reservation_dates.html')
+        self.assertTemplateUsed(response, 'edit_dates.html')
 
     def test_edit_dates_view_post_valid(self):
         # Test POST request with valid data
@@ -46,7 +46,7 @@ class EditDatesViewTest(TestCase):
         'checkout': checkout.strftime('%Y-%m-%d'),
         })
         form = response.context['form']
-        self.assertContains(response, 'La fecha de salida debe ser mayor que la de entrada')
+        self.assertContains(response, 'La fecha de checkout debe ser mayor que la de checkin')
 
     def test_edit_dates_view_post_not_available(self):
         # Test POST request with not available dates

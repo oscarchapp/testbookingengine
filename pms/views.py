@@ -235,7 +235,6 @@ class RoomDetailsView(View):
         context = {
             'room': room,
             'bookings': bookings}
-        print(context)
         return render(request, "room_detail.html", context)
 
 
@@ -249,12 +248,12 @@ class RoomsView(View):
         return render(request, "rooms.html", context)
 
 
-class EditReservationDatesView(View):
+class ChangeDatesView(View):
     def get(self, request, pk):
         reservation = get_object_or_404(Booking, pk=pk)
         form = EditReservationDatesForm(instance=reservation)
         context = {'form': form, 'reservation': reservation}
-        return render(request, 'edit_reservation_dates.html', context)
+        return render(request, 'edit_dates.html', context)
 
     def post(self, request, pk):
         reservation = get_object_or_404(Booking, pk=pk)
@@ -275,12 +274,12 @@ class EditReservationDatesView(View):
             else:
                 messages.error(request, 'No hay disponibilidad para las fechas seleccionadas')
                 context = {'form': form, 'reservation': reservation}
-                return render(request, 'edit_reservation_dates.html', context)
+                return render(request, 'edit_dates.html', context)
         else:
             if form.errors:
-                for errors in form.errors.items():
+                for field, errors in form.errors.items():
                     for error in errors:
                         messages.error(request, error)    
                 context = {'form': form, 'reservation': reservation}
-                return render(request, 'edit_reservation_dates.html', context)
+                return render(request, 'edit_dates.html', context)
         

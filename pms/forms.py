@@ -72,6 +72,6 @@ class EditReservationDatesForm(forms.ModelForm):
         checkout = cleaned_data.get("checkout")
         if checkin and checkout:
             if checkin >= checkout:
-                self.add_error('checkout', 'La fecha de salida debe ser mayor que la de entrada')
+                self.add_error('checkout', 'La fecha de checkout debe ser mayor que la de checkin')
             if checkin < date.today():
-                self.add_error('checkin', 'La fecha de entrada no puede ser anterior a la fecha actual')
+                self.add_error('checkin', 'El checkin no puede ser anterior a la fecha actual')
