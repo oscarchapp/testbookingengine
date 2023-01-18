@@ -278,10 +278,9 @@ class EditReservationDatesView(View):
                 return render(request, 'edit_reservation_dates.html', context)
         else:
             if form.errors:
-                for field, errors in form.errors.items():
+                for errors in form.errors.items():
                     for error in errors:
                         messages.error(request, error)    
-                "messages.error(request, 'Datos inválidos')"
                 context = {'form': form, 'reservation': reservation}
                 return render(request, 'edit_reservation_dates.html', context)
         

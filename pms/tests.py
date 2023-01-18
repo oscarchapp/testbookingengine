@@ -45,7 +45,8 @@ class EditDatesViewTest(TestCase):
         'checkin': checkin.strftime('%Y-%m-%d'),
         'checkout': checkout.strftime('%Y-%m-%d'),
         })
-        self.assertNotEqual(response.status_code, 200)
+        form = response.context['form']
+        self.assertContains(response, 'La fecha de salida debe ser mayor que la de entrada')
 
     def test_edit_dates_view_post_not_available(self):
         # Test POST request with not available dates
