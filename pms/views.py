@@ -260,14 +260,14 @@ class EditReservationDatesView(View):
         reservation = get_object_or_404(Booking, pk=pk)
         room = reservation.room
         form = EditReservationDatesForm(request.POST, instance=reservation)
+
         if form.is_valid():
             checkin = form.cleaned_data['checkin']
             checkout = form.cleaned_data['checkout']
             bookings_in_range = Booking.objects.filter(
                 room=room, checkin__lte=checkout, checkout__gte=checkin).exclude(pk=reservation.pk)
-            # Validar disponibilidad de habitación en las nuevas fechas seleccionadas
+            # Validate room availability on the new selected dates
             if not bookings_in_range.exists(): 
-                 
                 base_url = reverse('room_details', args=[reservation.room.pk])  # 1 /room/4/
                 form.save()
                 return redirect(base_url)
@@ -277,8 +277,11 @@ class EditReservationDatesView(View):
                 context = {'form': form, 'reservation': reservation}
                 return render(request, 'edit_reservation_dates.html', context)
         else:
-            
-            messages.error(request, 'Datos inválidos')
-            context = {'form': form, 'reservation': reservation}
-            return render(request, 'edit_reservation_dates.html', context)
+            if form.errors:
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(request, error)    
+                "messages.error(request, 'Datos inválidos')"
+                context = {'form': form, 'reservation': reservation}
+                return render(request, 'edit_reservation_dates.html', context)
         
