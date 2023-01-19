@@ -34,9 +34,14 @@ class TestOccupancyPercentage(TestCase):
     def test_occupancy_percentage_calculation(self):
         # Obtain the total number of rooms
         total_rooms = Room.objects.count()
-        # Obtener el número de reservas confirmadas
+        # Get the number of confirmed reservations
         confirmed_bookings = Booking.objects.filter(state='NEW').count()
-        # Obtain the number of confirmed reservations
-        occupancy_percentage = confirmed_bookings / total_rooms * 100
+        # calculates the percentage to test
+        test_percentage = confirmed_bookings / total_rooms * 100
+
+        # now compared to the percentage shown in the application:
+        response = self.client.get('/dashboard/')
+        real_percentage = response.context.get('dashboard').get('occupation_percentage')
+
         # Check that the calculation is correct
-        self.assertEqual(round(occupancy_percentage,1), round(66.67,1))
+        self.assertEqual(test_percentage, real_percentage)
