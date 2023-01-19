@@ -58,7 +58,7 @@ class BookingFormExcluded(ModelForm):
         }
 
 
-class EditReservationDatesForm(forms.ModelForm):
+class EditBookingDatesForm(forms.ModelForm):
     checkin = forms.DateField(widget=forms.TextInput(attrs={'type': 'date'}))
     checkout = forms.DateField(widget=forms.TextInput(attrs={'type': 'date'}))
 

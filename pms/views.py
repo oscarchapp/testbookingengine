@@ -248,17 +248,17 @@ class RoomsView(View):
         return render(request, "rooms.html", context)
 
 
-class ChangeDatesView(View):
+class ChangeBookingDatesView(View):
     def get(self, request, pk):
         reservation = get_object_or_404(Booking, pk=pk)
-        form = EditReservationDatesForm(instance=reservation)
+        form = EditBookingDatesForm(instance=reservation)
         context = {'form': form, 'reservation': reservation}
         return render(request, 'edit_dates.html', context)
 
     def post(self, request, pk):
         reservation = get_object_or_404(Booking, pk=pk)
         room = reservation.room
-        form = EditReservationDatesForm(request.POST, instance=reservation)
+        form = EditBookingDatesForm(request.POST, instance=reservation)
 
         if form.is_valid():
             checkin = form.cleaned_data['checkin']
