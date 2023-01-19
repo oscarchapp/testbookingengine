@@ -27,8 +27,7 @@ class RoomsViewTestCase(TestCase):
         self.assertContains(response, '')
 
     def test_search_view_without_query(self):
-        response = self.client.get(reverse('rooms'),
-        HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.get(reverse('rooms'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Room 1')
         self.assertContains(response, 'Room 2')
