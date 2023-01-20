@@ -3,6 +3,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class Customer(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
@@ -31,11 +32,11 @@ class Room(models.Model):
 
 
 class Booking(models.Model):
-    NEW = 'NEW'
-    DELETED = 'DEL'
+    NEW = "NEW"
+    DELETED = "DEL"
     STATE_CHOICES = [
-        (NEW, 'Nueva'),
-        (DELETED, 'Cancelada'),
+        (NEW, "Nueva"),
+        (DELETED, "Cancelada"),
     ]
     state = models.CharField(
         max_length=3,

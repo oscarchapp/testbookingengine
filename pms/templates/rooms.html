@@ -2,6 +2,10 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+    <form action="{% url 'rooms_search'%}" method="GET" class="d-flex">
+        <input class="form-control me-2" type="search" required name="filter" placeholder="Nombre habitación" aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Buscar </button>
+    </form>
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
