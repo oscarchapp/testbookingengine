@@ -39,3 +39,7 @@ body{
     height: 100%;
     align-items: center;
 }
+
+.choose__room{
+    margin: 3%;
+}

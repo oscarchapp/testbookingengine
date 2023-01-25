@@ -244,3 +244,11 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+    def post(self, request):
+        filter_rooms_by = request.POST['filter_rooms_by']
+        rooms = Room.filter_rooms(filter_rooms_by)
+        context = {
+            'rooms': rooms
+        }
+        return render(request, "rooms.html", context)

@@ -29,6 +29,10 @@ class Room(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def filter_rooms(cls, name_to_filter):
+        return cls.objects.filter(name__contains= name_to_filter).values("name", "room_type__name", "id")
+
 
 class Booking(models.Model):
     NEW = 'NEW'
