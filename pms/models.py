@@ -60,8 +60,8 @@ class Booking(models.Model):
 
     @classmethod
     def percentage_usage(cls):
-        from datetime import date, time, datetime
-        today = date.today()
-        rooms_booked = cls.objects.filter(checkout__gte= today.strftime("%Y-%m-%d"),checkin__lte= today.strftime("%Y-%m-%d")).count()
+        from datetime import date
+        today = date.today().strftime("%Y-%m-%d")
+        rooms_booked = cls.objects.filter(checkout__gte= today,checkin__lte= today).count()
         rooms_available = Room.objects.all().count()
         return "{:.2f}".format(rooms_booked/rooms_available)
