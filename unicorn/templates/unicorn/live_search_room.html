@@ -1,0 +1,28 @@
+<div>
+    <label>Buscar habitación: </label><br />
+    <input type="text" unicorn:model="search" placeholder="Nombre de la habitación" id="room-name"/> 
+
+    <br/>
+
+    {% if get_rooms %}
+    {% for room in get_rooms %}
+<div class="row card mt-3 mb-3 hover-card bg-tr-250">
+    <div class="col p-3">
+        <div class="">
+            {{room.name}} ({{room.room_type__name}})
+        </div>
+        <div>
+            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
+        </div>
+        
+    </div>
+    
+</div>
+{% endfor %}
+{% else %}
+<br />
+<div>No se encontraron habitaciones con ese nombre.</div>
+{% endif %}
+    
+</div>
+
