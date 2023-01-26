@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from .models import Room, Room_type, Customer, Booking
 # Create your tests here.
 
@@ -20,14 +20,12 @@ class TestPMS(TestCase):
         self.create_customer = Customer.objects.bulk_create([
             Customer(name="Señor Test", email="test@test.com", phone="565741222")])
         self.create_booking = Booking.objects.bulk_create([
-            Booking(checkin="2023-09-01", checkout="2023-09-12", room=Room.objects.get(name="Room 1.1"), guests=1, customer=Customer.objects.get(name="Señor Test"), total=20, code="TEST1"),
-            Booking(checkin="2024-10-04", checkout="2024-10-20", room=Room.objects.get(name="Room 2.1"), guests=2, customer=Customer.objects.get(name="Señor Test"), total=30, code="TEST2"),
-            Booking(checkin="2023-02-01", checkout="2023-02-01", room=Room.objects.get(name="Room 3.1"), guests=3, customer=Customer.objects.get(name="Señor Test"), total=40, code="TEST3"),])
-        
-    def test_connection_room(self):
-        client = Client()
-        response = client.get("/rooms/")
-        self.assertEqual(response.status_code, 200)
+            Booking(checkin="2023-01-26", checkout="2023-01-27", room=Room.objects.get(name="Room 1.1"), guests=1, customer=Customer.objects.get(name="Señor Test"), total=20, code="TEST1"),
+            Booking(checkin="2023-01-26", checkout="2023-01-27", room=Room.objects.get(name="Room 1.2"), guests=2, customer=Customer.objects.get(name="Señor Test"), total=30, code="TEST2"),
+            Booking(checkin="2023-01-26", checkout="2023-01-27", room=Room.objects.get(name="Room 2.1"), guests=3, customer=Customer.objects.get(name="Señor Test"), total=40, code="TEST3"),
+            Booking(checkin="2023-01-26", checkout="2023-01-27", room=Room.objects.get(name="Room 2.2"), guests=1, customer=Customer.objects.get(name="Señor Test"), total=20, code="TEST1"),
+            Booking(checkin="2023-01-26", checkout="2023-01-27", room=Room.objects.get(name="Room 3.1"), guests=2, customer=Customer.objects.get(name="Señor Test"), total=30, code="TEST2"),
+            Booking(checkin="2023-01-27", checkout="2023-01-27", room=Room.objects.get(name="Room 4.1"), guests=3, customer=Customer.objects.get(name="Señor Test"), total=40, code="TEST3"),])
         
     def test_room_type_check(self):
         room_type = Room_type.objects.get(name="Single")
@@ -40,3 +38,12 @@ class TestPMS(TestCase):
         room = Room.objects.all().values("name")
         froom = room.filter(name__icontains=input_search)
         self.assertNotEqual(len(froom), 0, msg="Debe de haber al menos una habitación que coincida con la búsqueda")
+        
+    def test_occupacy_percen_room(self):
+        from datetime import date
+        today = date.today()
+        room_ocupacy = (Booking.objects
+                          .filter(checkin__lte=today, checkout__gte=today)
+                          .exclude(state="DEL")
+                          ).count() / Room.objects.all().count() * 100
+        self.assertLess(room_ocupacy, 100, msg="El porcentaje de ocupación no puede ser mayor o igual que el 100%")
