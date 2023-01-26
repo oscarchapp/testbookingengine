@@ -1,0 +1,33 @@
+{% extends "main.html"%}
+
+{% block content %}
+
+<h1>Editar fechas de la reserva</h1>
+<form action="" method="post">
+
+    {% csrf_token%}
+    <div class="hidden">
+       <input  id="booking_code" value="{{pk}}"/>
+       <input  id="guests_booking" value="{{pk.guests}}"/>
+       <input  id="room_id_booking" value="{{pk.room_id}}"/>
+    </div>
+    {% for field in booking_form %}
+    <div class="row">
+        <div class="col-md-2">
+            {{field.label_tag}}
+        </div>
+        <div class="col">
+            {{field}}
+        </div>
+    </div>
+    {% endfor %}
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <!-- <button class="btn btn-primary"  type="submit">Guardar datos</button> -->
+    <button id="submit_button" class="btn btn-primary" type="submit">Guardar datos</button>
+    <p class="hidden" id="error_message" style="color: red;">No hay disponibilidad para las fechas seleccionadas.</p>
+</form>
+
+{% load static %}
+<script async src="{% static 'js/modify_dates_booking.js' %}"></script>
+
+{% endblock content%}

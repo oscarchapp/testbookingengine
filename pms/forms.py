@@ -19,6 +19,20 @@ class RoomSearchForm(ModelForm):
             'guests': forms.DateInput(attrs={'type': 'number', 'min': 1, 'max': 4}),
         }
 
+class ModifyDatesForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        labels = {
+            "guests": "Huéspedes"
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(
+                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+            # 'guests': forms.DateInput(attrs={'type': 'number', 'min': 1, 'max': 4}),
+        }
+
 
 class CustomerForm(ModelForm):
     class Meta:
@@ -41,7 +55,6 @@ class BookingForm(ModelForm):
             'checkout': forms.HiddenInput(),
             'guests': forms.HiddenInput()
         }
-
 
 class BookingFormExcluded(ModelForm):
     class Meta:

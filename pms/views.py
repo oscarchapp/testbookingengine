@@ -1,8 +1,11 @@
+import json
+
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import HttpResponse
 
 from .form_dates import Ymd
 from .forms import *
@@ -172,6 +175,50 @@ class EditBookingView(View):
             customer_form.save()
             return redirect("/")
 
+class EditBookingDatesView(View):
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = ModifyDatesForm(prefix="booking", instance=booking)
+        customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+        # print(dir(booking))
+        context = {
+            'booking_form': booking_form,
+            'pk': booking
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        customer_form = ModifyDatesForm(request.POST, prefix="booking", instance=booking)
+        if customer_form.is_valid():
+            customer_form.save()
+            return redirect("/")
+        else:
+            booking = Booking.objects.get(id=pk)
+            booking_form = ModifyDatesForm(prefix="booking", instance=booking)
+            customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+            context = {
+                'booking_form': booking_form,
+                'pk': booking
+            }
+            return render(request, "edit_booking_dates.html", context)
+
+class checkDatesView(View):
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request):
+        Data_received = request.POST.dict()
+        availability_booking = Booking()
+        response = availability_booking.verify_same_room(Data_received)
+        if not response:
+            response = availability_booking.verify_availability_ofchange(Data_received)
+        # print(response)
+        raw_data = {'IsAvailable': response}
+        # print(raw_data)
+        return HttpResponse(json.dumps(raw_data), content_type="application/json")
 
 class DashboardView(View):
     def get(self, request):

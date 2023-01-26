@@ -43,3 +43,21 @@ body{
 .choose__room{
     margin: 3%;
 }
+
+.c-loader{
+    position: absolute;
+    z-index: 1000;
+    background-color: #7e717145;
+
+    width: 200VW;
+    height: 200VH;
+}
+.loader{
+    position: relative;
+    left: 20%;
+    top: 15%;
+}
+
+.hidden{
+    display: none;
+}

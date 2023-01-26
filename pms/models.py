@@ -1,6 +1,6 @@
 from django.db import models
-
-
+from .form_dates import Ymd
+from django.db.models import F, Count
 # Create your models here.
 
 class Customer(models.Model):
@@ -65,3 +65,45 @@ class Booking(models.Model):
         rooms_booked = cls.objects.filter(checkout__gte= today,checkin__lte= today).count()
         rooms_available = Room.objects.all().count()
         return "{:.2f}".format(rooms_booked/rooms_available)
+
+    @classmethod
+    def verify_availability_ofchange(cls, query):
+        checkin = Ymd.Ymd(query['checkin'])
+        checkout = Ymd.Ymd(query['checkout'])
+        total_days = checkout - checkin
+        # get available rooms and total according to dates and guests
+        filters = {
+            'room_type': query['guests']
+        }
+        exclude = {
+            'booking__checkin__lte': query['checkout'],
+            'booking__checkout__gte': query['checkin'],
+            'booking__state__exact': "NEW"
+        }
+        rooms = (Room.objects
+                 .filter(**filters)
+                 .exclude(**exclude)
+                 .annotate(total=total_days * F('room_type__price'))
+                 .order_by("room_type__max_guests", "name")
+                 )
+        #varify the amount of rooms frees after the checkout date
+        total_rooms = (Room.objects
+                       .filter(**filters)
+                       .values("room_type__name", "room_type")
+                       .exclude(**exclude)
+                       .order_by("room_type__max_guests"))
+        print(total_days,total_rooms)
+        if len(total_rooms) >0:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def verify_same_room(cls, query):
+        rooms_booked = cls.objects.filter(room_id= query['room_id'],checkin__lte= query['checkout']).values('code')
+        if len(rooms_booked)<1:
+            return True
+        elif len(rooms_booked) == 1:
+            if rooms_booked[0]['code'] == query['code']:
+                return True
+        return False
