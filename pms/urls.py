@@ -11,7 +11,7 @@ urlpatterns = [
     path("booking/<str:pk>/editdates", views.EditBookingDatesView.as_view(), name="edit_booking_dates"),
     path("booking/<str:pk>/delete", views.DeleteBookingView.as_view(), name="delete_booking"),
     path("rooms/", views.RoomsView.as_view(), name="rooms"),
-    path("dates/available", views.checkDatesView.as_view(), name="chack_dates_booking"),
+    path("dates/available", views.checkDatesView.as_view(), name="check_dates_booking"),
     path("room/<str:pk>/", views.RoomDetailsView.as_view(), name="room_details"),
     path("dashboard/", views.DashboardView.as_view(), name="dashboard")
 ]
