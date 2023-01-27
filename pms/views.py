@@ -150,6 +150,45 @@ class DeleteBookingView(View):
         Booking.objects.filter(id=pk).update(state="DEL")
         return redirect("/")
 
+class EditBookingDateView(View):
+    #edit date of the booking
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_date_form = BookingDateForm(prefix="booking", instance=booking)
+        context = {
+            'booking': booking,
+            'booking_date_form': booking_date_form
+        }
+        return render(request, "edit_booking_date.html", context)
+    
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_date_form = BookingDateForm(request.POST, prefix="booking", instance=booking)
+        
+        if booking_date_form.is_valid():
+            checkin = booking_date_form.cleaned_data['checkout']
+            checkout = booking_date_form.cleaned_data['checkin']
+                       
+            check_room_availability = Booking.objects.filter(room=booking.room,checkin__lte=checkin, checkout__gte=checkout, state="NEW").exclude(id=booking.id).count()
+            
+            if check_room_availability > 0:
+                booking_date_form.add_error(None, "No hay disponibilidad para las fechas seleccionadas")
+                context = {
+                    'booking': booking,
+                    'booking_date_form': booking_date_form
+                        }
+                return render(request, "edit_booking_date.html", context)
+                
+            else:
+                booking_date_form.save()
+                return redirect("/")
+            
+        else:
+            context = {
+                'booking': booking,
+                'booking_date_form': booking_date_form
+            }
+            return render(request, "edit_booking_date.html", context)
 
 class EditBookingView(View):
     # renders the booking edition form

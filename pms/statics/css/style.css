@@ -2,8 +2,6 @@ body{
     padding-top: 4em
 }
 
-
-
 .bg-tr-250, .bg-tr-250:hover{
 
     -webkit-transition: background-color 250ms linear;
@@ -38,4 +36,8 @@ body{
     justify-content: center;
     height: 100%;
     align-items: center;
+}
+
+.error-message {
+    color: red;
 }
