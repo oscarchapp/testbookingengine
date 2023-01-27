@@ -1,0 +1,30 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>[{{booking.code}}] Editar fechas de la reserva</h1>
+<form action="" method="post">
+
+    {% csrf_token%}
+    {% for field in booking_date_form %}
+    <div class="row">
+        <div class="col-md-2">
+            {{field.label_tag}}
+        </div>
+        <div class="col">
+            {{field}}
+        </div>
+
+        
+    </div>
+
+    {% endfor %}
+
+    <p class="error-message">{{ booking_date_form.non_field_errors }}</p>
+
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary" type="submit">Guardar nuevas fechas</button>
+    
+</form>
+
+
+{% endblock content%}

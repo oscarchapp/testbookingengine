@@ -41,8 +41,41 @@ class BookingForm(ModelForm):
             'checkout': forms.HiddenInput(),
             'guests': forms.HiddenInput()
         }
-
-
+        
+class BookingDateForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin','checkout']
+        labels = {
+            "checkin": "Fecha de entrada",
+            "checkout": "Fecha de salida",
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(
+                attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')})
+        }
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        checkin = cleaned_data.get("checkin")
+        checkout = cleaned_data.get("checkout")
+        
+        if checkin and checkout:
+            if checkout < checkin:
+                raise forms.ValidationError(
+                    "La fecha de salida no puede ser anterior a la fecha de entrada"
+                )
+            if checkout == checkin:
+                raise forms.ValidationError(
+                    "La fecha de salida no puede ser igual a la fecha de entrada"
+                )
+            if (checkout - checkin).days > 30:
+                raise forms.ValidationError(
+                    "El máximo de días de estadía es de 30"
+                )
+        
+                
 class BookingFormExcluded(ModelForm):
     class Meta:
         model = Booking
