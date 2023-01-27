@@ -60,6 +60,8 @@ class Booking(models.Model):
 
     @classmethod
     def percentage_usage(cls):
+        ''' Calculates the percentage of rooms booked
+        '''
         from datetime import date
         today = date.today().strftime("%Y-%m-%d")
         rooms_booked = cls.objects.filter(checkout__gte= today,checkin__lte= today).count()
@@ -92,7 +94,6 @@ class Booking(models.Model):
                        .values("room_type__name", "room_type")
                        .exclude(**exclude)
                        .order_by("room_type__max_guests"))
-        print(total_days,total_rooms)
         if len(total_rooms) >0:
             return True
         else:
