@@ -214,7 +214,7 @@ class checkDatesView(View):
         availability_booking = Booking()
         response = availability_booking.verify_same_room(Data_received)
         if not response:
-            response = availability_booking.verify_availability_ofchange(Data_received)
+            response = availability_booking.verify_availability_of_change(Data_received)
         raw_data = {'IsAvailable': response}
         return HttpResponse(json.dumps(raw_data), content_type="application/json")
 

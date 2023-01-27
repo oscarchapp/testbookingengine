@@ -69,7 +69,7 @@ class Booking(models.Model):
         return "{:.2f}".format(rooms_booked/rooms_available)
 
     @classmethod
-    def verify_availability_ofchange(cls, query):
+    def verify_availability_of_change(cls, query):
         '''
             Verifys if there is any available room for the dates selected and same amount of guests
         '''
