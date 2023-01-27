@@ -70,6 +70,9 @@ class Booking(models.Model):
 
     @classmethod
     def verify_availability_ofchange(cls, query):
+        '''
+            Verifys if there is any available room for the dates selected and same amount of guests
+        '''
         checkin = Ymd.Ymd(query['checkin'])
         checkout = Ymd.Ymd(query['checkout'])
         total_days = checkout - checkin
@@ -101,6 +104,9 @@ class Booking(models.Model):
 
     @classmethod
     def verify_same_room(cls, query):
+        '''
+            Verifys if the same room is available in the days selectes, verifys the chechin with the checkout
+        '''
         rooms_booked = cls.objects.filter(room_id= query['room_id'],checkin__lte= query['checkout']).values('code')
         if len(rooms_booked)<1:
             return True
