@@ -73,9 +73,6 @@ class Booking(models.Model):
         '''
             Verifys if there is any available room for the dates selected and same amount of guests
         '''
-        checkin = Ymd.Ymd(query['checkin'])
-        checkout = Ymd.Ymd(query['checkout'])
-        total_days = checkout - checkin
         # get available rooms and total according to dates and guests
         filters = {
             'room_type': query['guests']
@@ -90,10 +87,9 @@ class Booking(models.Model):
                  .filter(**filters)
                  .exclude(**exclude)
                  .values("id", "name")
-                 .annotate(total=total_days * F('room_type__price'))
                  .order_by("room_type__max_guests", "name")
                  )
-
+        print(rooms)
         if len(rooms) >0:
             return True , rooms.first()['id']
         else:
