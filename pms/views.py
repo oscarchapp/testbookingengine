@@ -180,8 +180,6 @@ class EditBookingDatesView(View):
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
         booking_form = ModifyDatesForm(prefix="booking", instance=booking)
-        # customer_form = CustomerForm(prefix="customer", instance=booking.customer)
-        # print(dir(booking))
         context = {
             'booking_form': booking_form,
             'pk': booking
