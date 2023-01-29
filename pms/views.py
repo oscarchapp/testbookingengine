@@ -180,7 +180,7 @@ class EditBookingDatesView(View):
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
         booking_form = ModifyDatesForm(prefix="booking", instance=booking)
-        customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+        # customer_form = CustomerForm(prefix="customer", instance=booking.customer)
         # print(dir(booking))
         context = {
             'booking_form': booking_form,
@@ -192,6 +192,8 @@ class EditBookingDatesView(View):
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
         booking = Booking.objects.get(id=pk)
+        print(booking.room_id)
+        print(request.POST)
         customer_form = ModifyDatesForm(request.POST, prefix="booking", instance=booking)
         if customer_form.is_valid():
             customer_form.save()
@@ -212,10 +214,11 @@ class checkDatesView(View):
     def post(self, request):
         Data_received = request.POST.dict()
         availability_booking = Booking()
+        roomid_for_change = 0
         response = availability_booking.verify_same_room(Data_received)
         if not response:
-            response = availability_booking.verify_availability_of_change(Data_received)
-        raw_data = {'IsAvailable': response}
+            response, roomid_for_change = availability_booking.verify_availability_of_change(Data_received)
+        raw_data = {'IsAvailable': response, 'room_for_change':roomid_for_change}
         return HttpResponse(json.dumps(raw_data), content_type="application/json")
 
 class DashboardView(View):

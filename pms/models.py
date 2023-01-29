@@ -73,6 +73,9 @@ class Booking(models.Model):
         '''
             Verifys if there is any available room for the dates selected and same amount of guests
         '''
+        checkin = Ymd.Ymd(query['checkin'])
+        checkout = Ymd.Ymd(query['checkout'])
+        total_days = checkout - checkin
         # get available rooms and total according to dates and guests
         filters = {
             'room_type': query['guests']
@@ -82,16 +85,19 @@ class Booking(models.Model):
             'booking__checkout__gte': query['checkin'],
             'booking__state__exact': "NEW"
         }
-        #varify the amount of rooms frees after the checkout date
-        total_rooms = (Room.objects
-                       .filter(**filters)
-                       .values("room_type__name", "room_type")
-                       .exclude(**exclude)
-                       .order_by("room_type__max_guests"))
-        if len(total_rooms) >0:
-            return True
+        #verify the amount of rooms frees after the checkout date
+        rooms = (Room.objects
+                 .filter(**filters)
+                 .exclude(**exclude)
+                 .values("id", "name")
+                 .annotate(total=total_days * F('room_type__price'))
+                 .order_by("room_type__max_guests", "name")
+                 )
+
+        if len(rooms) >0:
+            return True , rooms.first()['id']
         else:
-            return False
+            return False , None
 
     @classmethod
     def verify_same_room(cls, query):
@@ -103,5 +109,5 @@ class Booking(models.Model):
             return True
         elif len(rooms_booked) == 1:
             if rooms_booked[0]['code'] == query['code']:
-                return True
+                return True 
         return False

@@ -3,10 +3,8 @@ import random
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.test import Client
-from pms.models import Room, Booking, Customer
-from django.core import serializers
+from pms.models import Room, Booking, Customer,Room_type
 # Create your tests here.
-from .forms import BookingForm, CustomerForm
 
 class RoomsViewTest(TestCase):
 
@@ -78,15 +76,26 @@ class EditBookingDatesTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.url = reverse('edit_booking_dates',args=['1'])
-        for index in range(5):
+        self.rooom_type_id_1 = Room_type.objects.create(
+                name='Room 1',
+                price='20',
+                max_guests = '1'
+            )
+        self.rooom_type_id_2 = Room_type.objects.create(
+                name='Room 1',
+                price='20',
+                max_guests = '2'
+            )
+        for index in range(1,5):
             room = Room.objects.create(
-                name='Room 1.{}'.format(index)
+                name='Room 1.{}'.format(index),
+                room_type_id='1'
             )
             customer = Customer.objects.create(
                 name='XXX{}'.format(index)
             )
             Booking.objects.create(
-                checkin='2023-02-08',
+                checkin='2023-02-01',
                 checkout='2023-02-10',
                 guests=2,
                 state='NEW',
@@ -95,9 +104,10 @@ class EditBookingDatesTest(TestCase):
                 room_id= room.id,
                 code = 'XASDERD{}'.format(index)
             )
-        for index in range(6):
+        for index in range(1,6):
             Room.objects.create(
-                name='Room 2.{}'.format(index)
+                name='Room 2.{}'.format(index),
+                room_type_id=self.rooom_type_id_2.id
             )
     @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage')
     def test_edit_book_dates_get(self):
@@ -137,14 +147,30 @@ class EditBookingDatesTest(TestCase):
         self.assertTemplateUsed(response, 'edit_booking_dates.html')
         self.assertEquals(Booking.objects.first().checkout.strftime("%Y-%m-%d"), '2023-02-10')
 
-    def test_verify_availability_ofchange(self):
+    def test_verify_availability_of_change_true(self):
+        availability = Booking()
+        data ={
+            'checkin': '2023-02-10',
+            'checkout': '2023-02-17',
+            'code': 'XASDERD0',
+            'guests': '2',
+            'room_id': '1',
+        }
+        # print(Booking.objects.first())
+        # print(Booking.objects.all().values('checkin','checkout','guests','room_id','state'))
+        response = availability.verify_availability_of_change(data)
+        self.assertEquals(response, True)
+
+    def test_verify_availability_of_change_false(self):
         availability = Booking()
         data ={
             'checkin': '2023-02-01',
-            'checkout': '2023-02-07',
-            'code': 'OOF6AUTS',
+            'checkout': '2023-02-10',
+            'code': 'XASDERD0',
             'guests': '2',
-            'room_id': '11',
+            'room_id': '1',
         }
-        response = availability.verify_availability_ofchange(data)
-        print(response)
+        # print(Booking.objects.first())
+        # print(Booking.objects.all().values('checkin','checkout','guests','room_id','state'))
+        response = availability.verify_availability_of_change(data)
+        self.assertEquals(response, False)
