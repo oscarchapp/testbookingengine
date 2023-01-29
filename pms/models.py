@@ -97,7 +97,7 @@ class Booking(models.Model):
         if len(rooms) >0:
             return True , rooms.first()['id']
         else:
-            return False , None
+            return False , 0
 
     @classmethod
     def verify_same_room(cls, query):
@@ -109,5 +109,5 @@ class Booking(models.Model):
             return True
         elif len(rooms_booked) == 1:
             if rooms_booked[0]['code'] == query['code']:
-                return True 
+                return True
         return False

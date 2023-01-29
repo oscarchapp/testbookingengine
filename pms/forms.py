@@ -22,7 +22,7 @@ class RoomSearchForm(ModelForm):
 class ModifyDatesForm(ModelForm):
     class Meta:
         model = Booking
-        fields = ['checkin', 'checkout']
+        fields = ['checkin', 'checkout','room']
         labels = {
             "guests": "Huéspedes"
         }
@@ -30,7 +30,7 @@ class ModifyDatesForm(ModelForm):
             'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
             'checkout': forms.DateInput(
                 attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
-            # 'guests': forms.DateInput(attrs={'type': 'number', 'min': 1, 'max': 4}),
+            'room': forms.HiddenInput()
         }
 
 
