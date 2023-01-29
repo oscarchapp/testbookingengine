@@ -190,8 +190,6 @@ class EditBookingDatesView(View):
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
         booking = Booking.objects.get(id=pk)
-        print(booking.room_id)
-        print(request.POST)
         customer_form = ModifyDatesForm(request.POST, prefix="booking", instance=booking)
         if customer_form.is_valid():
             customer_form.save()
@@ -283,7 +281,6 @@ class RoomDetailsView(View):
         context = {
             'room': room,
             'bookings': bookings}
-        print(context)
         return render(request, "room_detail.html", context)
 
 
