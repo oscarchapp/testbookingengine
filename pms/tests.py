@@ -51,7 +51,12 @@ class PercentageBookedTest(TestCase):
             newBooking = Booking()
             newBooking.total = '30'
             newBooking.checkin = '{}-{}-{}'.format(self.year,self.month, index)
-            newBooking.checkout = '{}-{}-{}'.format(self.year,self.month, index+1)
+            if index+1<31:
+                newBooking.checkout = '{}-{}-{}'.format(self.year,self.month, index+1)
+            else:
+                new_day = index-30
+                newBooking.checkout = '{}-{}-{}'.format(self.year,self.month, new_day+1)
+
             newBooking.guests = '3'
             newBooking.save()
         percentage = Booking()
@@ -62,10 +67,14 @@ class PercentageBookedTest(TestCase):
             newBooking = Booking()
             newBooking.total = '30'
             newBooking.checkin = '{}-{}-{}'.format(self.year,self.month, index)
-            newBooking.checkout = '{}-{}-{}'.format(self.year,self.month, index+5)
+            if index+5<30:
+                day_to_add = index
+            if day_to_add >30:
+                day_to_add-=30
+            newBooking.checkout = '{}-{}-{}'.format(self.year,self.month, day_to_add+5)
+
             newBooking.guests = '3'
             newBooking.save()
-
         percentage = Booking()
         self.assertNotEqual(percentage.percentage_usage(), '0.10')
 
@@ -120,13 +129,14 @@ class EditBookingDatesTest(TestCase):
         response = self.client.post(self.url,{
             'booking-checkin': '2023-02-09',
             'booking-checkout': '2023-02-12',
+            'booking-room': '2'
         })
 
         self.assertEquals(response.status_code, 302)
         self.assertEquals(Booking.objects.first().checkout.strftime("%Y-%m-%d"), '2023-02-12')
 
     @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.StaticFilesStorage')
-    def test_edit_book_dates_post_redirect(self):
+    def test_edit_book_dates_post_not_save(self):
         response = self.client.post(self.url,{
             'checkin': '2023-02-09',
             'checkout': '2023-02-12',
@@ -156,21 +166,35 @@ class EditBookingDatesTest(TestCase):
             'guests': '2',
             'room_id': '1',
         }
-        # print(Booking.objects.first())
-        # print(Booking.objects.all().values('checkin','checkout','guests','room_id','state'))
+
         response = availability.verify_availability_of_change(data)
-        self.assertEquals(response, True)
+        self.assertEquals(response[0], True)
 
     def test_verify_availability_of_change_false(self):
         availability = Booking()
         data ={
-            'checkin': '2023-02-01',
-            'checkout': '2023-02-10',
+            'checkin': '2023-02-10',
+            'checkout': '2023-02-12',
             'code': 'XASDERD0',
-            'guests': '2',
+            'guests': '1',
             'room_id': '1',
         }
-        # print(Booking.objects.first())
-        # print(Booking.objects.all().values('checkin','checkout','guests','room_id','state'))
+        for index in range(1,5):
+            room = Room.objects.get(id='{}'.format(index))
+            customer = Customer.objects.create(
+                name='XXX{}'.format(index)
+            )
+            Booking.objects.create(
+                checkin='2023-02-10',
+                checkout='2023-02-20',
+                guests=2,
+                state='NEW',
+                total=150,
+                customer_id =customer.id,
+                room_id= room.id,
+                code = 'XASDERD{}'.format(index)
+            )
+
         response = availability.verify_availability_of_change(data)
-        self.assertEquals(response, False)
+        self.assertEquals(response[0], False)
+
