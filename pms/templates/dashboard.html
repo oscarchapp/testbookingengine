@@ -18,6 +18,11 @@
             <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
         </div>
 
+        <div class="card text-white p-3 card-customization" style="background-color: pink;">
+            <h5 class="small">Porcentaje Ocupación</h5>
+            <h1 class="dashboard-value">{{dashboard.occupancy}} %</h1>
+        </div>
+
         <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
             <h5 class="small">Total facturado</h5>
             <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
