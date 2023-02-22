@@ -1,19 +1,36 @@
 {% extends "main.html"%}
+{% load static %}
+
 
 {% block content %}
-<h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
-<div class="row card mt-3 mb-3 hover-card bg-tr-250">
-    <div class="col p-3">
-        <div class="">
-            {{room.name}} ({{room.room_type__name}})
-        </div>
-        <div>
-            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>
-        
+<div class="component" >
+    <div class="ps-3">
+        <h3>Habitaciones del hotel</h3>
+    <form action="{% url 'rooms'%}" method="GET" class="d-flex">
+             <input class="form-control me-1" type="search" name="filter"
+                    placeholder="Introduzca el nombre de la habitación" aria-label="Search">
+             <button class="" type="submit">Buscar </button>
+    </form>
     </div>
-    
+
+    {% for room in rooms %}
+    <div class="row card mt-3 mb-3 hover-card bg-tr-250">
+        <div class="col p-3">
+                <div class="">
+                    {{room.name}} ({{room.room_type__name}})
+                </div>
+            <div>
+                <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
+            </div>
+        </div>
+    </div>
+
+    {% empty %}
+    <div class="alert alert-danger" id="NoResults">
+       Lo sentimos, No hay habitaciones con ese nombre. Inténtelo modificando el término de búsqueda.
+    </div>
+
+    {% endfor %}
+    {% endblock content%}
+
 </div>
-{% endfor %}
-{% endblock content%}

@@ -39,3 +39,8 @@ body{
     height: 100%;
     align-items: center;
 }
+
+.component {
+    position: fixed !important;
+    top: 5rem;
+}
