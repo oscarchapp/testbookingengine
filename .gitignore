@@ -1,2 +1,13 @@
-*/__pycache__/**
+**/__pycache__/**
 .idea/
+**staticfiles**
+**migrations**
+*.pot
+
+*.pyc
+
+*/*/*/__pycache__/
+
+*/*/__pycache__/
+
+ */__pycache__/

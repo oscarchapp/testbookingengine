@@ -61,6 +61,12 @@
                 <div class="col">
                     <span>Total estadía: €{{booking.total}}</span>
                 </div>
+                <div class="col"></div>
+                <div class="col">
+                {% if booking.state != "DEL" %}
+                    <a href="{% url 'edit_booking_dates' pk=booking.id%} " >Editar reserva</a>
+                {% endif %}
+                </div>
             </div>
             <div class="row">
                 <div class="col">
@@ -71,10 +77,14 @@
 
                 </div>
                 <div class="col">
+                    <div class="col">
 
-                    {% if booking.state != "DEL" %}
-                    <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
-                    {% endif %}
+                        {% if booking.state != "DEL" %}
+                        <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
+                        {% endif %}
+                    </div>
+
+
                 </div>
 
             </div>

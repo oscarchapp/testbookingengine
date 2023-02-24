@@ -1,6 +1,6 @@
 from datetime import datetime
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, widgets
 
 from .models import Booking, Customer
 
@@ -29,7 +29,6 @@ class CustomerForm(ModelForm):
             "phone": "Teléfono"
         }
 
-
 class BookingForm(ModelForm):
     class Meta:
         model = Booking
@@ -40,6 +39,21 @@ class BookingForm(ModelForm):
             'checkin': forms.HiddenInput(),
             'checkout': forms.HiddenInput(),
             'guests': forms.HiddenInput()
+        }
+
+
+class BookingFormDates(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ("checkin", "checkout")
+        labels = {
+            "checkin": "Fecha de entrada",
+            "checkout": "Fecha de Salida"
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date'}),
+            'checkout': forms.DateInput(
+                attrs={'type': 'date'}),
         }
 
 

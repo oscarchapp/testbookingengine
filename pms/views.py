@@ -1,5 +1,6 @@
+from django.contrib import messages
 from django.db.models import F, Q, Count, Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -8,6 +9,7 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from .utils import MessagesEnum
 
 
 class BookingSearchView(View):
@@ -172,6 +174,49 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+
+class EditBookingDatesView(View):
+
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, id=pk)
+        booking_form = BookingFormDates(prefix="booking_dates", instance=booking)
+
+        context = {
+            'booking_form': booking_form,
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+
+        booking_form = BookingFormDates(prefix="booking_dates", instance=booking)
+
+        context = {'booking_form': booking_form}
+
+        query = request.POST.dict()
+
+        if not query:
+            messages.warning(request, MessagesEnum.NO_DATA_SENT.value)
+            return render(request, "edit_booking_dates.html", context)
+
+        exclude = {
+            'booking__checkin__lte': query['booking_dates-checkin'],
+            'booking__checkout__gte': query['booking_dates-checkout'],
+            'booking__state__exact': "NEW"
+        }
+
+        free_rooms = Room.objects.exclude(**exclude)
+
+        if booking.room not in free_rooms:
+            messages.warning(request, MessagesEnum.NO_AVAILABILITY.value)
+            return render(request, "edit_booking_dates.html", context)
+
+        booking.checkin = query['booking_dates-checkin']
+        booking.checkout = query['booking_dates-checkout']
+        booking.save()
+        return redirect("/")
 
 
 class DashboardView(View):
