@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 
-from .models import Booking, Customer
+from .models import Booking, Customer, Room
 
 
 class RoomSearchForm(ModelForm):
@@ -43,6 +44,19 @@ class BookingForm(ModelForm):
         }
 
 
+class BookingChangeDatesForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ("checkin", "checkout",)
+        labels = {
+        }
+        widgets = {
+            'checkin': forms.widgets.TextInput(attrs={'type': 'date'}),
+            'checkout': forms.widgets.TextInput(attrs={'type': 'date'}),
+            'guests': forms.HiddenInput()
+        }
+
+
 class BookingFormExcluded(ModelForm):
     class Meta:
         model = Booking
@@ -56,3 +70,18 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class RoomFilterForm(ModelForm):
+    class Meta:
+        model = Room
+        fields = ['name']
+        labels = {
+            "name": "nombre"
+        }
+
+    def add_prefix(self, field_name):
+        '''
+        Add fields name a prefix to avoid collisions.
+        '''
+        return f'room_{field_name}'
