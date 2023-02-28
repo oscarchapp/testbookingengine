@@ -1,5 +1,7 @@
+from datetime import date
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -7,6 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from .form_dates import Ymd
 from .forms import *
 from .models import Room
+from .managers import BookingManager
 from .reservation_code import generate
 
 
@@ -174,6 +177,39 @@ class EditBookingView(View):
             return redirect("/")
 
 
+class EditBookingDatesView(View):
+    '''
+    Handles booking dates edition.
+    '''
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingChangeDatesForm(prefix="dates", instance=booking)
+        context = {
+            'booking_form': booking_form,
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        errors = {}
+        booking = Booking.objects.get(id=pk)
+        form = BookingChangeDatesForm(request.POST, prefix="dates", instance=booking)
+        if form.is_valid():
+            checkin = form.cleaned_data['checkin']
+            checkout = form.cleaned_data['checkout']
+            is_room_available = Booking.objects.is_room_available(booking, from_date=checkin, to_date=checkout)
+            if is_room_available:
+                form.save()
+            else:
+                errors['room'] = f"La habitación {booking.room.name} no está disponible para las fechas seleccionadas."
+
+        if errors or form.errors:
+            context = {'booking_form': form, 'errors': errors}
+            return render(request, "edit_booking_dates.html", context)
+
+        return redirect(reverse("home"))
+
+
 class DashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
@@ -209,13 +245,21 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get % of booked rooms
+        confirmed_bookings = (Booking.objects
+                              .filter(checkout__gte=date.today())
+                              .exclude(state="DEL")
+                              .count())
+        total_rooms = Room.objects.all().count()
+        occupation = confirmed_bookings / total_rooms * 100
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupation': occupation,
         }
 
         context = {
@@ -239,8 +283,15 @@ class RoomDetailsView(View):
 class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        room_name = request.GET.get('room_name', None)
+        if room_name is not None and room_name.strip() != '':
+            rooms_lookup = Room.objects.filter(name__contains=room_name)
+        else:
+            rooms_lookup = Room.objects.all()
+        rooms = rooms_lookup.values("name", "room_type__name", "id")
+        search_form = RoomFilterForm(initial={'name': room_name or None})
         context = {
-            'rooms': rooms
+            'rooms': rooms,
+            'search_form': search_form,
         }
         return render(request, "rooms.html", context)
