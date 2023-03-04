@@ -240,7 +240,20 @@ class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+        room_only_name_search_form = RoomOnlyNameSearchForm()
         context = {
-            'rooms': rooms
+            'rooms': rooms,
+            'form': room_only_name_search_form
+        }
+        return render(request, "rooms.html", context)
+    
+    def post(self, request):
+        query = request.POST.dict()
+        room_only_name_search_form = RoomOnlyNameSearchForm()
+        #we search for the rooms that the name starts with the user's search
+        rooms = Room.objects.filter(Q(name__startswith=query['name'])).values("name", "room_type__name", "id")
+        context = {
+            'rooms': rooms,
+            'form': room_only_name_search_form
         }
         return render(request, "rooms.html", context)

@@ -2,6 +2,10 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+
+<!– We add room search form –>
+{% include "booking_only_name_search_form.html" %}
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
