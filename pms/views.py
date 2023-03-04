@@ -244,3 +244,64 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+# View that allows us to manage the editing of booking dates
+class EditBookingDateView(View):
+     def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = EditDatesForm(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form,
+        }
+        return render(request, "edit_dates_booking.html", context)
+     
+     @method_decorator(ensure_csrf_cookie)
+     def post(self, request, pk):
+        query = request.POST.dict()
+        booking = Booking.objects.get(id=pk)
+        booking_form = EditDatesForm(request.POST, prefix="booking", instance=booking)
+        checkin = Ymd.Ymd(query['booking-checkin'])
+        checkout = Ymd.Ymd(query['booking-checkout'])
+        total_days = checkout - checkin
+        context = {
+            'booking_form': booking_form,
+            'message' : "No hay disponibilidad para las fechas seleccionadas"
+        }
+
+        # Check that the checkout date is greater than the checkin date
+        if total_days <= 0 :
+            context["message"] = "La fecha del checkout debe ser superior a la fecha del checkin"
+            return render(request, "edit_dates_booking.html", context)
+
+        if booking_form.is_valid():
+
+            # get available rooms and total according to dates
+            filters = {
+                'room__name': booking.room.name,
+                'state__exact': "NEW",
+                'checkin__gt' : query['booking-checkin'],
+                'checkout__lt' : query['booking-checkout'],
+            }
+
+            exclude = {
+                'code': booking.code,
+                'checkin__gte' : query['booking-checkout'],
+                'checkout__lte' : query['booking-checkin'],
+            }   
+
+            # Obtain the reserves that conflict with the new dates
+            total_booking = (Booking.objects
+                       .filter(**filters)
+                       .exclude(**exclude)
+                       .values("room__name","code","state","checkin","checkout")
+                       .annotate(total=Count('room__name')))
+            
+            # If the reservation can be edited we send the customer to the home page
+            # otherwise we show an error message.
+            if total_booking.count() == 0:
+                booking_form.save()
+            else:
+                return render(request, "edit_dates_booking.html", context)
+            return redirect("/")
+     
+
