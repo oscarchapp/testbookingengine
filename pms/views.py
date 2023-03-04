@@ -187,6 +187,19 @@ class DashboardView(View):
                         .filter(created__range=today_range)
                         .values("id")
                         ).count()
+        
+        # get the number of confirmed reservations by rooms
+        confirmed_bookings = (Booking.objects
+                        .filter(state='NEW')
+                        .values("room")
+                        .distinct()
+                        ).count()
+        
+        
+        # get the number of rooms
+        number_rooms = (Room.objects
+                        .all()
+                        ).count()
 
         # get incoming guests
         incoming = (Booking.objects
@@ -209,12 +222,16 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get occupancy rate by rounding the number to two decimal places
+        occupancy_rate = round((confirmed_bookings/number_rooms)*100,2)
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'occupancy_rate' : occupancy_rate,
 
         }
 

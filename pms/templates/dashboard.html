@@ -4,24 +4,36 @@
 <h1>Dashboard</h1>
 <div class="card">
     <h5 class="card-header">Hoy</h5>
-    <div class="d-flex justify-content-evenly pt-5 pb-5">
-        <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
-            <h5 class="small">Reservas hechas</h5>
-            <h1 class="dashboard-value">{{dashboard.new_bookings}}</h1>
-        </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
-            <h5 class="small">Huéspedes ingresando</h5>
-            <h1 class="dashboard-value">{{dashboard.incoming_guests}}</h1>
-        </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
-            <h5 class="small">Huéspedes saliendo</h5>
-            <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
+
+    <!– I organize the dashborad in one row with three elements and one row with two elements. –>
+    <div class="d-flex flex-column">
+        <div class="row d-flex justify-content-evenly pt-3 pb-3">
+            <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
+                <h5 class="small">Reservas hechas</h5>
+                <h1 class="dashboard-value">{{dashboard.new_bookings}}</h1>
+            </div>
+            <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
+                <h5 class="small">Huéspedes ingresando</h5>
+                <h1 class="dashboard-value">{{dashboard.incoming_guests}}</h1>
+            </div>
+            <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
+                <h5 class="small">Huéspedes saliendo</h5>
+                <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
+            </div>
         </div>
 
-        <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
-            <h5 class="small">Total facturado</h5>
-            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+        <div class="row d-flex justify-content-evenly pt-3 pb-3">
+            <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
+                <h5 class="small">Total facturado</h5>
+                <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+            </div>
+    
+            <div class="card text-white p-3 card-customization" style="background-color: #9659F6;">
+                <h5 class="small">% ocupación</h5>
+                <h1 class="dashboard-value">{{dashboard.occupancy_rate}}%</h1>
+            </div>
         </div>
+        
     </div>
 </div>
 {% endblock content%}
