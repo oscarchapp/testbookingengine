@@ -1,8 +1,11 @@
 from datetime import datetime
 from django import forms
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from django.forms import ModelForm
 
 from .models import Booking, Customer
+from .utils.custom_errors import RoomFilterError
 
 
 class RoomSearchForm(ModelForm):
@@ -56,3 +59,16 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class RoomFilterForm(forms.Form):
+    room_number = forms.CharField(label="Nº Habitación", max_length=10,
+                                  widget=forms.TextInput(attrs={'placeholder': 'Search', 'class': 'form-control'}))
+
+    def clean_room_number(self):
+        room_number = self.cleaned_data.get('room_number')
+        try:
+            float(room_number)
+        except Exception as e:
+            raise ValidationError(_(RoomFilterError.MESSAGE), code=RoomFilterError.CODE, params={'exception': e})
+        return room_number

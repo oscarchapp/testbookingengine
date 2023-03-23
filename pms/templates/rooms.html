@@ -2,6 +2,25 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+
+
+<form action="" method="GET">
+    <div class="row">
+        <div class="col-sm-11 d-flex align-items-end">
+            {{ form }}
+        </div>
+        <div class="col-sm-1 d-flex align-items-end">
+            <input type="submit" class="btn btn-primary" value="Buscar">
+        </div>
+    </div>
+</form>
+
+{% if not rooms %}
+<div class="alert alert-warning mt-3 mb-3 d-flex justify-content-center" role="alert">
+    <h2>No existen habitaciones con ese número.</h2>
+</div>
+{% endif %}
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
@@ -11,9 +30,7 @@
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
         </div>
-        
     </div>
-    
 </div>
 {% endfor %}
 {% endblock content%}
