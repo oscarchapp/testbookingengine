@@ -25,7 +25,7 @@
 
         <div class="card text-white p-3 card-customization" style="background-color: gray;">
             <h5 class="small">Ocupación</h5>
-            <h1 class="dashboard-value">{{dashboard.percentage}} %</h1>
+            <h1 class="dashboard-value">{{dashboard.percentage|floatformat:1}} %</h1>
             <div class="card-body">
                 <div class="progress" role="progressbar" aria-valuenow="{{ dashboard.percentage }}" aria-valuemin="0" aria-valuemax="100">
                     <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" style="width: {{ dashboard.percentage }}%"></div>

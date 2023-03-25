@@ -209,8 +209,14 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
-        # get occupation percentage
-        percentage = 60
+        # get occupancy percentage
+        booked_rooms = (
+            (Booking.objects.filter(checkin__lte=today, checkout__gt=today)
+             .exclude(state="DEL")
+             .aggregate(booked_rooms=Count('room', distinct=True)))
+        ).get('booked_rooms')
+        total_rooms = Room.objects.all().count()
+        percentage = booked_rooms / total_rooms * 100
 
         # preparing context data
         dashboard = {
