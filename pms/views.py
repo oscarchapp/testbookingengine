@@ -209,13 +209,16 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get occupation percentage
+        percentage = 60
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'percentage': percentage
         }
 
         context = {
