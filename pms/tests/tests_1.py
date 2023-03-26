@@ -1,10 +1,11 @@
 from django.db import IntegrityError
 from django.forms.models import model_to_dict
 from django.test import TestCase
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 
 from pms.forms import RoomFilterForm
 from pms.models import Room, Room_type
+from pms.views import RoomsView
 
 
 class RoomViewTest(TestCase):
@@ -44,6 +45,15 @@ class RoomViewTest(TestCase):
         response = self.client.get(reverse('rooms') + "?room_number=9")
         response_rooms, response_rooms_ids = self.__get_response_data(response)
         self.assertEqual(len(response_rooms), 0)
+
+    def test_url_matches_correct_view(self):
+        response = self.client.get(reverse('rooms'))
+        expected_view = RoomsView
+        self.assertEqual(response.resolver_match.func.view_class, expected_view)
+
+    def test_url_no_matches_view(self):
+        with self.assertRaises(NoReverseMatch):
+            self.client.get(reverse('fake-url'))
 
     def test_get_method_is_allowed(self):
         response = self.client.get(reverse('rooms'))
