@@ -51,5 +51,9 @@ class Booking(models.Model):
     code = models.CharField(max_length=8)
     created = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        self.total = (self.checkout - self.checkin).days * self.room.room_type.price
+        super(Booking, self).save(*args, **kwargs)
+
     def __str__(self):
         return self.code

@@ -1,3 +1,5 @@
+from datetime import date, time, datetime
+
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -176,7 +178,6 @@ class EditBookingView(View):
 
 class DashboardView(View):
     def get(self, request):
-        from datetime import date, time, datetime
         today = date.today()
 
         # get bookings created today
@@ -216,7 +217,7 @@ class DashboardView(View):
              .aggregate(booked_rooms=Count('room', distinct=True)))
         ).get('booked_rooms')
         total_rooms = Room.objects.all().count()
-        percentage = booked_rooms / total_rooms * 100
+        percentage = booked_rooms / total_rooms * 100 if total_rooms else 0  # avoid ZeroDivisionError
 
         # preparing context data
         dashboard = {

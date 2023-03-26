@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.forms.models import model_to_dict
 from django.test import TestCase
 from django.urls import reverse
