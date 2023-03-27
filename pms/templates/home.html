@@ -68,7 +68,12 @@
                     <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
-
+                    {% if booking.state != "DEL" %}
+                    <a href="{% url 'edit_booking_dates' pk=booking.id%} " >
+                        <i class="bi bi-calendar3-range"></i>
+                        Editar Fechas de Reserva
+                    </a>
+                    {% endif %}
                 </div>
                 <div class="col">
 

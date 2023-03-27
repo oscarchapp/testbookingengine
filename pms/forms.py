@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.forms import ModelForm
 
 from .models import Booking, Customer
-from .utils.custom_errors import RoomFilterError
+from .utils.custom_errors import RoomFilterError, BookingEditDateError
 
 
 class RoomSearchForm(ModelForm):
@@ -59,6 +59,28 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingDateForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        labels = {
+            'checkin': "Entrada",
+            'checkout': "Salida"
+        }
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'checkout': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        checkin = cleaned_data.get("checkin")
+        checkout = cleaned_data.get("checkout")
+        if checkin > checkout:
+            raise forms.ValidationError(_(BookingEditDateError.MESSAGE), code=BookingEditDateError.CODE)
+        return cleaned_data
 
 
 class RoomFilterForm(forms.Form):

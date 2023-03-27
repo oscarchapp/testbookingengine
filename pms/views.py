@@ -1,7 +1,7 @@
 from datetime import date, time, datetime
 
 from django.db.models import F, Q, Count, Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -174,6 +174,40 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+
+class EditBookingDateView(View):
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, id=pk)
+        form = BookingDateForm(instance=booking)
+
+        context = {'form': form}
+        return render(request, "edit_booking_dates.html", context)
+
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.select_related('room').get(id=pk)
+
+        form = BookingDateForm(request.POST, instance=booking)
+
+        if form.is_valid():
+            # Check if exist overlapped dates
+            overlapping_bookings = (Booking.objects
+                                    .filter(Q(checkin__lte=form.cleaned_data['checkout']) &
+                                            Q(checkout__gte=form.cleaned_data['checkin']))
+                                    .filter(room=booking.room, state="NEW")
+                                    .exclude(code=booking.code)
+                                    .values('code'))
+            if not overlapping_bookings:
+                form.save()
+                return redirect("/")
+            form.add_error(None, "No hay disponibilidad para las fechas seleccionadas.")
+
+        context = {
+            'form': form,
+        }
+        return render(request, "edit_booking_dates.html", context)
 
 
 class DashboardView(View):
