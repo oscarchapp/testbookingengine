@@ -20,11 +20,6 @@
       {{ form.non_field_errors }}
     </div>
     {% endif %}
-    {% if form.errors %}
-    <div class="alert alert-danger" role="alert">
-      {{ form.non_field_errors }}
-    </div>
-    {% endif %}
     <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
     <button class="btn btn-primary" type="submit">Guardar datos</button>
 </form>
