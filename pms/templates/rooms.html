@@ -2,6 +2,12 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+
+<form action="{% url 'rooms' %}" method="GET">
+    <input type="text" name="room_name">
+    <input type="submit" value="Filter room by name">
+</form>
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
