@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic import ListView
 
 from .form_dates import Ymd
 from .forms import *
@@ -236,11 +237,14 @@ class RoomDetailsView(View):
         return render(request, "room_detail.html", context)
 
 
-class RoomsView(View):
-    def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
-        return render(request, "rooms.html", context)
+class RoomsView(ListView):
+    model = Room
+    template_name = "rooms.html"
+    context_object_name = "rooms"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        room_name = self.request.GET.get("room_name", None)
+        if room_name:
+            queryset = queryset.filter(name__contains=room_name.strip())
+        return queryset.values("name", "room_type__name", "id")
