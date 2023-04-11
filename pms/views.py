@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -241,10 +242,17 @@ class RoomsView(ListView):
     model = Room
     template_name = "rooms.html"
     context_object_name = "rooms"
+    form_class = RoomSearchNameForm
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        room_name = self.request.GET.get("room_name", None)
-        if room_name:
-            queryset = queryset.filter(name__contains=room_name.strip())
+        if self.request.GET.get("name", None):
+            form = self.form_class(self.request.GET)
+            if form.is_valid():
+                queryset = queryset.filter(name__contains=form.cleaned_data["name"])
         return queryset.values("name", "room_type__name", "id")
+
+    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form_class
+        return context

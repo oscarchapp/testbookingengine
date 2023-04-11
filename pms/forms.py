@@ -2,7 +2,7 @@ from datetime import datetime
 from django import forms
 from django.forms import ModelForm
 
-from .models import Booking, Customer
+from .models import Booking, Customer, Room
 
 
 class RoomSearchForm(ModelForm):
@@ -56,3 +56,18 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class RoomSearchNameForm(ModelForm):
+    class Meta:
+        model = Room
+        fields = ['name']
+        labels = {
+            "name": "Nombre de la habitación"
+        }
+        
+    def clean_name(self):
+        name = self.cleaned_data["name"].strip()
+        if not name:
+            raise forms.ValidationError("Insert a name.")
+        return name
