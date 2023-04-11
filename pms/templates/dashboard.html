@@ -4,23 +4,27 @@
 <h1>Dashboard</h1>
 <div class="card">
     <h5 class="card-header">Hoy</h5>
-    <div class="d-flex justify-content-evenly pt-5 pb-5">
-        <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
+    <div class="d-flex justify-content-evenly flex-wrap align-content-around pt-5 pb-5">
+        <div class="card text-white p-3 card-customization margin-bottom-small" style="background-color: #1000ff;">
             <h5 class="small">Reservas hechas</h5>
             <h1 class="dashboard-value">{{dashboard.new_bookings}}</h1>
         </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
+        <div class="card text-white p-3 card-customization margin-bottom-small" style="background-color: #00ab74;">
             <h5 class="small">Huéspedes ingresando</h5>
             <h1 class="dashboard-value">{{dashboard.incoming_guests}}</h1>
         </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
+        <div class="card text-white p-3 card-customization margin-bottom-small" style="background-color: #eeb258;">
             <h5 class="small">Huéspedes saliendo</h5>
             <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
         </div>
+        <div class="card text-white p-3 card-customization margin-bottom-small" style="background-color: #58aaee;">
+            <h5 class="small">% Ocupación</h5>
+            <h1 class="dashboard-value">{{dashboard.occupancy_rate}}%</h1>
+        </div>
 
-        <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
+        <div class="card text-white p-3 card-customization margin-bottom-small" style="background-color: #ff7f7f;">
             <h5 class="small">Total facturado</h5>
-            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+            <h1 class="dashboard-value">€ {% if dashboard.invoiced == None %}0.00{% endif %} {{dashboard.invoiced|floatformat:2}}</h1>
         </div>
     </div>
 </div>
