@@ -1,8 +1,10 @@
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic import UpdateView
 
 from .form_dates import Ymd
 from .forms import *
@@ -172,6 +174,20 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+
+class EditBookingDatesView(UpdateView):
+    form_class = BookingDatesForm
+    model = Booking
+    template_name = "edit_booking_dates.html"
+
+    def get_success_url(self):
+        return reverse("home")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["url_home"] = reverse("home")
+        return context
 
 
 class DashboardView(View):

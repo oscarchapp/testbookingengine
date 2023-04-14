@@ -54,7 +54,9 @@
                     <span>{{booking.guests}}</span>
                 </div>
                 <div class="col"></div>
-                <div class="col"></div>
+                <div class="col">
+                    <a href="{% url 'edit_booking_dates' pk=booking.id%}">Editar fechas</a>
+                </div>
             </div>
             
             <div class="row">
