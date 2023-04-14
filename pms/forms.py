@@ -85,6 +85,9 @@ class BookingDatesForm(ModelForm):
         if check_in == check_out:
             raise forms.ValidationError("Check out can't be same day as check in.")
 
+        elif check_in > check_out:
+            raise forms.ValidationError("Check in can't be after check in.")
+
         if Booking.objects.filter(
                 ~Q(id=self.instance.id) &
                 Q(state=Booking.NEW) &
