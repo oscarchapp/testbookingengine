@@ -208,7 +208,7 @@ class DashboardView(View):
         )
 
         rooms = Room.objects.all().count()
-        occupancy_rate = round(booking_stats["total_bookings"] / rooms, 1) * 100 if rooms else 0
+        occupancy_rate = round(booking_stats["total_bookings"] / rooms, 2) * 100 if rooms else 0
 
         dashboard = {
             'new_bookings': booking_stats["new_bookings"],

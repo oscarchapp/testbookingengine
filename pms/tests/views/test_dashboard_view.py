@@ -131,7 +131,7 @@ class DashboardViewTestCase(TestCase):
         response = self.client.get(self.url)
         total_rooms = Room.objects.all().count()
         total_bookings = Booking.objects.filter(state=Booking.NEW).count()
-        expected = round(total_bookings / total_rooms, 1) * 100
+        expected = round(total_bookings / total_rooms, 2) * 100
 
         self.assertEqual(response.context["dashboard"]["occupancy_rate"], expected)
 
