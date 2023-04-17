@@ -83,10 +83,10 @@ class BookingDatesForm(ModelForm):
         check_out = cleaned_data.get("checkout")
 
         if check_in == check_out:
-            raise forms.ValidationError("Check out can't be same day as check in.")
+            raise forms.ValidationError("Check out no puede ser el mismo dia que check in.")
 
         elif check_in > check_out:
-            raise forms.ValidationError("Check in can't be after check in.")
+            raise forms.ValidationError("Check in no puede ser despues del check out.")
 
         if Booking.objects.filter(
                 ~Q(id=self.instance.id) &
@@ -114,8 +114,6 @@ class BookingDatesForm(ModelForm):
         self.instance.save()
 
         return super().save(commit=commit)
-
-
 
 
 class BookingFormExcluded(ModelForm):
