@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from datetime import date, time, datetime
 
 from .form_dates import Ymd
 from .forms import *
@@ -174,54 +175,108 @@ class EditBookingView(View):
             return redirect("/")
 
 
+def calculate_dashboard_statistics(selected_date):
+    """Returns a dictionary with dashboard data for the given date"""
+
+    # get bookings created today
+    date_min = datetime.combine(selected_date, time.min)
+    date_max = datetime.combine(selected_date, time.max)
+    date_range = (date_min, date_max)
+    new_bookings = (
+        Booking.objects
+        .filter(created__range=date_range)
+        .values("id")
+    ).count()
+
+    # get incoming guests
+    incoming = (
+        Booking.objects
+        .filter(checkin=selected_date)
+        .exclude(state="DEL")
+        .values("id")
+    ).count()
+
+    # get outcoming guests
+    outcoming = (
+        Booking.objects
+        .filter(checkout=selected_date)
+        .exclude(state="DEL")
+        .values("id")
+    ).count()
+
+    # get outcoming guests
+    invoiced = (
+        Booking.objects
+        .filter(created__range=date_range)
+        .exclude(state="DEL")
+        .aggregate(Sum('total'))
+    )
+
+    # get occupation percentage
+    number_of_bookings = (
+        Booking.objects
+        .filter(checkin__lte=selected_date, checkout__gte=selected_date)
+        .exclude(state="DEL")
+        .values("id")
+    ).count()
+    number_of_rooms = Room.objects.all().count()
+    # round to 2 decimals on string
+    occupation = "{:.2f}".format(round((number_of_bookings / number_of_rooms) * 100, 2))
+
+    return {
+        'occupation': occupation,
+        'new_bookings': new_bookings,
+        'incoming_guests': incoming,
+        'outcoming_guests': outcoming,
+        'invoiced': invoiced,
+    }
+
 class DashboardView(View):
+    """View for the dashboard with the following data:"""
+
     def get(self, request):
-        from datetime import date, time, datetime
+        """Returns a dictionary with dashboard data for today"""
+
+        # get today's date
         today = date.today()
-
-        # get bookings created today
-        today_min = datetime.combine(today, time.min)
-        today_max = datetime.combine(today, time.max)
-        today_range = (today_min, today_max)
-        new_bookings = (Booking.objects
-                        .filter(created__range=today_range)
-                        .values("id")
-                        ).count()
-
-        # get incoming guests
-        incoming = (Booking.objects
-                    .filter(checkin=today)
-                    .exclude(state="DEL")
-                    .values("id")
-                    ).count()
-
-        # get outcoming guests
-        outcoming = (Booking.objects
-                     .filter(checkout=today)
-                     .exclude(state="DEL")
-                     .values("id")
-                     ).count()
-
-        # get outcoming guests
-        invoiced = (Booking.objects
-                    .filter(created__range=today_range)
-                    .exclude(state="DEL")
-                    .aggregate(Sum('total'))
-                    )
-
-        # preparing context data
-        dashboard = {
-            'new_bookings': new_bookings,
-            'incoming_guests': incoming,
-            'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
-        }
-
+        # Create context data
         context = {
-            'dashboard': dashboard
+            'dashboard': calculate_dashboard_statistics(
+                selected_date=today
+            ),
+            'date_form': DashboardDateForm(
+                dict(
+                    date=today
+                )
+            )
         }
+        # render dashboard with context data
         return render(request, "dashboard.html", context)
+
+    def post(self, request):
+        """Returns a dictionary with dashboard data for the given date"""
+
+        # get date from form
+        date_form = DashboardDateForm(request.POST)
+
+        if date_form.is_valid():
+            # get date from form
+            selected_date = date_form.cleaned_data['date']
+            # Create context data
+            context = {
+                'dashboard': calculate_dashboard_statistics(
+                    selected_date=selected_date
+                ),
+                'date_form': DashboardDateForm(
+                    dict(
+                        date=selected_date
+                    )
+                )
+            }
+            # render dashboard with context data
+            return render(request, "dashboard.html", context)
+        else:
+            return redirect("dashboard/")
 
 
 class RoomDetailsView(View):
@@ -231,8 +286,8 @@ class RoomDetailsView(View):
         bookings = room.booking_set.all()
         context = {
             'room': room,
-            'bookings': bookings}
-        print(context)
+            'bookings': bookings
+        }
         return render(request, "room_detail.html", context)
 
 

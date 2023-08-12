@@ -30,17 +30,18 @@ class Room(models.Model):
         return self.name
 
 
+class BookingStateChoices(models.TextChoices):
+    """State choices for booking"""
+    NEW = "NEW", "Nueva"
+    DELETED = "DEL", "Cancelada"
+
 class Booking(models.Model):
-    NEW = 'NEW'
-    DELETED = 'DEL'
-    STATE_CHOICES = [
-        (NEW, 'Nueva'),
-        (DELETED, 'Cancelada'),
-    ]
+    """Model for booking"""
+
     state = models.CharField(
         max_length=3,
-        choices=STATE_CHOICES,
-        default=NEW,
+        choices=BookingStateChoices.choices,
+        default=BookingStateChoices.NEW
     )
     checkin = models.DateField()
     checkout = models.DateField()

@@ -3,21 +3,30 @@
 {% block content %}
 <h1>Dashboard</h1>
 <div class="card">
-    <h5 class="card-header">Hoy</h5>
+    <nav class="card-header">
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ date_form.as_p }}
+            <button type="submit">Ir a la fecha</button>
+        </form>
+    </nav>
     <div class="d-flex justify-content-evenly pt-5 pb-5">
+        <div class="card text-white p-3 card-customization" style="background-color: #d07ae1;">
+            <h5 class="small">% ocupación</h5>
+            <h1 class="dashboard-value">{{ dashboard.occupation }} %</h1>
+        </div>
         <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
             <h5 class="small">Reservas hechas</h5>
-            <h1 class="dashboard-value">{{dashboard.new_bookings}}</h1>
+            <h1 class="dashboard-value">{{ dashboard.new_bookings }}</h1>
         </div>
         <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
             <h5 class="small">Huéspedes ingresando</h5>
-            <h1 class="dashboard-value">{{dashboard.incoming_guests}}</h1>
+            <h1 class="dashboard-value">{{ dashboard.incoming_guests }}</h1>
         </div>
         <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
             <h5 class="small">Huéspedes saliendo</h5>
-            <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
+            <h1 class="dashboard-value">{{ dashboard.outcoming_guests }}</h1>
         </div>
-
         <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
             <h5 class="small">Total facturado</h5>
             <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>

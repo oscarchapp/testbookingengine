@@ -56,3 +56,9 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+class DashboardDateForm(forms.Form):
+    date = forms.DateField(
+        label="Fecha",
+        widget=forms.DateInput(attrs={'type': 'date', 'max': datetime.today().strftime('%Y-%m-%d')})
+    )
