@@ -231,16 +231,52 @@ class RoomDetailsView(View):
         bookings = room.booking_set.all()
         context = {
             'room': room,
-            'bookings': bookings}
-        print(context)
+            'bookings': bookings
+        }
         return render(request, "room_detail.html", context)
 
 
 class RoomsView(View):
+    """View for rooms"""
+
     def get(self, request):
+        """Renders all rooms"""
+
+        # Create empty form
+        filter_form = RoomFilterForm()
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
         context = {
-            'rooms': rooms
+            'rooms': rooms,
+            'filter_form': filter_form
         }
         return render(request, "rooms.html", context)
+
+    def post(self, request):
+        """Filter rooms by name or/and type"""
+
+        # Get form data
+        filter_form = RoomFilterForm(request.POST)
+        # check if form is valid
+        if filter_form.is_valid():
+            # get data from form
+            name = filter_form.cleaned_data['name']
+            room_type = filter_form.cleaned_data['room_type']
+            # Get all rooms
+            rooms = Room.objects.all().values("name", "room_type__name", "id")
+            # filter by name
+            if name:
+                rooms = rooms.filter(name__icontains=name)
+            # filter by type
+            if room_type:
+                rooms = rooms.filter(room_type__name=room_type)
+            # prepare context data
+            context = {
+                'rooms': rooms,
+                'filter_form': filter_form
+            }
+            # render template
+            return render(request, "rooms.html", context)
+        else:
+            # if form is not valid, redirect to rooms
+            return redirect("rooms/")

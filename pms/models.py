@@ -13,6 +13,8 @@ class Customer(models.Model):
 
 
 class Room_type(models.Model):
+    """Model for room types"""
+
     name = models.CharField(max_length=100)
     price = models.FloatField()
     max_guests = models.IntegerField()
@@ -22,6 +24,8 @@ class Room_type(models.Model):
 
 
 class Room(models.Model):
+    """Model for rooms"""
+
     room_type = models.ForeignKey(Room_type, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=500)
