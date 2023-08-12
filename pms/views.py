@@ -151,7 +151,7 @@ class DeleteBookingView(View):
         return redirect("/")
 
 
-class EditBookingView(View):
+class EditContactBookingView(View):
     # renders the booking edition form
     def get(self, request, pk):
         booking = Booking.objects.get(id=pk)
@@ -162,7 +162,7 @@ class EditBookingView(View):
             'customer_form': customer_form
 
         }
-        return render(request, "edit_booking.html", context)
+        return render(request, "edit_contact_booking.html", context)
 
     # updates the customer form
     @method_decorator(ensure_csrf_cookie)
@@ -172,6 +172,32 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+
+
+class EditDatesBookingView(View):
+
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        dates_form = BookingDatesForm(prefix="dates", instance=booking)
+        context = {
+            'dates_form': dates_form
+        }
+        return render(request, "edit_dates_booking.html", context)
+
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        dates_form = BookingDatesForm(request.POST, prefix="dates", instance=booking)
+        if dates_form.is_valid():
+            dates_form.save()
+            return redirect("/")
+        else:
+            context = {
+                'dates_form': dates_form,
+            }
+            return render(request, "edit_dates_booking.html", context)
 
 
 class DashboardView(View):
@@ -231,8 +257,8 @@ class RoomDetailsView(View):
         bookings = room.booking_set.all()
         context = {
             'room': room,
-            'bookings': bookings}
-        print(context)
+            'bookings': bookings
+        }
         return render(request, "room_detail.html", context)
 
 
