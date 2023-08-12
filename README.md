@@ -45,6 +45,12 @@ To deploy this project locally run
     python manage.py runserver
 ```
 
+### Start tests with pytest
+
+```bash
+    docker compose -f docker-compose.yml exec -T testservice bash -c "pytest"
+```
+
 ### Django admin (/admin)
 Use for username and password for superuser is "admin" (without quotes).Remember to change it.
 
