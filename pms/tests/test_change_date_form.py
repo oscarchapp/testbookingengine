@@ -110,4 +110,4 @@ def test_change_date_form_valid_not_exist_room():
     # Check that form has error
     assert form.errors, f"Form has errors: {form.errors}"
     # Check that form has error in room
-    assert form.errors['__all__'][0] == 'No hay habitaciones disponibles para las fechas seleccionadas.'
+    assert form.errors['__all__'][0] == 'No hay disponibilidad para las fechas seleccionadas.'

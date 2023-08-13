@@ -43,18 +43,31 @@ class BookingForm(ModelForm):
         }
 
 
-def get_first_equal_room_available(checkin, checkout, room_type):
+def get_first_equal_room_available(checkin, checkout, original_room):
     """Get first room available for the given dates and room type"""
 
-    # get available rooms and total according to dates and guests
+    # Set filters and exclude
     filters = {
-        'room_type': room_type
+        'room_type': original_room.room_type
     }
     exclude = {
         'booking__checkin__lte': checkout,
         'booking__checkout__gte': checkin,
         'booking__state__exact': "NEW"
     }
+
+    # Obtain the original room first on the new dates
+    original_room_in_new_dates = (
+        Room.objects
+        .filter(id=original_room.id)
+        .exclude(**exclude)
+        .order_by("room_type__max_guests", "name")
+        .first()
+    )
+    if original_room_in_new_dates:
+        # If the original room is available, return it
+        return original_room_in_new_dates
+    # If the original room is not available, return the first available room
     return (
         Room.objects
         .filter(**filters)
@@ -77,7 +90,7 @@ class BookingDatesForm(ModelForm):
             new_room = get_first_equal_room_available(
                 checkin=checkin,
                 checkout=checkout,
-                room_type=self.instance.room.room_type
+                original_room=self.instance.room
             )
             if new_room:
                 self.instance.room = new_room
