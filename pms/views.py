@@ -7,7 +7,7 @@ from datetime import date, time, datetime
 
 from .form_dates import Ymd
 from .forms import *
-from .models import Room
+from .models import Room, Booking, BookingStateChoices
 from .reservation_code import generate
 
 
@@ -53,7 +53,7 @@ class RoomSearchView(View):
         exclude = {
             'booking__checkin__lte': query['checkout'],
             'booking__checkout__gte': query['checkin'],
-            'booking__state__exact': "NEW"
+            'booking__state__exact': BookingStateChoices.NEW
         }
         rooms = (Room.objects
                  .filter(**filters)
@@ -148,7 +148,7 @@ class DeleteBookingView(View):
 
     # deletes the booking
     def post(self, request, pk):
-        Booking.objects.filter(id=pk).update(state="DEL")
+        Booking.objects.filter(id=pk).update(state=BookingStateChoices.DELETED)
         return redirect("/")
 
 
@@ -192,7 +192,7 @@ def calculate_dashboard_statistics(selected_date):
     incoming = (
         Booking.objects
         .filter(checkin=selected_date)
-        .exclude(state="DEL")
+        .exclude(state=BookingStateChoices.DELETED)
         .values("id")
     ).count()
 
@@ -200,7 +200,7 @@ def calculate_dashboard_statistics(selected_date):
     outcoming = (
         Booking.objects
         .filter(checkout=selected_date)
-        .exclude(state="DEL")
+        .exclude(state=BookingStateChoices.DELETED)
         .values("id")
     ).count()
 
@@ -208,7 +208,7 @@ def calculate_dashboard_statistics(selected_date):
     invoiced = (
         Booking.objects
         .filter(created__range=date_range)
-        .exclude(state="DEL")
+        .exclude(state=BookingStateChoices.DELETED)
         .aggregate(Sum('total'))
     )
 
@@ -216,7 +216,7 @@ def calculate_dashboard_statistics(selected_date):
     number_of_bookings = (
         Booking.objects
         .filter(checkin__lte=selected_date, checkout__gte=selected_date)
-        .exclude(state="DEL")
+        .exclude(state=BookingStateChoices.DELETED)
         .values("id")
     ).count()
     number_of_rooms = Room.objects.all().count()
