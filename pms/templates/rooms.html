@@ -3,10 +3,9 @@
 {% block content %}
 <h1>Habitaciones del hotel</h1>
 <nav>
-    <form class="my_filter" method="post">
+    <form class="my_filter" id="my_form_filter_rooms" action="http://localhost:8000/rooms/" method="post">
         {% csrf_token %}
         {{ filter_form.as_p }}
-        <button type="submit">Filtrar</button>
     </form>
 </nav>
 {% for room in rooms %}
@@ -21,4 +20,22 @@
     </div>
 </div>
 {% endfor %}
+<script>
+    const form = document.getElementById("my_form_filter_rooms");
+    const name = document.getElementById("id_name");
+    const typeOfRoom = document.getElementById("id_room_type");
+
+    // Set focus on name input
+    name.focus();
+    // Set cursor at the end of the input
+    name.setSelectionRange(name.value.length, name.value.length);
+
+    // Submit form when user types
+    name.addEventListener("input", () => {
+        form.submit();
+    });
+    typeOfRoom.addEventListener("input", () => {
+        form.submit();
+    });
+</script>
 {% endblock content%}
