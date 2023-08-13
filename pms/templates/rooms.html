@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Habitaciones del hotel</h1>
 <nav>
-    <form class="my_filter" id="my_form_filter_rooms" action="http://localhost:8000/rooms/" method="post">
+    <form class="my_filter" id="my_form_filter_rooms" method="post">
         {% csrf_token %}
         {{ filter_form.as_p }}
     </form>
