@@ -244,3 +244,59 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+    
+class UpdateBookingView(View):
+
+    # get booking or none
+    def get_room_and_booking(self, pk):
+        try:
+            booking = Booking.objects.get(id=pk, state="NEW")
+            return booking
+        except Booking.DoesNotExist:
+            print("Booking does not exist")
+            return None
+
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = self.get_room_and_booking(pk)
+
+        if not booking:
+            return redirect("/")
+        booking_form = BookingFormEdit(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form,
+
+        }
+        return render(request, "update_booking.html", context)
+
+     # updates the booking form
+    def post(self, request, pk):
+        data = request.POST.dict()
+
+        booking = self.get_room_and_booking(pk)
+
+        if not booking:
+            return redirect("/")
+
+        booking_form = BookingFormEdit(request.POST, prefix="booking", instance=booking)
+
+        filter = {
+            'checkin__lte': data['booking-checkout'],
+            'checkout__gte': data['booking-checkin'],
+            'state__exact': "NEW",
+            'room_id': booking.room.id
+        }
+
+        # get list of bookings for the same room and dates
+        bookings = Booking.objects.filter(**filter).exclude(id=pk)
+
+        if bookings.count() > 0:
+            context = {
+                'booking_form': booking_form,
+                'error_message': 'No hay disponibilidad para las fechas seleccionadas.',
+            }
+            return render(request, "update_booking.html", context) 
+
+        if booking_form.is_valid():
+            booking_form.save()
+            return redirect("/")

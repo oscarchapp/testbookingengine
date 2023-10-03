@@ -1,0 +1,22 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar reserva</h1>
+<form style="max-width: 400px;" action="" method="POST">
+    {% csrf_token%}
+    {% for field in booking_form %}
+    <div class="row">
+      <div class="mb-3">
+        <label class="form-label">{{field.label_tag}}</label>
+        {{field}}
+      </div>
+    </div>
+    {% endfor %}
+    {% if error_message %}
+      <div class="alert alert-danger">{{error_message}}</div>
+    {% endif %}
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary" type="submit">Guardar</button>
+</form>
+
+{% endblock content%}
