@@ -2,6 +2,25 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+<div class="row">
+
+<Form style="max-width: 400px;" method="GET" action="">
+        <div class="input-group">   
+            <input
+                {% if form.search_room.value %} value="{{ form.search_room.value }}"  {% endif %}
+                name="search_room"
+                class="form-control " 
+                placeholder="Buscar Habitación"
+                type="search"
+                aria-label="Search"
+                autocomplete="off"
+            >
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+</Form>
+</div>  
+{% if form.errors %} <div class="alert alert-danger mt-2">Asegúrese de que este valor tenga como máximo 200 caracteres.</div> {% endif %}
+{% if not rooms|length %} <div class="alert alert-dark mt-2">No se encontraron habitaciones</div> {% endif %}
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">

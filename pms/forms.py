@@ -56,3 +56,6 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+class RoomFormFilter(forms.Form):
+    search_room = forms.CharField(max_length=200, required=False, label='Buscar Habitación')
