@@ -240,7 +240,12 @@ class RoomsView(View):
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
+        filter_form = RoomFilterForm(request.GET)
+        if filter_form.is_valid():
+            text_filter = filter_form.cleaned_data['search']
+            rooms = rooms.filter(name__startswith=text_filter)
         context = {
-            'rooms': rooms
+            'rooms': rooms,
+            'form': filter_form
         }
         return render(request, "rooms.html", context)
