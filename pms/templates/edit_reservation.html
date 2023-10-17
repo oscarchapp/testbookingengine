@@ -1,0 +1,25 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar reserva</h1>
+{% if error_message  %}
+<p style="color: red;">{{ error_message }}</p>
+{% endif %}
+
+<form method="POST" action="{% url 'edit_reservation' pk=booking.id %}">
+    {% csrf_token%}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+    <div class="row">
+        <div class="col-md-2">{{field.label_tag}}</div>
+        <div class="col-md">{{field}}</div>
+    </div>
+    {% endfor %}
+    <div class="row">
+        <div class="col-md-auto">
+            <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+            <button class="btn btn-primary" type="submit">Guardar</button>
+        </div>
+    </div>
+</form>
+{% endblock content%}

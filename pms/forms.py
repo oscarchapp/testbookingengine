@@ -1,5 +1,6 @@
 from datetime import datetime
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms import ModelForm
 
 from .models import Booking, Customer
@@ -56,3 +57,24 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingEditForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'min': datetime.today().strftime('%Y-%m-%d')}),
+            'checkout': forms.DateInput(attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        checkin = cleaned_data.get('checkin')
+        checkout = cleaned_data.get('checkout')
+
+        # Check if checkin is greater than checkout
+        if checkin and checkout and checkin > checkout:
+            raise ValidationError("Fecha de Checkin debe ser menor a fecha de Checkout.")
+
+        return cleaned_data

@@ -244,3 +244,47 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+class EditReservationView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = BookingEditForm(instance=booking)
+
+        context = {
+            'form': form,
+            'booking': booking,
+        }
+        return render(request, "edit_reservation.html", context)
+
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = BookingEditForm(request.POST, instance=booking)
+
+        if form.is_valid():
+            checkin = form.cleaned_data['checkin']
+            checkout = form.cleaned_data['checkout']
+
+            # check for overlapping reservations
+            overlapping_reservations = Booking.objects.filter(
+                Q(checkin__lte=checkout, checkout__gte=checkin) |
+                Q(checkin__gte=checkin, checkout__lte=checkout)
+            ).exclude(id=pk)
+
+            if overlapping_reservations.exists():
+                error_message = "No hay disponibilidad para las fechas seleccionadas."
+                context = {
+                    'form': form,
+                    'booking': booking,
+                    'error_message': error_message,
+                }
+                return render(request, "edit_reservation.html", context)
+            else:
+                form.save()
+                return redirect('/')
+
+        context = {
+            'form': form,
+            'booking': booking,
+        }
+        return render(request, "edit_reservation.html", context)
