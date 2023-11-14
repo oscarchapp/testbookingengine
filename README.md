@@ -52,6 +52,12 @@ Use for username and password for superuser is "admin" (without quotes).Remember
 - SECRET_KEY should be stored in .env file for production!
 - DEBUG is set to TRUE.
 
+## Run Unit tests
+```bash 
+   docker exec -it testservice python manage.py collectstatic --noinput
+   docker exec -it testservice python manage.py test pms.tests
+```
+
 ## TODO List / Improvements
 
 - Handle and create error pages

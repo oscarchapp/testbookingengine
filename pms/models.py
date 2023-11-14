@@ -1,12 +1,15 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
-
-# Create your models here.
 
 class Customer(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
-    phone = models.CharField(max_length=50)  # TODO:ADD REGEX FOR PHONE VALIDATION
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,50}$',
+        message="Phone number format: '+99999...99'."
+    )  # TODO:ADD REGEX FOR PHONE VALIDATION
+    phone = models.CharField(validators=[phone_regex], max_length=50)
 
     def __str__(self):
         return self.name

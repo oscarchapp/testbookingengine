@@ -1,5 +1,6 @@
 from random import choice, choices
-from string import ascii_uppercase,digits
-def get():
+from string import ascii_uppercase, digits
 
-    return ''.join(choices(ascii_uppercase+digits,k=8))
+
+def get():
+    return ''.join(choices(ascii_uppercase+digits, k=8))
