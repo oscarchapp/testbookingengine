@@ -1,3 +1,5 @@
+from datetime import date, time, datetime
+
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -6,7 +8,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .form_dates import Ymd
 from .forms import *
-from .models import Room
+from .models import Room, Booking
 from .reservation_code import generate
 
 
@@ -175,6 +177,77 @@ class EditBookingView(View):
 
 
 class DashboardView(View):
+    def get(self, request):
+        today = date.today()
+
+        new_bookings = self.get_new_bookings(today)
+        incoming_guests = self.get_incoming_guests(today)
+        outcoming_guests = self.get_outcoming_guests(today)
+        invoiced_amount = self.get_invoiced_amount(today)
+        percentage_occupation = self.get_percentage_occupation(today)
+
+        dashboard_data = {
+            'new_bookings': new_bookings,
+            'incoming_guests': incoming_guests,
+            'outcoming_guests': outcoming_guests,
+            'invoiced_amount': invoiced_amount,
+            'percentage_occupation': percentage_occupation
+        }
+
+        context = {
+            'dashboard': dashboard_data
+        }
+
+        return render(request, "dashboard.html", context)
+
+    def get_percentage_occupation(self, today):
+        confirmed_bookings = Booking.objects.filter(
+            state="NEW",
+            checkin__gte=today
+        ).count()
+        rooms_quantity = Room.objects.all().count()
+
+        if rooms_quantity == 0:
+            return 0
+
+        return (confirmed_bookings/rooms_quantity) * 100
+
+    def get_new_bookings(self, today):
+        today_min = datetime.combine(today, time.min)
+        today_max = datetime.combine(today, time.max)
+        today_range = (today_min, today_max)
+
+        return Booking.objects.filter(created__range=today_range).count()
+
+    def get_incoming_guests(self, today):
+        return (
+                Booking.objects
+                    .filter(checkin=today)
+                    .exclude(state="DEL")
+                    .values("id")
+               ).count()
+
+    def get_outcoming_guests(self, today):
+        return (
+                Booking.objects
+                     .filter(checkout=today)
+                     .exclude(state="DEL")
+                     .values("id")
+               ).count()
+
+    def get_invoiced_amount(self, today):
+        today_min = datetime.combine(today, time.min)
+        today_max = datetime.combine(today, time.max)
+        today_range = (today_min, today_max)
+        return (
+                Booking.objects
+                    .filter(created__range=today_range)
+                    .exclude(state="DEL")
+                    .aggregate(Sum('total'))
+               )
+
+
+class aaaaDashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
         today = date.today()
