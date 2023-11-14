@@ -4,18 +4,28 @@ Date.prototype.addDays = function(days) {
     return date;
 }
 
-function onDateUpdate(){
-    const date1=new Date(document.querySelector("#id_checkin").value)
-    const date2=new Date(document.querySelector("#id_checkout").value)
+function onDateUpdate(checkin, checkout){
+    const date1=new Date(checkin)
+    const date2=new Date(checkout)
     document.querySelector("#total-days").innerHTML=(date2.getTime() - date1.getTime())/(1000*3600*24)
 
 }
 
-document.querySelector("#id_checkout").addEventListener("change",(e)=>{
-    onDateUpdate()
-    document.querySelector("#id_guests").focus()
-    
-})
+const idBookingCheckoutElement = document.querySelector("#id_booking-checkout");
+if (idBookingCheckoutElement) {
+    onDateUpdate(document.querySelector("#id_booking-checkin").value, idBookingCheckoutElement.value);
+    idBookingCheckoutElement.addEventListener("change", (e) => {
+        onDateUpdate(document.querySelector("#id_booking-checkin").value, idBookingCheckoutElement.value);
+    });
+}
+
+const idCheckoutElement = document.querySelector("#id_checkout");
+if (idCheckoutElement) {
+  idCheckoutElement.addEventListener("change", (e) => {
+      onDateUpdate(document.querySelector("#id_checkin").value, idCheckoutElement.value);
+      document.querySelector("#id_guests").focus();
+  });
+}
 // document.querySelector("#id_checkin").addEventListener("change",(e)=>{
 //     const checkout=document.querySelector("#id_checkout")
 

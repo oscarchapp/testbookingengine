@@ -22,7 +22,7 @@ class RoomSearchForm(ModelForm):
 
 class EditDatesForm(RoomSearchForm):
     class Meta(RoomSearchForm.Meta):
-        exclude = ['guests']
+        fields = ['checkin', 'checkout']
 
 
 class CustomerForm(ModelForm):

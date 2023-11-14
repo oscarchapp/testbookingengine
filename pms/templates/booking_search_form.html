@@ -2,24 +2,37 @@
 
 {% block content %}
 {% if edit %}
-<h1> Editar fechas</h1>
+    {% if messages %}
+        <div class="alert alert-danger" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+<h1>Editar fechas</h1>
 {% else %}
 <h1>Nueva reserva</h1>
 {% endif %}
-<form action="{% url 'search'%}" method="POST">
+<form {% if edit %}action=""{% else %}action="{% url 'search' %}"{% endif %} method="POST">
     {% csrf_token%}
     {% for field in form %}
-    <div class="row">
-        <div class="col-md-2">{{field.label_tag}}</div>
-        <div class="col-md">{{field}}</div>
-    </div>
+        <div class="row">
+            <div class="col-md-2">{{field.label_tag}}</div>
+            <div class="col-md">{{field}}</div>
+        </div>
     {% endfor %}
     <div class="row">
         <div class="col"><span>Días: </span><span id="total-days"></span></div>
     </div>
     <div class="row">
         <div class="col-md-auto">
-            <button class="btn btn-primary" type="submit">Buscar disponibilidad</button>
+            <button class="btn btn-primary" type="submit">
+                {% if edit %}
+                  Guardar
+                {% else %}
+                  Buscar disponibilidad
+                {% endif %}
+            </button>
         </div>
     </div>
 </form>

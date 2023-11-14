@@ -1,8 +1,10 @@
+from django.http import HttpResponseBadRequest, Http404
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib import messages
 
 from .form_dates import Ymd
 from .forms import *
@@ -151,22 +153,58 @@ class DeleteBookingView(View):
         return redirect("/")
 
 class EditBookingDateView(View):
+    template = "booking_search_form.html"
+
     def get(self, request, pk):
-        edit_dates_form = EditDatesForm()
+        try:
+            booking = Booking.objects.get(id=pk)
+        except Booking.DoesNotExist:
+            messages.error(request,  "Booking does not exist")
+            return redirect('/')
+
+        edit_dates_form = EditDatesForm(prefix="booking", instance=booking)
         context = {
             'form': edit_dates_form,
             'edit': True
         }
+        return render(request, self.template, context)
 
-        return render(request, "booking_search_form.html", context)
-
-    @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
+        error = ""
         booking = Booking.objects.get(id=pk)
-        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
-        if customer_form.is_valid():
-            customer_form.save()
-            return redirect("/")
+        edit_dates_form = EditDatesForm(request.POST, prefix="booking", instance=booking)
+
+        if edit_dates_form.is_valid():
+            checkin = edit_dates_form.cleaned_data['checkin']
+            checkout = edit_dates_form.cleaned_data['checkout']
+            room = booking.room.id
+
+            if self.is_room_available(room, checkin, checkout, booking):
+                edit_dates_form.save()
+                messages.success(request, 'Fechas actualizadas correctamente.')
+                return redirect('/')
+            else:
+                messages.error(request, 'No hay disponibilidad para las fechas seleccionadas.')
+
+    def is_room_available(self, room, checkin, checkout, current_booking):
+        """
+        Validate if the room is available for booking within the specified dates.
+
+        Parameters:
+        - room (Room): The room for which availability is checked.
+        - checkin (date): The desired check-in date.
+        - checkout (date): The desired check-out date.
+        - current_booking (Booking): The current booking being modified.
+
+        Returns:
+        - bool: True if the room is available, False otherwise.
+        """
+        overlapping_bookings = Booking.objects.filter(
+            Q(room=room),
+            Q(checkin__gte=checkin, checkout__lte=checkout)
+        ).exclude(id=current_booking.id)
+
+        return not overlapping_bookings.exists()
 
 
 class EditBookingView(View):
