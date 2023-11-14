@@ -235,12 +235,32 @@ class RoomDetailsView(View):
         print(context)
         return render(request, "room_detail.html", context)
 
-
 class RoomsView(View):
+    template = "rooms.html"
+
+    def render_rooms(self, request, rooms, search_query="", error=""):
+        context = {
+            'rooms': rooms,
+            'search_query': search_query,
+            'error': error
+        }
+        return render(request, self.template, context)
+
     def get(self, request):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
-        return render(request, "rooms.html", context)
+        return self.render_rooms(request, rooms)
+
+    def post(self, request):
+        room_name = request.POST.get('room_name', '')
+        rooms = Room.objects.filter(
+            name__icontains=room_name
+        ).values("name", "room_type__name", "id")
+
+        error = ""
+        if not rooms:
+            error = f"No rooms for {room_name} pattern."
+
+        return self.render_rooms(
+            request, rooms, search_query=room_name, error=error
+        )

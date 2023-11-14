@@ -2,6 +2,23 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+
+{% if error %}
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+{% endif %}
+
+<form class="mt-3 mb-3" method="post" action="{% url 'rooms' %}">
+    {% csrf_token %}
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Buscar habitación por nombre" name="room_name" value="{{search_query}}" />
+      <div class="input-group-append">
+        <button class="btn btn-primary" type="submit">Buscar</button>
+      </div>
+    </div>
+</form>
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
@@ -17,3 +34,4 @@
 </div>
 {% endfor %}
 {% endblock content%}
+
