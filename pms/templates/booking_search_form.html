@@ -1,7 +1,11 @@
 {% extends "main.html"%}
 
 {% block content %}
+{% if edit %}
+<h1> Editar fechas</h1>
+{% else %}
 <h1>Nueva reserva</h1>
+{% endif %}
 <form action="{% url 'search'%}" method="POST">
     {% csrf_token%}
     {% for field in form %}

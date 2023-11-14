@@ -20,6 +20,11 @@ class RoomSearchForm(ModelForm):
         }
 
 
+class EditDatesForm(RoomSearchForm):
+    class Meta(RoomSearchForm.Meta):
+        exclude = ['guests']
+
+
 class CustomerForm(ModelForm):
     class Meta:
         model = Customer

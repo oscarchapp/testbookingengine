@@ -150,6 +150,24 @@ class DeleteBookingView(View):
         Booking.objects.filter(id=pk).update(state="DEL")
         return redirect("/")
 
+class EditBookingDateView(View):
+    def get(self, request, pk):
+        edit_dates_form = EditDatesForm()
+        context = {
+            'form': edit_dates_form,
+            'edit': True
+        }
+
+        return render(request, "booking_search_form.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+        if customer_form.is_valid():
+            customer_form.save()
+            return redirect("/")
+
 
 class EditBookingView(View):
     # renders the booking edition form
