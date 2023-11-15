@@ -77,13 +77,24 @@ class EditBookingDateViewTests(TestCase):
             self.edit_dates_form_data["booking-checkout"],
         )
 
+    def test_date_updated_correctly(self):
+        response = self.client.post(
+            self.url,
+            self.edit_dates_form_data
+        )
+        self.assertEqual(response.status_code, 302)
+
+        response = self.client.get("/")
+        self.assertContains(response, "Fechas actualizadas correctamente.")
+
     def test_room_unavailable(self):
         response = self.client.post(
             self.url,
             self.edit_dates_form_data,
             follow=True
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        messages = list(get_messages(response.wsgi_request))
         self.assertContains(
             response, "No hay disponibilidad para las fechas seleccionadas."
         )
