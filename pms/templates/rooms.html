@@ -1,7 +1,26 @@
 {% extends "main.html"%}
 
 {% block content %}
+<br>
 <h1>Habitaciones del hotel</h1>
+
+<div class="row mt-3 mb-3">
+    <form method="get" action="{% url 'rooms' %}">
+        <div class="col col-md-5 offset-md-7">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Buscar habitación por nombre"
+                    aria-label="Buscar habitación por nombre" aria-describedby="button-addon2"
+                    name="room_name" value="{{search_query}}">
+                <button class="btn btn-dark" type="submit" id="btn-search-room">Buscar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if rooms|length == 0 %}
+    <div class="alert alert-secondary">No hay resultados</div>
+{% endif %}
+
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
@@ -11,9 +30,9 @@
         <div>
             <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
         </div>
-        
+
     </div>
-    
+
 </div>
 {% endfor %}
 {% endblock content%}

@@ -237,10 +237,25 @@ class RoomDetailsView(View):
 
 
 class RoomsView(View):
+
     def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        """
+        This function searches for rooms and filters them
+        if necessary, then returns the rendered list.
+
+        Args:
+            room_name (int): Name of the room to filter
+
+        Returns:
+            html: Rendered room list
+        """
+
+        search_query = request.GET.get("room_name", "").strip()
+        queryset = Room.objects.all()
+        rooms = queryset.filter(name__contains=search_query) if search_query else queryset
+
         context = {
-            'rooms': rooms
+            'rooms': rooms.values("name", "room_type__name", "id"),
+            'search_query': search_query
         }
         return render(request, "rooms.html", context)
