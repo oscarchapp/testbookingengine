@@ -12,10 +12,25 @@ function onDateUpdate(){
 }
 
 document.querySelector("#id_checkout").addEventListener("change",(e)=>{
+    const checkin = document.querySelector("#id_checkin")
+    const yesterday = new Date(e.target.value).addDays(-1).toISOString().split('T')[0]
+    checkin.setAttribute("max",yesterday)
     onDateUpdate()
-    document.querySelector("#id_guests").focus()
-    
+
+    onDateUpdate()
+    const id_guests = document.querySelector("#id_guests")
+    if(id_guests){
+        id_guests.focus()
+    }
 })
+
+document.querySelector("#id_checkin").addEventListener("change",(e)=>{
+    const checkout = document.querySelector("#id_checkout")
+    const tomorrow = new Date(e.target.value).addDays(1).toISOString().split('T')[0]
+    checkout.setAttribute("min",tomorrow)
+    onDateUpdate()
+})
+
 // document.querySelector("#id_checkin").addEventListener("change",(e)=>{
 //     const checkout=document.querySelector("#id_checkout")
 

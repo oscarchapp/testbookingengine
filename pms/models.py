@@ -1,8 +1,6 @@
 from django.db import models
 
 
-# Create your models here.
-
 class Customer(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField()
@@ -50,6 +48,22 @@ class Booking(models.Model):
     total = models.FloatField()
     code = models.CharField(max_length=8)
     created = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def is_room_available(cls, room_id, checkin, checkout, excluded_booking_ids=None):
+        """
+        Verify that the room is available in the date range received,
+        specific bookings can be excluded (excluded_booking_ids)
+        """
+        queryset = cls.objects.filter(
+            checkin__lte=checkout,
+            checkout__gte=checkin,
+            state=Booking.NEW,
+            room_id=room_id
+        )
+        if isinstance(excluded_booking_ids, list):
+            queryset = queryset.exclude(id__in=excluded_booking_ids)
+        return not queryset.exists()
 
     def __str__(self):
         return self.code

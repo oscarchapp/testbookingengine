@@ -2,6 +2,22 @@
 
 {% block content %}
 
+{% if messages %}
+    <div class="alert alert-success mt-3" role="alert">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if bar %}
+    <div class="alert alert-danger mt-3" role="alert">df
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+
 <h1>Home</h1>
     {% if filter %}
     <h3>Resultados de la búsqueda</h3>
@@ -64,19 +80,26 @@
             </div>
             <div class="row">
                 <div class="col">
-
+                    <i class="bi bi-person-vcard"> </i>
                     <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
                 </div>
                 <div class="col">
 
                 </div>
                 <div class="col">
-
                     {% if booking.state != "DEL" %}
                     <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
                     {% endif %}
                 </div>
 
+            </div>
+            <div class="row mt-2">
+                <div class="col">
+                    {% if booking.state != "DEL" %}
+                    <i class="bi bi-calendar-date"> </i>
+                    <a href="{% url 'edit_booking' pk=booking.id%}?type=date_editing " >Editar fecha de reserva</a>
+                    {% endif %}
+                </div>
             </div>
 
         </div>

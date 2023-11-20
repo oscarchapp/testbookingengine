@@ -1,5 +1,6 @@
 from django.db.models import F, Q, Count, Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -8,6 +9,7 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from django.contrib import messages
 
 
 class BookingSearchView(View):
@@ -152,26 +154,56 @@ class DeleteBookingView(View):
 
 
 class EditBookingView(View):
-    # renders the booking edition form
-    def get(self, request, pk):
-        booking = Booking.objects.get(id=pk)
-        booking_form = BookingForm(prefix="booking", instance=booking)
-        customer_form = CustomerForm(prefix="customer", instance=booking.customer)
-        context = {
-            'booking_form': booking_form,
-            'customer_form': customer_form
 
-        }
+    def get(self, request, pk):
+        """
+        Renders the booking edition form
+        """
+        booking = get_object_or_404(Booking, pk=pk)
+        context = {}
+        if request.GET.get("type") == "date_editing":
+            context.update({
+                "booking_form": BookingDateEditForm(instance=booking),
+                "total_days": (booking.checkout - booking.checkin).days
+            })
+            return render(request, "edit_booking_date.html", context)
+
+        context.update({
+            "customer_form": CustomerForm(
+                prefix="customer",
+                instance=booking.customer
+            )}
+        )
         return render(request, "edit_booking.html", context)
 
-    # updates the customer form
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
-        booking = Booking.objects.get(id=pk)
-        customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
-        if customer_form.is_valid():
-            customer_form.save()
-            return redirect("/")
+        booking = get_object_or_404(Booking, pk=pk)
+
+        if request.GET.get("type") == "date_editing":
+            query = request.POST.dict()
+            checkin, checkout = query['checkin'], query['checkout']
+
+            if not Booking.is_room_available(
+                booking.room.id, checkin,
+                checkout, [booking.id]
+            ):
+                messages.error(request, 'No hay disponibilidad para las fechas seleccionadas.')
+                context = {
+                    "booking_form": BookingDateEditForm(data=request.POST),
+                    "total_days": (Ymd.Ymd(query['checkout']) - Ymd.Ymd(query['checkin']))
+                }
+                return render(request, "edit_booking_date.html", context)
+
+            _form = BookingDateEditForm(request.POST, instance=booking)
+            messages.success(request, 'Fechas actualizadas correctamente.')
+        else:
+            _form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+
+        if _form.is_valid():
+            _form.save()
+
+        return redirect("/")
 
 
 class DashboardView(View):
@@ -231,8 +263,8 @@ class RoomDetailsView(View):
         bookings = room.booking_set.all()
         context = {
             'room': room,
-            'bookings': bookings}
-        print(context)
+            'bookings': bookings
+        }
         return render(request, "room_detail.html", context)
 
 
