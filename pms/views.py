@@ -8,6 +8,7 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from .utils import Utils
 
 
 class BookingSearchView(View):
@@ -214,7 +215,8 @@ class DashboardView(View):
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'occupancy_percentage': Utils.get_occupancy_percentage()  # Added by Patricio Kumagae
 
         }
 
