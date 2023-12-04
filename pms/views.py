@@ -8,6 +8,7 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from .managers import RoomManager
 
 
 class BookingSearchView(View):
@@ -243,4 +244,35 @@ class RoomsView(View):
         context = {
             'rooms': rooms
         }
+        return render(request, "rooms.html", context)
+
+    """
+    Added by Patricio Kumagae
+    """
+    def post(self, request):
+        """
+        Method that filters rooms by its name
+        """
+        room_name_filter = ''
+        message = ''
+        message_type = ''
+        rooms = []
+
+        try:
+            room_name_filter = request.POST['room_name_filter']
+
+            rooms = RoomManager().filter_rooms_by_name(room_name_filter)
+
+        except Exception:
+            message = 'Ocurrió un error al intentar filtrar las habitaciones'
+            message_type = 'danger'
+
+        context = {
+            'rooms': rooms,
+            'room_name_filter': room_name_filter,
+            'results': len(rooms),
+            'message': message,
+            'message_type': message_type
+        }
+
         return render(request, "rooms.html", context)

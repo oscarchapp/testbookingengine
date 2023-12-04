@@ -2,6 +2,32 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
+{% if message %}
+    <div class="alert alert-{{ message_type }}" role="alert">
+      {{ message }}
+    </div>
+{% endif %}
+<div class="row col-sm-6 card mt-3 mb-3 hover-card bg-tr-250">
+    <div><h3>Filtrar</h3></div>
+    <form method="post" action="/rooms/" style="padding: 5px">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="room_name_filter">Nombre de la habitación</label>
+            <input class="form-control" type="text" id="room_name_filter" name="room_name_filter" placeholder="Nombre de la habitación" value="{{ room_name_filter }}" />
+        </div>
+        <br>
+        <div class="form-group">
+            <button class="btn btn-secondary" type="button" onclick="window.location='/rooms/'">Limpiar Filtros</button>
+            <button class="btn btn-primary" type="submit">Filtrar</button>
+        </div>
+
+    </form>
+</div>
+{% if request.method == 'POST' %}
+    <div>
+        {{ results }} resultado{% if results > 1 %}s{% endif %} encontrado{% if results > 1 %}s{% endif %}
+    </div>
+{% endif %}
 {% for room in rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
