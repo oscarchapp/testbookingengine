@@ -22,6 +22,12 @@
             <h5 class="small">Total facturado</h5>
             <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
         </div>
+
+         <div class="card text-white p-3 card-customization" style="background-color: #7e6aee;">
+            <h5 class="small">% Ocupación</h5>
+            <input type="hidden" value="Occupancy percentage: {{ dashboard.occupancy_percentage }} %">
+            <h1 class="dashboard-value">{{ dashboard.occupancy_percentage }} %</h1>
+        </div>
     </div>
 </div>
 {% endblock content%}
