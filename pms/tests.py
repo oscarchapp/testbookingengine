@@ -48,7 +48,7 @@ class TestRooms(SetUp):
         response = self.client.post(reverse('rooms'), data=search_data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '0 resultados')
+        self.assertContains(response, '0 resultado')
 
     def test_room_name_filter_invalid_param(self):
         """
