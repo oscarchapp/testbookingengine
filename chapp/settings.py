@@ -122,3 +122,45 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "{asctime} - {message}",
+            "style": "{",
+        },
+        "verbose": {
+            "format": "{asctime} - {filename}:{lineno} - {levelname}: {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "info": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "./info.log",
+            "formatter": "simple",
+        },
+        "error": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": "./error.log",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "chapp_info": {
+            "handlers": ["info"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "chapp_error": {
+            "handlers": ["error"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+    },
+}

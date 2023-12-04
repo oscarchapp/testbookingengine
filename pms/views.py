@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -8,7 +10,13 @@ from .form_dates import Ymd
 from .forms import *
 from .models import Room
 from .reservation_code import generate
+from .managers import BookingManager
+from .exceptions import InvalidDateError, NoAvailabilityError
+from .utils import Utils
 
+
+chapp_logger_info = logging.getLogger('chapp_info')
+chapp_logger_error = logging.getLogger('chapp_error')
 
 class BookingSearchView(View):
     # renders search results for bookingings
@@ -244,3 +252,62 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+
+"""
+Added by Patricio Kumagae
+"""
+class EditBookingDatesView(View):
+    def get(self, request, pk):
+
+        booking = Booking.objects.get(id=pk)
+        context = {
+            'booking_form': BookingEditDatesForm({'checkin': booking.checkin, 'checkout': booking.checkout}),
+            'booking': booking
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+    def post(self, request, pk):
+
+        from datetime import date, time, datetime, timedelta
+
+        try:
+            booking = Booking.objects.get(id=pk)
+
+            checkin = Ymd.Ymd(request.POST['checkin'])
+            checkout = Ymd.Ymd(request.POST['checkout'])
+
+            Utils.check_room_availability(booking, checkin, checkout)
+
+            BookingManager().update_booking_dates(booking, checkin, checkout)
+
+            message = f"Fechas modificadas. Nuevas fechas: {checkin.date.strftime('%d/%m/%Y')} - {checkout.date.strftime('%d/%m/%Y')}"
+            message_type = "success"
+
+            chapp_logger_info.info(f'Booking ID: {booking.id} - {message}')
+
+        except InvalidDateError as e:
+            message = str(e)
+            message_type = 'danger'
+        except NoAvailabilityError as e:
+            message = str(e)
+            message_type = 'danger'
+        except Exception as e:
+            chapp_logger_error.error(str(e))
+            booking = None
+            checkin = Ymd.Ymd(str(date.today()))
+            checkout = Ymd.Ymd(str(date.today() + timedelta(days=1)))
+            message = 'Ocurrió un error al intentar modificar las fechas'
+            message_type = 'danger'
+
+
+        context = {
+            'booking_form': BookingEditDatesForm({'checkin': checkin.date, 'checkout': checkout.date}),
+            'booking': booking,
+            'message': message,
+            'message_type': message_type
+        }
+
+        return render(request, "edit_booking_dates.html", context)
+

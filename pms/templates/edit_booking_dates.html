@@ -1,0 +1,35 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar reserva {{ booking.code }}</h1>
+
+{% if message %}
+    <div class="alert alert-{{ message_type }}" role="alert">
+      {{ message }}
+    </div>
+{% endif %}
+
+
+<form method="POST">
+    {% csrf_token%}
+    {% for field in booking_form %}
+    <div class="row">
+        <div class="col-md-2">{{ field.label_tag }}</div>
+        <div class="col-md">{{ field }}</div>
+    </div>
+    {% endfor %}
+    <div class="row">
+        <div class="col"><span>Días: </span><span id="total-days"></span></div>
+    </div>
+    <div class="row">
+        <div class="col-md-auto">
+            <button class="btn btn-secondary" type="button" onclick="window.location = '/'">Cancelar</button>
+            <button class="btn btn-primary" type="submit">Guardar</button>
+        </div>
+    </div>
+</form>
+
+
+{% load static %}
+<script async src="{% static 'js/search_room.js' %}"></script>
+{% endblock content%}
