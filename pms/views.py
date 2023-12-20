@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib import messages
 
 from .form_dates import Ymd
 from .forms import *
@@ -55,17 +56,17 @@ class RoomSearchView(View):
             'booking__state__exact': "NEW"
         }
         rooms = (Room.objects
-                 .filter(**filters)
-                 .exclude(**exclude)
-                 .annotate(total=total_days * F('room_type__price'))
-                 .order_by("room_type__max_guests", "name")
-                 )
+                .filter(**filters)
+                .exclude(**exclude)
+                .annotate(total=total_days * F('room_type__price'))
+                .order_by("room_type__max_guests", "name")
+                )
         total_rooms = (Room.objects
-                       .filter(**filters)
-                       .values("room_type__name", "room_type")
-                       .exclude(**exclude)
-                       .annotate(total=Count('room_type'))
-                       .order_by("room_type__max_guests"))
+                    .filter(**filters)
+                    .values("room_type__name", "room_type")
+                    .exclude(**exclude)
+                    .annotate(total=Count('room_type'))
+                    .order_by("room_type__max_guests"))
         # prepare context data for template
         data = {
             'total_days': total_days
@@ -183,39 +184,31 @@ class DashboardView(View):
         today_min = datetime.combine(today, time.min)
         today_max = datetime.combine(today, time.max)
         today_range = (today_min, today_max)
-        new_bookings = (Booking.objects
-                        .filter(created__range=today_range)
-                        .values("id")
-                        ).count()
+        valid_bookings = Booking.objects.exclude(state="DEL")
+
+        #get bookings today
+        new_bookings = valid_bookings.filter(created__range=today_range).count()
 
         # get incoming guests
-        incoming = (Booking.objects
-                    .filter(checkin=today)
-                    .exclude(state="DEL")
-                    .values("id")
-                    ).count()
+        incoming = valid_bookings.filter(checkin=today).count()
 
         # get outcoming guests
-        outcoming = (Booking.objects
-                     .filter(checkout=today)
-                     .exclude(state="DEL")
-                     .values("id")
-                     ).count()
+        outcoming = valid_bookings.filter(checkout=today).count()
 
         # get outcoming guests
-        invoiced = (Booking.objects
-                    .filter(created__range=today_range)
-                    .exclude(state="DEL")
-                    .aggregate(Sum('total'))
-                    )
+        invoiced = valid_bookings.filter(created__range=today_range).aggregate(Sum('total'))
+
+
+        count_room = Room.objects.all().count()
+        occupation = int((new_bookings/count_room) *100) if count_room != 0 else 0
 
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupation': occupation
         }
 
         context = {
@@ -232,7 +225,6 @@ class RoomDetailsView(View):
         context = {
             'room': room,
             'bookings': bookings}
-        print(context)
         return render(request, "room_detail.html", context)
 
 
@@ -241,6 +233,43 @@ class RoomsView(View):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
         context = {
-            'rooms': rooms
+            'rooms': list(rooms)
         }
         return render(request, "rooms.html", context)
+
+
+class EditDateBookingView(View):
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = RoomEditSearchForm(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form
+        }
+        return render(request, "edit_date_booking.html", context)
+
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = RoomEditSearchForm(request.POST, prefix="booking", instance=booking)
+
+        if booking_form.is_valid():
+            checkin = booking_form.cleaned_data['checkin']
+            checkout = booking_form.cleaned_data['checkout']
+            if self.is_room_available(booking.room, checkin, checkout, booking):
+                booking_form.save()
+                return redirect("/")
+            else:
+                messages.error(request, "No hay disponibilidad para las fechas seleccionadas.")
+
+        return render(request, "edit_date_booking.html", {"booking_form": booking_form})
+
+    def is_room_available(self, room, checkin, checkout, current_booking):
+        conflicting_bookings = Booking.objects.filter(
+            room=room,
+            checkout__gt=checkin,
+            checkin__lt=checkout,
+        ).exclude(id=current_booking.id)
+
+        return not conflicting_bookings.exists()

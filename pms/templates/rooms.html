@@ -1,19 +1,39 @@
-{% extends "main.html"%}
+{% extends "main.html" %}
 
 {% block content %}
-<h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
-<div class="row card mt-3 mb-3 hover-card bg-tr-250">
-    <div class="col p-3">
-        <div class="">
-            {{room.name}} ({{room.room_type__name}})
-        </div>
-        <div>
-            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>
-        
-    </div>
+    <h1>Habitaciones del hotel</h1>
     
-</div>
-{% endfor %}
-{% endblock content%}
+    <!-- Formulario de búsqueda -->
+    <form id="searchForm">
+        <label for="searchInput">Buscar habitación: </label>
+        <input type="text" id="searchInput" name="searchInput">
+        <input type="submit" value="Buscar">
+    </form>
+
+    <div id="roomList">
+        {% for room in rooms %}
+            <div class="row card mt-3 mb-3 hover-card bg-tr-250">
+                <div class="col p-3">
+                    <div class="room-info">
+                        {{ room.name }} ({{ room.room_type__name }})
+                    </div>
+                    <div class="details-link">
+                        <a href="{% url 'room_details' pk=room.id %}">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div id="results">
+        <!-- Aquí se mostrarán los resultados de la búsqueda -->
+    </div>
+
+    {# Convertir datos de Python a JSON seguro para JavaScript #}
+    {% with rooms_json=rooms|json_script:"roomsData" %}
+        {{ rooms_json }}
+    {% endwith %}
+
+    {% load static %}
+    <script async src="{% static 'js/rooms_finder.js' %}"></script>
+{% endblock content %}
