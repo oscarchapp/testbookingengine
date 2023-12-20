@@ -183,39 +183,31 @@ class DashboardView(View):
         today_min = datetime.combine(today, time.min)
         today_max = datetime.combine(today, time.max)
         today_range = (today_min, today_max)
-        new_bookings = (Booking.objects
-                        .filter(created__range=today_range)
-                        .values("id")
-                        ).count()
+        valid_bookings = Booking.objects.exclude(state="DEL")
+
+        #get bookings today
+        new_bookings = valid_bookings.filter(created__range=today_range).count()
 
         # get incoming guests
-        incoming = (Booking.objects
-                    .filter(checkin=today)
-                    .exclude(state="DEL")
-                    .values("id")
-                    ).count()
+        incoming = valid_bookings.filter(checkin=today).count()
 
         # get outcoming guests
-        outcoming = (Booking.objects
-                    .filter(checkout=today)
-                    .exclude(state="DEL")
-                    .values("id")
-                    ).count()
+        outcoming = valid_bookings.filter(checkout=today).count()
 
         # get outcoming guests
-        invoiced = (Booking.objects
-                    .filter(created__range=today_range)
-                    .exclude(state="DEL")
-                    .aggregate(Sum('total'))
-                    )
+        invoiced = valid_bookings.filter(created__range=today_range).aggregate(Sum('total'))
+
+
+        count_room = Room.objects.all().count()
+        occupation = int((new_bookings/count_room) *100) if count_room != 0 else 0
 
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
-
+            'invoiced': invoiced,
+            'occupation': occupation
         }
 
         context = {
@@ -232,7 +224,6 @@ class RoomDetailsView(View):
         context = {
             'room': room,
             'bookings': bookings}
-        print(context)
         return render(request, "room_detail.html", context)
 
 
