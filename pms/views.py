@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib import messages
 
 from .form_dates import Ymd
 from .forms import *
@@ -235,3 +236,40 @@ class RoomsView(View):
             'rooms': list(rooms)
         }
         return render(request, "rooms.html", context)
+
+
+class EditDateBookingView(View):
+    # renders the booking edition form
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = RoomEditSearchForm(prefix="booking", instance=booking)
+        context = {
+            'booking_form': booking_form
+        }
+        return render(request, "edit_date_booking.html", context)
+
+    # updates the customer form
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = RoomEditSearchForm(request.POST, prefix="booking", instance=booking)
+
+        if booking_form.is_valid():
+            checkin = booking_form.cleaned_data['checkin']
+            checkout = booking_form.cleaned_data['checkout']
+            if self.is_room_available(booking.room, checkin, checkout, booking):
+                booking_form.save()
+                return redirect("/")
+            else:
+                messages.error(request, "No hay disponibilidad para las fechas seleccionadas.")
+
+        return render(request, "edit_date_booking.html", {"booking_form": booking_form})
+
+    def is_room_available(self, room, checkin, checkout, current_booking):
+        conflicting_bookings = Booking.objects.filter(
+            room=room,
+            checkout__gt=checkin,
+            checkin__lt=checkout,
+        ).exclude(id=current_booking.id)
+
+        return not conflicting_bookings.exists()
