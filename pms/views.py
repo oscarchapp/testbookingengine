@@ -55,17 +55,17 @@ class RoomSearchView(View):
             'booking__state__exact': "NEW"
         }
         rooms = (Room.objects
-                 .filter(**filters)
-                 .exclude(**exclude)
-                 .annotate(total=total_days * F('room_type__price'))
-                 .order_by("room_type__max_guests", "name")
-                 )
+                .filter(**filters)
+                .exclude(**exclude)
+                .annotate(total=total_days * F('room_type__price'))
+                .order_by("room_type__max_guests", "name")
+                )
         total_rooms = (Room.objects
-                       .filter(**filters)
-                       .values("room_type__name", "room_type")
-                       .exclude(**exclude)
-                       .annotate(total=Count('room_type'))
-                       .order_by("room_type__max_guests"))
+                    .filter(**filters)
+                    .values("room_type__name", "room_type")
+                    .exclude(**exclude)
+                    .annotate(total=Count('room_type'))
+                    .order_by("room_type__max_guests"))
         # prepare context data for template
         data = {
             'total_days': total_days
@@ -197,10 +197,10 @@ class DashboardView(View):
 
         # get outcoming guests
         outcoming = (Booking.objects
-                     .filter(checkout=today)
-                     .exclude(state="DEL")
-                     .values("id")
-                     ).count()
+                    .filter(checkout=today)
+                    .exclude(state="DEL")
+                    .values("id")
+                    ).count()
 
         # get outcoming guests
         invoiced = (Booking.objects
@@ -241,6 +241,6 @@ class RoomsView(View):
         # renders a list of rooms
         rooms = Room.objects.all().values("name", "room_type__name", "id")
         context = {
-            'rooms': rooms
+            'rooms': list(rooms)
         }
         return render(request, "rooms.html", context)
