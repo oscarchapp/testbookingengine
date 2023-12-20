@@ -1,0 +1,31 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar datos de contacto</h1>
+
+{% if messages %}
+    <div class="alert alert-danger">
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form action="" method="post">
+    {% csrf_token%}
+    {% for field in booking_form %}
+    <div class="row">
+        <div class="col-md-2">
+            {{field.label_tag}}
+        </div>
+        <div class="col">
+            {{field}}
+        </div>
+    </div>
+    {% endfor %}
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary" type="submit">Guardar datos</button>
+</form>
+
+
+{% endblock content%}
