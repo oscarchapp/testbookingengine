@@ -2,6 +2,7 @@ from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.generic import ListView
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .form_dates import Ymd
@@ -236,11 +237,38 @@ class RoomDetailsView(View):
         return render(request, "room_detail.html", context)
 
 
-class RoomsView(View):
-    def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
-        context = {
-            'rooms': rooms
-        }
-        return render(request, "rooms.html", context)
+class RoomListView(ListView):
+    model = Room
+    form_class = RoomListFilterForm
+    template_name = 'rooms.html'
+    queryset = Room.objects.prefetch_related("room_type").all()
+    context_object_name = 'rooms'
+
+    def get_queryset(self):
+        """
+        Get the list of items for this view.
+        Search for the rooms by name.
+        """
+        queryset = super().get_queryset()
+        form = self.get_form()
+        if form.is_valid():
+            search_value = form.cleaned_data['search_field']
+            if search_value:
+                queryset = queryset.filter(name__icontains=search_value)
+        queryset = queryset.values("name", "room_type__name", "id")
+        return queryset
+
+    def get_form(self):
+        """
+        Get the form for this view.
+        """
+        return self.form_class(self.request.GET)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        """
+        Get the context for this view.
+        Add the form to the context.
+        """
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        return context
