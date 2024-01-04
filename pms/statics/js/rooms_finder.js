@@ -2,27 +2,27 @@ document.addEventListener("DOMContentLoaded", function() {
     let roomsData = JSON.parse(document.getElementById("roomsData").textContent);
     document.getElementById("searchForm").addEventListener("submit", function(event) {
         event.preventDefault();
-        buscar();
+        search();
     });
 
-    function buscar() {
+    function search() {
         let query = document.getElementById("searchInput").value.toLowerCase();
-        let resultados = roomsData.filter(room => {
+        let results = roomsData.filter(room => {
             let parts = room.name.toLowerCase().split('.');
             return parts.some(part => part.trim().startsWith(query.trim()));
         });
-        mostrarResultados(resultados);
+        showResults(results);
     }
 
-    function mostrarResultados(resultados) {
+    function showResults(results) {
         let resultsContainer = document.getElementById("results");
         let roomListContainer = document.getElementById("roomList");
         roomListContainer.style.display = "none";
         resultsContainer.innerHTML = "";
-        if (resultados.length === 0) {
-            resultsContainer.innerHTML = "No se encontraron resultados.";
+        if (results.length === 0) {
+            resultsContainer.innerHTML = "Not found results.";
         } else {
-            resultados.forEach(room => {
+            results.forEach(room => {
                 let roomDiv = document.createElement("div");
                 roomDiv.classList.add("row", "card", "mt-3", "mb-3", "hover-card", "bg-tr-250");
                 let colDiv = document.createElement("div");
