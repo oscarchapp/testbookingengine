@@ -32,19 +32,12 @@ class BookingSearchViewTest(TestCase):
         bookings = response.context['bookings']
         room_search_form = response.context['form']
         has_filter = response.context['filter']
-
-        # Puedes agregar más afirmaciones según sea necesario
-
-        # Verifica que la información de las reservas se muestra en el HTML
         for booking in bookings:
             self.assertContains(response, str(booking.code))
             self.assertContains(response, str(booking.customer.name))
 
     def test_get_search_results_without_filter(self):
-        # Realiza la solicitud GET a la vista sin un filtro
         response = self.client.get(reverse('booking_search'))
-
-        # Verifica que la respuesta redirige a la URL esperada (ajusta según tu aplicación)
         self.assertRedirects(response, '')
 
 
@@ -157,7 +150,6 @@ class EditBookingViewTest(TestCase):
         self.assertContains(response, str(self.booking.total))
         self.assertContains(response, self.customer.name)
 
-    #TODO: este marca error
     def test_post_update_customer(self):
         new_customer_data = {'name': 'Nuevo Nombre', 'email': 'nuevo_email@example.com'}
         response = self.client.post(reverse('edit_booking', args=[self.booking.id]), data=new_customer_data, prefix='customer')
