@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
 
 from .form_dates import Ymd
 from .forms import *
@@ -251,7 +252,7 @@ class EditDateBookingView(View):
     # updates the customer form
     @method_decorator(ensure_csrf_cookie)
     def post(self, request, pk):
-        booking = Booking.objects.get(id=pk)
+        booking = get_object_or_404(Booking, id=pk)
         booking_form = RoomEditSearchForm(request.POST, prefix="booking", instance=booking)
 
         if booking_form.is_valid():
@@ -261,7 +262,10 @@ class EditDateBookingView(View):
                 booking_form.save()
                 return redirect("/")
             else:
-                messages.error(request, "No hay disponibilidad para las fechas seleccionadas.")
+                messages.error(request, "There is no availability for the selected dates.")
+        else:
+            messages.error(request, "Form no valid.")
+            return render(request, 'edit_date_booking.html', {'booking_form': booking_form})
 
         return render(request, "edit_date_booking.html", {"booking_form": booking_form})
 
