@@ -1,7 +1,7 @@
 {% extends "main.html"%}
 
 {% block content %}
-<h1>Editar datos de contacto</h1>
+<h1>Editar fecha de Reserva</h1>
 
 {% if messages %}
     <div class="alert alert-danger">
@@ -23,6 +23,7 @@
         </div>
     </div>
     {% endfor %}
+    {{ booking_form.non_field_errors }}
     <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
     <button class="btn btn-primary" type="submit">Guardar datos</button>
 </form>
