@@ -69,3 +69,13 @@ class RoomEditSearchForm(ModelForm):
             'checkout': forms.DateInput(
                 attrs={'type': 'date', 'max': datetime.today().replace(month=12, day=31).strftime('%Y-%m-%d')}),
         }
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        checkin = cleaned_data.get('checkin')
+        checkout = cleaned_data.get('checkout')
+
+        if checkin and checkout and checkin >= checkout:
+            raise forms.ValidationError('The checkin date must be prior to the checkout date.')
+
+        return cleaned_data
