@@ -210,7 +210,8 @@ class DashboardView(View):
                     )
 
         confirmed_reservations = Booking.objects.filter(
-            created__range=today_range, state=Booking.CONFIRMED
+            Q(checkin__range=today_range) | Q(checkout__range=today_range),
+            state=Booking.NEW
         ).count()
         total_active_rooms = Room.objects.all().count()
         percentage_occupation = round(
