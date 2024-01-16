@@ -35,7 +35,7 @@ class Booking(models.Model):
     DELETED = 'DEL'
     STATE_CHOICES = [
         (NEW, 'Nueva'),
-        (DELETED, 'Cancelada'),
+        (DELETED, 'Cancelada')
     ]
     state = models.CharField(
         max_length=3,

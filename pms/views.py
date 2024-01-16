@@ -209,12 +209,22 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        confirmed_reservations = Booking.objects.filter(
+            Q(checkin__range=today_range) | Q(checkout__range=today_range),
+            state=Booking.NEW
+        ).count()
+        total_active_rooms = Room.objects.all().count()
+        percentage_occupation = round(
+            (confirmed_reservations / total_active_rooms) * 100, 2
+        )
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'percentage_occupation': percentage_occupation
 
         }
 
