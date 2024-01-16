@@ -2,7 +2,7 @@ from datetime import datetime
 from django import forms
 from django.forms import ModelForm
 
-from .models import Booking, Customer
+from .models import Booking, Customer, Room
 
 
 class RoomSearchForm(ModelForm):
@@ -56,3 +56,7 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class RoomListFilterForm(forms.Form):
+    search_field = forms.CharField(label='Buscar cuarto', required=False)
