@@ -1,8 +1,10 @@
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.generic import UpdateView
 
 from .form_dates import Ymd
 from .forms import *
@@ -244,3 +246,15 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+class EditBookingDateView(UpdateView):
+    """
+    View to edit booking dates.
+    Use the model Booking and the form BookingFormExcluded
+    """
+
+    model = Booking
+    form_class = BookingUpdateDateForm
+    template_name = "edit_booking_dates.html"
+    success_url = reverse_lazy("home")

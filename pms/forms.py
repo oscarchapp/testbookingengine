@@ -1,5 +1,6 @@
 from datetime import datetime
 from django import forms
+from django.db.models import Q
 from django.forms import ModelForm
 
 from .models import Booking, Customer
@@ -56,3 +57,41 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class BookingUpdateDateForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ["checkin", "checkout"]
+        labels = {}
+        widgets = {
+            "checkin": forms.DateInput(
+                attrs={"type": "date", "min": datetime.today().strftime("%Y-%m-%d")}
+            ),
+            "checkout": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "max": datetime.today()
+                    .replace(month=12, day=31)
+                    .strftime("%Y-%m-%d"),
+                }
+            ),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        instance = self.instance
+        checkin = cleaned_data["checkin"]
+        checkout = cleaned_data["checkout"]
+        reservation = Booking.objects.filter(
+            Q(checkin__range=(checkin, checkout)) |
+            Q(checkout__range=(checkin, checkout)),
+            room_id=instance.room.id
+        ).exclude(
+            id=instance.id
+        )
+        if reservation:
+            raise forms.ValidationError(
+                "No hay disponibilidad para las fechas seleccionadas"
+            )
+        return cleaned_data

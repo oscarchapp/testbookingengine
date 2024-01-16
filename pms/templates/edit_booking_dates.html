@@ -1,0 +1,16 @@
+{% extends "main.html"%}
+
+{% block content %}
+<h1>Editar fechas de la reserva</h1>
+<form action="" method="post">
+
+    {% csrf_token%}
+    <div class="row">
+        {{ form.as_p }}
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
+    <button class="btn btn-primary" type="submit">Guardar datos</button>
+</form>
+
+
+{% endblock content%}>
