@@ -191,7 +191,6 @@ class DashboardView(View):
         # Get total confirmed todays bookings
         confirmed_bookings = (Booking.objects
                             .filter(created__range=today_range, state="NEW")
-                            .values("id")
                             ).count()
 
         # get incoming guests
@@ -219,9 +218,7 @@ class DashboardView(View):
         room_count = Room.objects.count()
          
         # Get occupancy
-        occupancy = 0
-        if confirmed_bookings > 0 and room_count > 0:
-            occupancy = (confirmed_bookings / room_count) * 100
+        occupancy = (confirmed_bookings / room_count) * 100 if confirmed_bookings > 0 and room_count > 0 else 0
         
         # preparing context data
         dashboard = {
