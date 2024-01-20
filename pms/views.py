@@ -258,3 +258,49 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+class EditReservationView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = EditReservationForm(instance=booking)
+        context = {
+            'form': form,
+            'booking': booking,
+        }
+        return render(request, 'edit_reservation.html', context)
+
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = EditReservationForm(request.POST, instance=booking)
+        if form.is_valid():
+            # validate disponibility before save 
+            new_checkin = form.cleaned_data['checkin']
+            new_checkout = form.cleaned_data['checkout']
+            room = booking.room
+
+        #     exclude = {
+        #     'booking__checkin__lte': query['checkout'],
+        #     'booking__checkout__gte': query['checkin'],
+        #     'booking__state__exact': "NEW"
+        # }
+
+            # Verify if room is verify
+            occupied_rooms = Room.objects.filter(
+                booking__checkin__lte=new_checkout,
+                booking__checkout__gte=new_checkin,
+                booking__state__exact="NEW"
+            ).values_list('pk', flat=True)
+
+            print(room,room.pk,occupied_rooms)
+            if room.pk not in occupied_rooms:
+                form.save()
+                return redirect('/')
+            else:
+                form.add_error(None, "No hay disponibilidad para las fechas seleccionadas.")        
+        
+        # invalid form:
+        context = {
+            'form': form,
+            'booking': booking,
+        }
+        return render(request, 'edit_reservation.html', context)
