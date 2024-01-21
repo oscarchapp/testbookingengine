@@ -64,4 +64,18 @@ Use for username and password for superuser is "admin" (without quotes).Remember
 ## License
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://choosealicense.com/licenses/mit/)
 
+## Changes Pablo Arancibia:
+### environment variables
+Add `.env` file, see `.example.env` file for reference. 
 
+### Test
+To run tests of the project execute the follow comands inside de docker container  
+```
+python manage.py collectstatic
+
+python manage.py test -v 2 pms.tests
+```
+  
+### Django admin:
+new password is: supersecret
+  
