@@ -2,7 +2,13 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
+<form action="{% url 'rooms' %}" method="GET" class="mt-3">
+    {% csrf_token %}
+    <label for="filter_value">Filtrar por nombre:</label>
+    <input type="text" id="filter_value" name="filter_value" />
+    <button type="submit">Buscar</button>
+</form>
+{% for room in filtered_rooms%}
 <div class="row card mt-3 mb-3 hover-card bg-tr-250">
     <div class="col p-3">
         <div class="">
