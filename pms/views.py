@@ -278,12 +278,6 @@ class EditReservationView(View):
             new_checkout = form.cleaned_data['checkout']
             room = booking.room
 
-        #     exclude = {
-        #     'booking__checkin__lte': query['checkout'],
-        #     'booking__checkout__gte': query['checkin'],
-        #     'booking__state__exact': "NEW"
-        # }
-
             # Verify if room is verify
             occupied_rooms = Room.objects.filter(
                 booking__checkin__lte=new_checkout,
