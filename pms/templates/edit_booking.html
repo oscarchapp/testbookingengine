@@ -1,22 +1,42 @@
 {% extends "main.html"%}
 
 {% block content %}
-<h1>Editar datos de contacto</h1>
+<h1>{% if editing_dates %}Editar fechas de reserva{% else %}Editar datos de contacto{% endif %}</h1>
 <form action="" method="post">
 
     {% csrf_token%}
-    {% for field in customer_form %}
-    <div class="row">
-        <div class="col-md-2">
-            {{field.label_tag}}
+    {% if editing_dates %}
+        {% for field in booking_date_form %}
+            <div class="row">
+                <div class="col-md-2">
+                    {{ field.label_tag }}
+                </div>
+                <div class="col">
+                    {{ field }}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        {% for field in customer_form %}
+        <div class="row">
+            <div class="col-md-2">
+                {{field.label_tag}}
+            </div>
+            <div class="col">
+                {{field}}
+            </div>
         </div>
-        <div class="col">
-            {{field}}
-        </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
+    {% endif %}
     <a class="btn btn-outline-primary" href="{% url 'home' %}">Volver</a>
     <button class="btn btn-primary" type="submit">Guardar datos</button>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </form>
 
 
