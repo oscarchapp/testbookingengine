@@ -78,6 +78,13 @@ python manage.py collectstatic
 ```
 python manage.py test -v 2 pms.tests
 ```
+
+Coverage  
+```
+coverage run manage.py test pms.tests
+coverage report
+coverage html
+```
   
 ### Django admin:
 new password is: supersecret
