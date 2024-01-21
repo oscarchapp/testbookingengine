@@ -4,6 +4,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
+from django.contrib import messages
+
 from .form_dates import Ymd
 from .forms import *
 from .models import Room
@@ -153,22 +155,44 @@ class DeleteBookingView(View):
 
 class EditBookingView(View):
     # renders the booking edition form
-    def get(self, request, pk):
+    def get(self, request, pk, edit_type):
         booking = Booking.objects.get(id=pk)
         booking_form = BookingForm(prefix="booking", instance=booking)
         customer_form = CustomerForm(prefix="customer", instance=booking.customer)
+        booking_date_form = BookingDateForm(prefix="booking", instance=booking)
         context = {
             'booking_form': booking_form,
-            'customer_form': customer_form
-
+            'customer_form': customer_form,
+            'booking_date_form': booking_date_form,
+            'editing_dates': True if edit_type=='date' else False,
         }
         return render(request, "edit_booking.html", context)
 
     # updates the customer form
     @method_decorator(ensure_csrf_cookie)
-    def post(self, request, pk):
+    def post(self, request, pk, edit_type):
         booking = Booking.objects.get(id=pk)
         customer_form = CustomerForm(request.POST, prefix="customer", instance=booking.customer)
+        booking_date_form = BookingDateForm(request.POST, prefix="booking", instance=booking)
+        if edit_type:
+            if booking_date_form.is_valid():
+                checkin = booking_date_form.cleaned_data['checkin']
+                checkout = booking_date_form.cleaned_data['checkout']
+                room = booking.room
+                overlapping_bookings = Booking.objects.filter(
+                    checkin__lte=checkout,
+                    checkout__gte=checkin,
+                    state='NEW',
+                    room__id=room.id
+                ).exclude(id=pk)
+
+                if overlapping_bookings.exists():
+                    messages.error(request, 'No hay disponibilidad para las fechas seleccionadas.')
+                    return redirect('edit_booking', pk=pk, edit_type='date')
+
+                booking_date_form.save()
+                return redirect("/")
+
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
