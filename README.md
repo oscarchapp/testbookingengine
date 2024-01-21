@@ -70,9 +70,12 @@ Add `.env` file, see `.example.env` file for reference.
 
 ### Test
 To run tests of the project execute the follow comands inside de docker container  
+Only first time:
 ```
 python manage.py collectstatic
+```
 
+```
 python manage.py test -v 2 pms.tests
 ```
   
