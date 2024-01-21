@@ -209,12 +209,17 @@ class DashboardView(View):
                     .aggregate(Sum('total'))
                     )
 
+        # get total rooms account & calculate occupation percentage
+        rooms = Room.objects.count()
+        occupation_percentage = (incoming / rooms) * 100 if rooms > 0 else 0
+
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'occupation_percentage' : occupation_percentage
 
         }
 
