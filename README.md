@@ -79,7 +79,7 @@ python manage.py collectstatic
 python manage.py test -v 2 pms.tests
 ```
 
-Coverage  
+Coverage[Coverage Docs](https://coverage.readthedocs.io/en/7.4.0/)  
 ```
 coverage run manage.py test pms.tests
 coverage report
