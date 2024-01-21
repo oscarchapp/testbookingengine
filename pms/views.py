@@ -187,6 +187,11 @@ class DashboardView(View):
                         .filter(created__range=today_range)
                         .values("id")
                         ).count()
+        
+        # Get total confirmed todays bookings
+        confirmed_bookings = (Booking.objects
+                            .filter(created__range=today_range, state="NEW")
+                            ).count()
 
         # get incoming guests
         incoming = (Booking.objects
@@ -202,19 +207,26 @@ class DashboardView(View):
                      .values("id")
                      ).count()
 
-        # get outcoming guests
+        # get invoiced count
         invoiced = (Booking.objects
                     .filter(created__range=today_range)
                     .exclude(state="DEL")
                     .aggregate(Sum('total'))
                     )
 
+        # Get the total number of rooms
+        room_count = Room.objects.count()
+         
+        # Get occupancy
+        occupancy = (confirmed_bookings / room_count) * 100 if confirmed_bookings > 0 and room_count > 0 else 0
+        
         # preparing context data
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'occupancy': occupancy
 
         }
 
@@ -238,9 +250,51 @@ class RoomDetailsView(View):
 
 class RoomsView(View):
     def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        name_filter = request.GET.get('name', '')
+        # filter a list of rooms
+        rooms = Room.objects.filter(name__istartswith=name_filter).values("name", "room_type__name", "id")
+
         context = {
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+class EditReservationView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = EditReservationForm(instance=booking)
+        context = {
+            'form': form,
+            'booking': booking,
+        }
+        return render(request, 'edit_reservation.html', context)
+
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = EditReservationForm(request.POST, instance=booking)
+        if form.is_valid():
+            # validate disponibility before save 
+            new_checkin = form.cleaned_data['checkin']
+            new_checkout = form.cleaned_data['checkout']
+            room = booking.room
+
+            # Verify if room is verify
+            occupied_rooms = Room.objects.filter(
+                booking__checkin__lte=new_checkout,
+                booking__checkout__gte=new_checkin,
+                booking__state__exact="NEW"
+            ).values_list('pk', flat=True)
+
+            print(room,room.pk,occupied_rooms)
+            if room.pk not in occupied_rooms:
+                form.save()
+                return redirect('/')
+            else:
+                form.add_error(None, "No hay disponibilidad para las fechas seleccionadas.")        
+        
+        # invalid form:
+        context = {
+            'form': form,
+            'booking': booking,
+        }
+        return render(request, 'edit_reservation.html', context)

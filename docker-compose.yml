@@ -6,6 +6,8 @@ services:
             dockerfile: Dockerfile
         environment:
             - DJANGO_SETTINGS_MODULE=chapp.settings
+        env_file:
+            - .env
         command: python manage.py runserver 0.0.0.0:8000
         volumes:
             - .:/code
