@@ -238,8 +238,10 @@ class RoomDetailsView(View):
 
 class RoomsView(View):
     def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        name_filter = request.GET.get('name', '')
+        # filter a list of rooms
+        rooms = Room.objects.filter(name__istartswith=name_filter).values("name", "room_type__name", "id")
+
         context = {
             'rooms': rooms
         }
