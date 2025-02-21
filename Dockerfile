@@ -1,4 +1,6 @@
-FROM python:latest
+# Using Python 3.11 for this test instead of "latest" because cgi was removed on Python 3.13 (PEP 594)
+# Link to the offical docs of cgi library: https://docs.python.org/3/library/cgi.html
+FROM python:3.11
 
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE="chapp.settings"
