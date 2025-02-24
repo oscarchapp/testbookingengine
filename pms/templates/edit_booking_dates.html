@@ -1,0 +1,15 @@
+{% extends "main.html" %}
+
+{% block content %}
+<h1>Editar Fechas de Reserva</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ booking_dates_form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+{% if booking_dates_form.non_field_errors %}
+    <div class="alert alert-danger">
+        {{ booking_dates_form.non_field_errors }}
+    </div>
+{% endif %}
+{% endblock content %}
