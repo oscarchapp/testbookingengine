@@ -2,18 +2,68 @@
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
-<div class="row card mt-3 mb-3 hover-card bg-tr-250">
-    <div class="col p-3">
-        <div class="">
-            {{room.name}} ({{room.room_type__name}})
-        </div>
-        <div>
-            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>
-        
-    </div>
-    
+
+<div class="row card mt-3 mb-3">
+    <input id="searchRoom" class="form-control me-2" type="search" name="filter"
+           placeholder="Buscar nombre o tipo de habitación" aria-label="Search" autocomplete="off">
 </div>
-{% endfor %}
-{% endblock content%}
+
+<div id="roomList">
+    {% for room in rooms %}
+    <div class="row card mt-3 mb-3 hover-card bg-tr-250">
+        <div class="col p-3">
+            <div>{{ room.name }} ({{ room.room_type__name }})</div>
+            <div>
+                <a href="{% url 'room_details' pk=room.id %}">Ver detalles</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p>No hay habitaciones disponibles.</p>
+    {% endfor %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    $('#searchRoom').on('input', function() {
+        const keyword = $(this).val().trim();
+
+        $.ajax({
+            url: '{% url "ajax_room_search" %}',
+            type: 'GET',
+            data: { keyword: keyword },
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(response) {
+                const roomList = $('#roomList');
+                roomList.empty();
+
+                if (response.rooms.length === 0) {
+                    roomList.append('<p>No se encontraron habitaciones.</p>');
+                    return;
+                }
+
+                response.rooms.forEach(room => {
+                    const card = `
+                        <div class="row card mt-3 mb-3 hover-card bg-tr-250">
+                            <div class="col p-3">
+                                <div>${room.name} (${room.room_type})</div>
+                                <div>
+                                    <a href="<a href="/rooms/${room.id}/">Ver detalles</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    roomList.append(card);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la búsqueda:', error);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+

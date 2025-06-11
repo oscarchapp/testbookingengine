@@ -1,6 +1,8 @@
 from django.urls import path
 
-from . import views
+from pms import views
+from pms import ajax
+
 
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
@@ -11,5 +13,8 @@ urlpatterns = [
     path("booking/<str:pk>/delete", views.DeleteBookingView.as_view(), name="delete_booking"),
     path("rooms/", views.RoomsView.as_view(), name="rooms"),
     path("room/<str:pk>/", views.RoomDetailsView.as_view(), name="room_details"),
-    path("dashboard/", views.DashboardView.as_view(), name="dashboard")
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
+
+    # Ajax
+    path("ajax/room_search/", ajax.room_search, name="ajax_room_search"),
 ]
