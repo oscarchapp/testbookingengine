@@ -1,0 +1,32 @@
+{% extends "main.html"%}
+{% load static %}
+
+{% block content %}
+<h1>Editar fecha de reserva</h1>
+<form action="" method="post">
+    {% csrf_token%}
+
+    {% for field in booking_form %}
+    <div class="row">
+        <div class="col-md-2">
+            {{field.label_tag}}
+        </div>
+        <div class="col-md-4">
+            {{field}}
+        </div>
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Guardar datos</button>
+    <br><br>
+    {% if booking_form.errors %}
+        <div class="alert alert-danger">
+            {{ booking_form.errors }}
+        </div>
+    {% endif %}
+</form>
+
+
+{% endblock content%}
+{% block scripts %}
+    <script async src="{% static 'js/search_room.js' %}"></script>
+{% endblock %}

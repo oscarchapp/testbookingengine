@@ -244,3 +244,41 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+class EditBookingDateView(View):
+
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = BookingDateForm(instance=booking)
+        return render(request, "edit_booking_date.html", {'booking_form': form})
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = BookingDateForm(request.POST, instance=booking)
+
+        if form.is_valid():
+            checkin = form.cleaned_data['checkin']
+            checkout = form.cleaned_data['checkout']
+
+            if checkin > checkout:
+                form.add_error('checkin', 'La fecha de check-in no puede ser mayor que la de check-out.')
+
+            overlapping = Booking.objects.filter(
+                Q(checkin__lt=checkout) &
+                Q(checkout__gt=checkin) &
+                Q(state="NEW") &
+                Q(room=booking.room)
+            ).exclude(id=booking.id)
+
+            if overlapping.exists():
+                form.add_error(None, 'No hay disponibilidad para las fechas seleccionadas.')
+
+            if form.errors:
+                return render(request, "edit_booking_date.html", {'booking_form': form})
+
+            form.save()
+            return redirect("/")
+
+        return render(request, "edit_booking_date.html", {'booking_form': form})
