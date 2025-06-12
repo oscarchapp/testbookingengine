@@ -1,19 +1,47 @@
-{% extends "main.html"%}
+{% extends "main.html" %}
 
 {% block content %}
-<h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
-<div class="row card mt-3 mb-3 hover-card bg-tr-250">
-    <div class="col p-3">
-        <div class="">
-            {{room.name}} ({{room.room_type__name}})
+<div class="container mt-5">
+    <h2 class="mb-4 text-center fw-bold">Habitaciones del hotel</h2>
+
+    <!-- FORMULARIO DE BÚSQUEDA -->
+    <form method="get" action="" class="mb-5">
+        <div class="input-group shadow-sm">
+            <input type="text" id="search" name="q" value="{{ query }}" class="form-control form-control-lg rounded-start" placeholder="Buscar por nombre (ej: Room 1)">
+            <button type="submit" class="btn btn-lg btn-dark rounded-end">Buscar</button>
         </div>
-        <div>
-            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
+    </form>
+
+    <!-- LISTADO DE HABITACIONES -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for room in rooms %}
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0 rounded-4 transition-all" style="transition: all 0.3s ease;">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-2 fw-semibold">{{ room.name }}</h5>
+                    <p class="card-text text-muted mb-4">
+                        Tipo de habitación: <strong>{{ room.room_type__name }}</strong>
+                    </p>
+                    <div class="d-grid">
+                        <a href="{% url 'room_details' pk=room.id %}" class="btn btn-outline-dark btn-sm">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-warning w-100 text-center shadow-sm">
+                No se encontraron habitaciones con ese nombre.
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    
 </div>
-{% endfor %}
-{% endblock content%}
+
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+{% endblock content %}

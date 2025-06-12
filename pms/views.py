@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib import messages
+
 
 from .form_dates import Ymd
 from .forms import *
@@ -238,9 +240,18 @@ class RoomDetailsView(View):
 
 class RoomsView(View):
     def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        query = request.GET.get("q", "")
+        if query:
+            rooms = Room.objects.filter(name__icontains=query).values("name", "room_type__name", "id")
+            if rooms.exists():
+                messages.success(request, f"Se encontraron {rooms.count()} habitaciones para: '{query}'")
+            else:
+                messages.warning(request, f"No se encontraron habitaciones para: '{query}'")
+        else:
+            rooms = Room.objects.all().values("name", "room_type__name", "id")
+
         context = {
-            'rooms': rooms
+            'rooms': rooms,
+            'query': query
         }
         return render(request, "rooms.html", context)
