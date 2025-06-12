@@ -179,6 +179,14 @@ class EditBookingView(View):
 class DashboardView(View):
     def get(self, request):
         from datetime import date, time, datetime
+        # Calcular % ocupación
+        total_habitaciones = Room.objects.count()
+        reservas_activas = Booking.objects.filter(state="NEW").count()
+        porcentaje_ocupacion = 0
+
+        if total_habitaciones > 0:
+            porcentaje_ocupacion = round((reservas_activas / total_habitaciones) * 100, 2)
+
         today = date.today()
 
         # get bookings created today
@@ -216,7 +224,9 @@ class DashboardView(View):
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'occupancy': porcentaje_ocupacion
+
 
         }
 
