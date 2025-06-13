@@ -238,9 +238,18 @@ class RoomDetailsView(View):
 
 class RoomsView(View):
     def get(self, request):
-        # renders a list of rooms
-        rooms = Room.objects.all().values("name", "room_type__name", "id")
+        # 1) Leer el texto de búsqueda
+        filter_text = request.GET.get('filter', '').strip()
+        # 2) Base queryset
+        qs = Room.objects.all()
+        # 3) Si hay filtro, aplicarlo
+        if filter_text:
+            qs = qs.filter(name__icontains=filter_text)
+        # 4) Valores que antes ya usabas
+        rooms = qs.values("name", "room_type__name", "id")
+        # 5) Pasar 'filter' al contexto para rellenar el form
         context = {
-            'rooms': rooms
+            "rooms": rooms,
+            "filter": filter_text,
         }
         return render(request, "rooms.html", context)
