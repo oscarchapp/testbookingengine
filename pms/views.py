@@ -4,6 +4,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib import messages
+from datetime import timedelta
+
 
 
 from .form_dates import Ymd
@@ -265,3 +267,62 @@ class RoomsView(View):
             'query': query
         }
         return render(request, "rooms.html", context)
+    
+class EditBookingDatesView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk) 
+        form = BookingDatesForm(prefix="booking", instance=booking)
+        context = {
+            'form': form,
+            'booking': booking
+        }
+        return render(request, "edit_booking_dates.html", context)
+    
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        form = BookingDatesForm(request.POST, prefix="booking", instance=booking)
+        if form.is_valid():
+            checkin = form.cleaned_data['checkin']
+            checkout = form.cleaned_data['checkout']
+            selected_room = form.cleaned_data['room']
+
+            overlapping = Booking.objects.filter(
+                room=selected_room,
+                state="NEW",
+                checkin__lt=checkout,
+                checkout__gt=checkin
+            ).exclude(id=booking.id)
+            if overlapping.exists():
+                available_rooms = Room.objects.filter(
+                    room_type=booking.room.room_type,
+                    room_type__max_guests__gte=booking.guests
+                ).exclude(
+                    booking__checkin__lt=checkout,
+                    booking__checkout__gt=checkin,
+                    booking__state="NEW"
+                )
+                form = BookingDatesForm(
+                    request.POST,
+                    prefix="booking",
+                    instance=booking,
+                    available_rooms=available_rooms
+                )
+                form.add_error(None, "No hay disponibilidad para la habitación actual en esas fechas.")
+
+                return render(request, "edit_booking_dates.html", {
+                    "form": form,
+                    "booking": booking
+                })
+
+            else:
+                form.save()
+                messages.success(request, "Fechas actualizadas correctamente.")
+                return redirect('/')
+        else:
+            messages.error(request, "Error al actualizar las fechas. Por favor, revisa los datos ingresados.")
+        context = {
+            'form': form,
+            'booking': booking
+        }
+        return render(request, "edit_booking_dates.html", context)
+

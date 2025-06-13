@@ -56,3 +56,27 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+class BookingDatesForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout', 'room']
+        widgets = {
+            'checkin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'checkout': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'room': forms.HiddenInput(),  
+        }
+        labels = {
+            'checkin': 'Fecha de entrada',
+            'checkout': 'Fecha de salida',
+        }
+        
+    def __init__(self, *args, available_rooms=None, **kwargs):
+        
+        super().__init__(*args, **kwargs)
+
+        if available_rooms is not None:
+            self.fields['room'].widget = forms.Select(attrs={'class': 'form-select'})
+            self.fields['room'].queryset = available_rooms
+            self.fields['room'].initial = self.instance.room.pk
+        

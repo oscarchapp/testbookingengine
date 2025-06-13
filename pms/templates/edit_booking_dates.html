@@ -1,0 +1,100 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mx-auto" style="max-width: 600px;">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">Editar Fechas de la Reserva</h4>
+                <small class="d-block mt-1">ID de reserva: {{ booking.id }} — Código: {{ booking.code }}</small>
+            </div>
+            
+            <div class="card-body">
+
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    {% if next_available %}
+                    <div class="alert alert-warning mt-3">
+                        <strong>Próxima fecha disponible para esta habitación:</strong>
+                        {{ next_available|date:"d M Y" }}
+                    </div>
+                    {% endif %}
+
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                        {% endif %}
+                       
+                    </div>
+
+                    {% endfor %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <strong>Habitación asignada </strong>
+                        </label>
+                    
+                        {% if available_rooms %}
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                                <select name="booking-room-room" id="booking-room-room" class="form-select">
+                                    {% for room in available_rooms %}
+                                    <option value="{{ room.id }}" {% if room.id == booking.room.id %}selected{% endif %}>
+                                        Habitación {{ room.name }} — {{ room.room_type.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Solo se muestran habitaciones disponibles para estas fechas.</small>
+                        {% else %}
+                            <div class="form-control-plaintext">
+                                Habitación {{ booking.room.name }} — {{ booking.room.room_type.name }}
+                            </div>
+                            <input type="hidden" name="booking-room-room" value="{{ booking.room.id }}">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar fechas</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkin = document.querySelector('input[name="booking-checkin"]');
+        const checkout = document.querySelector('input[name="booking-checkout"]');
+
+        if (checkin && checkout) {
+            // Al cambiar la fecha de entrada, bloquea fechas anteriores en la salida
+            checkin.addEventListener('change', function () {
+                if (checkin.value) {
+                    checkout.min = checkin.value;
+                    // Si checkout ya está antes del nuevo checkin, se borra
+                    if (checkout.value && checkout.value < checkin.value) {
+                        checkout.value = '';
+                    }
+                }
+            });
+
+            if (checkin.value) {
+                checkout.min = checkin.value;
+            }
+        }
+    });
+</script>
+
+{% endblock content %}

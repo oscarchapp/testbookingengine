@@ -1,24 +1,70 @@
-{% extends "main.html"%}
-
+{% extends "main.html" %}
 {% block content %}
-<h1>Nueva reserva</h1>
-<form action="{% url 'search'%}" method="POST">
-    {% csrf_token%}
-    {% for field in form %}
-    <div class="row">
-        <div class="col-md-2">{{field.label_tag}}</div>
-        <div class="col-md">{{field}}</div>
+<div class="container py-5">
+  <div class="card shadow-lg mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-primary text-white text-center">
+      <h4 class="mb-0">Nueva Reserva</h4>
     </div>
-    {% endfor %}
-    <div class="row">
-        <div class="col"><span>Días: </span><span id="total-days"></span></div>
-    </div>
-    <div class="row">
-        <div class="col-md-auto">
-            <button class="btn btn-primary" type="submit">Buscar disponibilidad</button>
+    <div class="card-body">
+      <form action="{% url 'search' %}" method="POST" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-4">
+            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Días de estadía:</label>
+          <span id="total-days" class="fs-5 fw-bold">0</span>
         </div>
+        <div class="d-flex justify-content-between">
+          <button type="reset" class="btn btn-outline-secondary">Limpiar</button>
+          <button type="submit" class="btn btn-success">Buscar Disponibilidad</button>
+        </div>
+      </form>
     </div>
-</form>
+  </div>
+</div>
+
 {% load static %}
-<script async src="{% static 'js/search_room.js' %}"></script>
-{% endblock content%}
+<script src="{% static 'js/search_room.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('form input, form select').forEach(el => {
+      el.classList.add('form-control', 'form-control-lg');
+    });
+
+    // Calcular días entre fechas
+    const dateInputs = ['{{ form.prefix }}-checkin', '{{ form.prefix }}-checkout'];
+    dateInputs.forEach(id => {
+      const input = document.getElementById(id);
+      if (input) input.addEventListener('change', updateDays);
+    });
+
+    function updateDays() {
+      const inDate = new Date(document.getElementById(dateInputs[0]).value);
+      const outDate = new Date(document.getElementById(dateInputs[1]).value);
+      const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
+      document.getElementById('total-days').textContent = diff > 0 ? diff : 0;
+    }
+  });
+</script>
+
+<style>
+  .form-label { font-size: 1rem; }
+  .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  .card {
+    border-radius: 0.5rem;
+  }
+  .btn-success {
+    border-radius: 0.5rem;
+  }
+</style>
+{% endblock content %}
