@@ -1,6 +1,6 @@
 from datetime import datetime
 from django import forms
-from django.forms import ModelForm
+from django.forms import ModelForm, DateInput
 
 from .models import Booking, Customer
 
@@ -55,4 +55,18 @@ class BookingFormExcluded(ModelForm):
             'guests': forms.HiddenInput(),
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
+        }
+
+
+class BookingDatesForm(ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkin', 'checkout']
+        labels = {
+            'checkin': 'Fecha de entrada',
+            'checkout': 'Fecha de salida',
+        }
+        widgets = {
+            'checkin': DateInput(attrs={'type': 'date'}),
+            'checkout': DateInput(attrs={'type': 'date'}),
         }

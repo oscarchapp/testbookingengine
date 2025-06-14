@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+
+{% block content %}
+  <h1>Editar fechas de reserva {{ booking.code }}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="mb-3">
+      {{ form.checkin.label_tag }}
+      {{ form.checkin }}
+      {{ form.errors.checkin }}
+    </div>
+    <div class="mb-3">
+      {{ form.checkout.label_tag }}
+      {{ form.checkout }}
+      {{ form.errors.checkout }}
+    </div>
+    <button class="btn btn-primary" type="submit">Guardar</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+{% endblock %}

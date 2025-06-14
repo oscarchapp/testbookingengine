@@ -1,12 +1,12 @@
 from django.db.models import F, Q, Count, Sum
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from .form_dates import Ymd
 from .forms import *
-from .models import Room
+from .models import Room, Booking
 from .reservation_code import generate
 
 
@@ -244,3 +244,39 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+
+
+class EditBookingDatesView(View):
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        form = BookingDatesForm(instance=booking)
+        return render(request, "edit_booking_dates.html", {
+            'form': form,
+            'booking': booking
+        })
+
+    def post(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        form = BookingDatesForm(request.POST, instance=booking)
+        if form.is_valid():
+            new_ci = form.cleaned_data['checkin']
+            new_co = form.cleaned_data['checkout']
+            # Comprobar conflictos en la misma habitación, excluyendo la reserva actual
+            conflict = Booking.objects.filter(
+                room=booking.room,
+                state=Booking.NEW
+            ).exclude(pk=booking.pk).filter(
+                checkin__lt=new_co,
+                checkout__gt=new_ci
+            ).exists()
+            if conflict:
+                form.add_error(None, "No hay disponibilidad para las fechas seleccionadas")
+            else:
+                form.save()
+                return redirect('home')
+        return render(request, "edit_booking_dates.html", {
+            'form': form,
+            'booking': booking
+        })
