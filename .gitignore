@@ -1,2 +1,6 @@
 */__pycache__/**
 .idea/
+env/
+pms/form_dates/__pycache__/
+pms/migrations/__pycache__/
+pms/reservation_code/__pycache__/

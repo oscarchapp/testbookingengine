@@ -1,19 +1,39 @@
-{% extends "main.html"%}
+{% extends "main.html" %}
 
 {% block content %}
 <h1>Habitaciones del hotel</h1>
-{% for room in rooms%}
-<div class="row card mt-3 mb-3 hover-card bg-tr-250">
-    <div class="col p-3">
-        <div class="">
-            {{room.name}} ({{room.room_type__name}})
-        </div>
-        <div>
-            <a href="{% url 'room_details' pk=room.id%}">Ver detalles</a>
-        </div>
-        
-    </div>
-    
+
+<form id="filter-form" class="mb-4">
+    <input
+        type="text"
+        name="search"
+        id="search-input"
+        placeholder="Buscar habitación por nombre..."
+        value="{{ request.GET.search }}"
+        class="form-control"
+    />
+    <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+</form>
+
+<div id="rooms-list">
+    {% include 'partials/room_list.html' %}
 </div>
-{% endfor %}
-{% endblock content%}
+
+<script>
+    document.getElementById('filter-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const query = document.getElementById('search-input').value;
+
+        fetch(`?search=${encodeURIComponent(query)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('rooms-list').innerHTML = html;
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+{% endblock %}
