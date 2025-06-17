@@ -1,27 +1,55 @@
-{% extends "main.html"%}
+{% extends "main.html" %}
 
 {% block content %}
-<h1>Dashboard</h1>
-<div class="card">
-    <h5 class="card-header">Hoy</h5>
-    <div class="d-flex justify-content-evenly pt-5 pb-5">
-        <div class="card text-white p-3 card-customization" style="background-color: #1000ff;">
-            <h5 class="small">Reservas hechas</h5>
-            <h1 class="dashboard-value">{{dashboard.new_bookings}}</h1>
-        </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #00ab74;">
-            <h5 class="small">Huéspedes ingresando</h5>
-            <h1 class="dashboard-value">{{dashboard.incoming_guests}}</h1>
-        </div>
-        <div class="card text-white p-3 card-customization" style="background-color: #eeb258;">
-            <h5 class="small">Huéspedes saliendo</h5>
-            <h1 class="dashboard-value">{{dashboard.outcoming_guests}}</h1>
-        </div>
+<h1 class="mb-4">Dashboard</h1>
 
-        <div class="card text-white p-3 card-customization" style="background-color: #ff7f7f;">
-            <h5 class="small">Total facturado</h5>
-            <h1 class="dashboard-value">€ {% if dashboard.invoiced.total__sum == None %}0.00{% endif %} {{dashboard.invoiced.total__sum|floatformat:2}}</h1>
+<div class="row row-cols-1 row-cols-md-3 row-cols-xl-4 g-4">
+    <div class="col">
+        <div class="card text-white bg-primary h-100 text-center p-3">
+            <div class="card-body">
+                <h6 class="card-title">Reservas hechas hoy</h6>
+                <h2 class="card-text">{{ dashboard.new_bookings }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-success h-100 text-center p-3">
+            <div class="card-body">
+                <h6 class="card-title">Huéspedes ingresando</h6>
+                <h2 class="card-text">{{ dashboard.incoming_guests }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-warning h-100 text-center p-3">
+            <div class="card-body">
+                <h6 class="card-title">Huéspedes saliendo</h6>
+                <h2 class="card-text">{{ dashboard.outcoming_guests }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-danger h-100 text-center p-3">
+            <div class="card-body">
+                <h6 class="card-title">Total facturado hoy</h6>
+                <h2 class="card-text">
+                    € {{ dashboard.invoiced.total__sum|default:"0.00"|floatformat:2 }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card text-white bg-dark h-100 text-center p-3">
+            <div class="card-body">
+                <h6 class="card-title">% de ocupación</h6>
+                <h2 class="card-text">{{ dashboard.occupancy_percentage }}%</h2>
+                <small class="text-white-50">({{ dashboard.confirmed_bookings }} de {{ dashboard.total_rooms }} habitaciones)</small>
+            </div>
         </div>
     </div>
 </div>
-{% endblock content%}
+{% endblock %}

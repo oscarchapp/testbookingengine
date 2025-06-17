@@ -1,3 +1,5 @@
+from datetime import date, time
+
 from django.db.models import F, Q, Count, Sum
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -176,53 +178,62 @@ class EditBookingView(View):
 
 class DashboardView(View):
     def get(self, request):
-        from datetime import date, time, datetime
         today = date.today()
 
-        # get bookings created today
+        # Rango de hoy
         today_min = datetime.combine(today, time.min)
         today_max = datetime.combine(today, time.max)
-        today_range = (today_min, today_max)
-        new_bookings = (Booking.objects
-                        .filter(created__range=today_range)
-                        .values("id")
-                        ).count()
 
-        # get incoming guests
-        incoming = (Booking.objects
-                    .filter(checkin=today)
-                    .exclude(state="DEL")
-                    .values("id")
-                    ).count()
+        # Reservas hechas hoy
+        new_bookings = Booking.objects.filter(created__range=(today_min, today_max)).count()
 
-        # get outcoming guests
-        outcoming = (Booking.objects
-                     .filter(checkout=today)
-                     .exclude(state="DEL")
-                     .values("id")
-                     ).count()
+        # Huéspedes que ingresan hoy
+        incoming = Booking.objects.filter(checkin=today, state='NEW').count()
 
-        # get outcoming guests
-        invoiced = (Booking.objects
-                    .filter(created__range=today_range)
-                    .exclude(state="DEL")
-                    .aggregate(Sum('total'))
-                    )
+        # Huéspedes que salen hoy
+        outcoming = Booking.objects.filter(checkout=today, state='NEW').count()
 
-        # preparing context data
+        # Total facturado hoy
+        invoiced = Booking.objects.filter(created__range=(today_min, today_max), state='NEW').aggregate(Sum('total'))
+
+        # Total habitaciones
+        total_rooms = Room.objects.count()
+
+        # Ocupaciones actuales del día (checkin <= hoy < checkout)
+        current_occupations = Booking.objects.filter(
+            Q(state='NEW') &
+            Q(checkin__lte=today) &
+            Q(checkout__gt=today)
+        ).count()
+
+        # Porcentaje ocupación
+        if total_rooms > 0:
+            occupancy_rate = round((current_occupations / total_rooms) * 100, 2)
+        else:
+            occupancy_rate = 0.0
+
+        # Color dinámico
+        if occupancy_rate < 50:
+            occupancy_color = "#e74c3c"
+        elif occupancy_rate <= 80:
+            occupancy_color = "#f1c40f"
+        else:
+            occupancy_color = "#2ecc71"
+
         dashboard = {
             'new_bookings': new_bookings,
             'incoming_guests': incoming,
             'outcoming_guests': outcoming,
-            'invoiced': invoiced
+            'invoiced': invoiced,
+            'occupancy_rate': occupancy_rate,
+            'occupancy_color': occupancy_color,
+            'current_occupations': current_occupations,
+            'total_rooms': total_rooms
+
 
         }
 
-        context = {
-            'dashboard': dashboard
-        }
-        return render(request, "dashboard.html", context)
-
+        return render(request, "dashboard.html", {'dashboard': dashboard})
 
 class RoomDetailsView(View):
     def get(self, request, pk):
