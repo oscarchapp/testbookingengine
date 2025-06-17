@@ -1,0 +1,56 @@
+{% extends "main.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      Editar fechas de la reserva: {{ booking.code }}
+    </div>
+    <div class="card-body">
+      <form id="booking-date-form">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="id_checkin" class="form-label">Fecha de entrada</label>
+          {{ form.checkin }}
+        </div>
+        <div class="mb-3">
+          <label for="id_checkout" class="form-label">Fecha de salida</label>
+          {{ form.checkout }}
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- SweetAlert para mostrar mensajes -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.getElementById("booking-date-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const data = new FormData(form);
+
+    fetch("", {
+      method: "POST",
+      body: data,
+      headers: {
+        "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      Swal.fire({
+        icon: data.success ? "success" : "error",
+        title: data.message
+      }).then(() => {
+        if (data.success) {
+          window.location.href = "{% url 'home' %}";
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

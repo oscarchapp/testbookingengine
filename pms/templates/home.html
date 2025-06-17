@@ -1,87 +1,59 @@
-{% extends "main.html"%}
+{% extends "main.html" %}
 
 {% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Reservas</h1>
 
-<h1>Home</h1>
     {% if filter %}
-    <h3>Resultados de la búsqueda</h3>
+        <h4 class="text-muted">Resultados de la búsqueda</h4>
     {% else %}
-    <h3>Reservas Realizadas</h3>
-    {% endif%}
-    
-    <div class="ps-3">
-        {% if bookings|length == 0 %}
-        <div class="alert alert-danger">No hay resultados</div>
-        {% endif %}
+        <h4 class="text-muted">Reservas Realizadas</h4>
+    {% endif %}
+
+    {% if bookings|length == 0 %}
+        <div class="alert alert-warning mt-4">No hay resultados</div>
+    {% endif %}
+
+    <div class="row">
         {% for booking in bookings %}
-        <div class="card card-body row mt-2 hover-card bg-tr-250">
-            <div class="row">
-                <div class="col">
-                    Reserva: {{booking.code}}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <strong>Reserva:</strong> {{ booking.code }}
                     {% if booking.state == "DEL" %}
-                    <span class="tag tag-red">Cancelada</span>
+                        <span class="badge bg-danger float-end">Cancelada</span>
                     {% elif booking.state == "NEW" %}
-                    <span class="tag tag-green">Confirmada</span>
+                        <span class="badge bg-success float-end">Confirmada</span>
                     {% endif %}
                 </div>
-            </div>
-            <div class="row">
-                <div class="col">{{booking.customer.name}}</div>
-                <div class="col">
-                    <i class="bi bi-envelope-fill"></i>
-                    <span>{{booking.customer.email}}</span>
+                <div class="card-body">
+                    <p><strong>Cliente:</strong> {{ booking.customer.name }}</p>
+                    <p><i class="bi bi-envelope-fill me-1"></i>{{ booking.customer.email }}</p>
+                    <p><i class="bi bi-telephone-fill me-1"></i>{{ booking.customer.phone }}</p>
+                    <p><i class="bi bi-person-fill me-1"></i>{{ booking.guests }} huésped(es)</p>
+                    <hr>
+                    <p><i class="bi bi-door-open-fill me-1"></i><strong>Habitación:</strong>
+                        <a href="{% url 'room_details' pk=booking.room.id %}">{{ booking.room.name }}</a></p>
+                    <p><i class="bi bi-box-arrow-in-right me-1"></i>Entrada: {{ booking.checkin }}</p>
+                    <p><i class="bi bi-box-arrow-right me-1"></i>Salida: {{ booking.checkout }}</p>
+                    <p class="fw-bold">Total estadía: €{{ booking.total }}</p>
                 </div>
-                <div class="col">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    <span>{{booking.checkin}}</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col"><a href="{% url 'room_details' pk=booking.room.id%} ">{{booking.room.name}}</a></div>
-                <div class="col">
-                    <i class="bi bi-telephone-fill"></i>
-                    <span>{{booking.customer.phone}}</span>
-                </div>
-                
-                <div class="col">
-                    <i class="bi bi-box-arrow-right"></i>
-                    <span>{{booking.checkout}}</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <i class="bi bi-person-fill"></i>
-                    <span>{{booking.guests}}</span>
-                </div>
-                <div class="col"></div>
-                <div class="col"></div>
-            </div>
-            
-            <div class="row">
-                <div class="col">
-                    <span>Total estadía: €{{booking.total}}</span>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-
-                    <a href="{% url 'edit_booking' pk=booking.id%} " >Editar datos de contacto</a>
-                </div>
-                <div class="col">
-
-                </div>
-                <div class="col">
-
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{% url 'edit_booking' pk=booking.id %}" class="btn btn-sm btn-outline-secondary">
+                        Editar contacto
+                    </a>
+                    <a href="{% url 'update_booking_dates' pk=booking.id %}" class="btn btn-sm btn-outline-primary">
+                        Editar fechas
+                    </a>
                     {% if booking.state != "DEL" %}
-                    <a href="{% url 'delete_booking' pk=booking.id%} " >Cancelar reserva</a>
+                        <a href="{% url 'delete_booking' pk=booking.id %}" class="btn btn-sm btn-outline-danger">
+                            Cancelar
+                        </a>
                     {% endif %}
                 </div>
-
             </div>
-
         </div>
         {% endfor %}
     </div>
 </div>
-
-{% endblock content%}
+{% endblock content %}

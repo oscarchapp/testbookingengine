@@ -1,8 +1,10 @@
+from django.contrib import messages
 from django.db.models import F, Q, Count, Sum
-from django.shortcuts import render, redirect
+from django.http.response import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
 
 from .form_dates import Ymd
 from .forms import *
@@ -244,3 +246,34 @@ class RoomsView(View):
             'rooms': rooms
         }
         return render(request, "rooms.html", context)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class BookingDateUpdateView(View):
+    def get(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        form = BookingDatesForm(instance=booking)
+        return render(request, 'edit_booking_dates.html', {'booking': booking, 'form': form})
+
+    def post(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        form = BookingDatesForm(request.POST, instance=booking)
+
+        if form.is_valid():
+            checkin = form.cleaned_data['checkin']
+            checkout = form.cleaned_data['checkout']
+
+            overlaps = Booking.objects.filter(
+                room=booking.room,
+                checkin__lt=checkout,
+                checkout__gt=checkin
+            ).exclude(pk=booking.pk).exists()
+
+            if overlaps:
+                return JsonResponse(
+                    {'success': False, 'message': 'No hay disponibilidad para las fechas seleccionadas.'})
+
+            form.save()
+            return JsonResponse({'success': True, 'message': 'Fechas actualizadas correctamente.'})
+
+        return JsonResponse({'success': False, 'message': 'Datos inválidos.'})
