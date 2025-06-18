@@ -3,9 +3,6 @@
 
 A small open-source PMS app made with Django.
 
-## Live Demo
-
-https://chapp-inn.herokuapp.com/
 
 ## Stored data
 - Type of rooms: name, n° of guests and price per day
